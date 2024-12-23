@@ -5,7 +5,7 @@ module.exports = (mongoose) => {
       email: { type: String, required: true, unique: true },
       password: { type: String, required: true },
       profilePicture: { type: String },
-      cloudinary_id: { type: Number },
+      cloudinary_id: { type: String },
       notifications: { type: Boolean, default: true },
       sound: { type: Boolean, default: true, required: true },
       vibration: { type: Boolean, default: true, required: true },

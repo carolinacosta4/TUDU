@@ -3,7 +3,7 @@ module.exports = (mongoose) => {
     {
       name: { type: String, required: true },
       image: { type: String },
-      cloudinary_id: { type: Number },
+      cloudinary_id: { type: String },
     },
     {
       collection: "achievements",
