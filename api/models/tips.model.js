@@ -4,7 +4,7 @@ module.exports = (mongoose) => {
       info: { type: String },
       IDcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'TipCategory' },
       image: { type: String },
-      cloudinary_id: { type: Number },
+      cloudinary_id: { type: String },
       createdAt: { type: Date, default: Date.now }
   }, {
       collection: 'tip',
