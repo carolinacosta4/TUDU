@@ -13,6 +13,9 @@ app.get("/", function (req, res) {
   res.status(200).json({ message: "home -- TUDU api" });
 });
 
+app.use("/tips", require("./routes/tips.routes.js"));
+app.use("/tipCategory", require("./routes/tipCategory.routes.js"));
+
 app.all("*", function (req, res) {
   res.status(400).json({
     success: false,
