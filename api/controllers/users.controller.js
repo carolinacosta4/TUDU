@@ -411,41 +411,80 @@ exports.delete = async (req, res) => {
 
 exports.unlockAchievement = async (req, res) => {
   try {
-      const idA = req.params.idA
-      const achievement = await db.Achievements.findOne({ _id: idA }).exec();
+    const idA = req.params.idA
+    const achievement = await db.Achievements.findOne({ _id: idA }).exec();
 
-      if (!achievement) {
-          return res.status(404).json({
-              success: false,
-              msg: "Achievement not found",
-          });
-      }
-
-      let unlocked = new UserAchievements({
-          IDuser: req.loggedUserId,
-          IDAchievements: idA
+    if (!achievement) {
+      return res.status(404).json({
+        success: false,
+        msg: "Achievement not found",
       });
+    }
 
-      const existingAchievement = await UserAchievements.findOne({
-          IDuser: req.loggedUserId,
-          IDAchievements: idA
-      }).exec();
+    let unlocked = new UserAchievements({
+      IDuser: req.loggedUserId,
+      IDAchievements: idA
+    });
 
-      if (existingAchievement) {
-          return res.status(400).json({
-              success: false,
-              msg: "Achievement is already unlocked",
-          });
-      }
+    const existingAchievement = await UserAchievements.findOne({
+      IDuser: req.loggedUserId,
+      IDAchievements: idA
+    }).exec();
 
-      const newUnlocked = await unlocked.save();
-
-      return res.status(201).json({
-          success: true,
-          msg: "New achievement unlocked!",
-          data: newUnlocked,
+    if (existingAchievement) {
+      return res.status(400).json({
+        success: false,
+        msg: "Achievement is already unlocked",
       });
+    }
+
+    const newUnlocked = await unlocked.save();
+
+    return res.status(201).json({
+      success: true,
+      msg: "New achievement unlocked!",
+      data: newUnlocked,
+    });
   } catch (error) {
-      handleErrorResponse(res, error);
+    handleErrorResponse(res, error);
+  }
+}
+
+
+exports.assignMascotToUser = async (req, res) => {
+  try {
+    const idMascot = req.params.idM
+    const idUser = req.params.idU
+    console.log(idUser);
+
+
+    const mascot = await db.Mascot.findOne({ _id: idMascot }).exec();
+    const user = await db.User.findOne({ _id: idUser }).exec();
+
+    if (!mascot) {
+      return res.status(404).json({
+        success: false,
+        msg: "Mascot not found",
+      });
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        msg: "User not found",
+      });
+    }
+
+    user.IDmascot = idMascot
+
+    await user.save()
+
+    return res.status(201).json({
+      success: true,
+      msg: "Mascot added to user",
+      data: user,
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
   }
 }

@@ -18,6 +18,8 @@ router
 
 router.route("/:idU/achievements/:idA").post(authController.verifyToken, usersController.unlockAchievement)
 
+router.route("/:idU/mascots/:idM").patch(authController.verifyToken, usersController.assignMascotToUser)
+
 
 router.all("*", function (req, res) {
   res.status(404).json({ message: "users: what???" });
