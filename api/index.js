@@ -15,7 +15,8 @@ app.get("/", function (req, res) {
 
 app.use("/users", require("./routes/users.routes.js"));
 app.use("/tips", require("./routes/tips.routes.js"));
-app.use("/tipCategory", require("./routes/tipCategory.routes.js"));
+app.use("/tipCategory", require("./routes/tipCategories.routes.js"));
+app.use("/mascots", require("./routes/mascots.routes.js"));
 app.use("/achievements", require("./routes/achievement.routes.js"));
 
 app.all("*", function (req, res) {
