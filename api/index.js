@@ -18,6 +18,7 @@ app.use("/tips", require("./routes/tips.routes.js"));
 app.use("/tipCategory", require("./routes/tipCategories.routes.js"));
 app.use("/mascots", require("./routes/mascots.routes.js"));
 app.use("/achievements", require("./routes/achievement.routes.js"));
+app.use("/streaks", require("./routes/streaks.routes.js"));
 
 app.all("*", function (req, res) {
   res.status(400).json({
