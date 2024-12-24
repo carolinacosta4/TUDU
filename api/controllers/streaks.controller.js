@@ -42,7 +42,6 @@ exports.updateStreak = async (req, res) => {
         let streak = await Streaks.findOne({ _id: userId });
 
         if (!streak) {
-            // Se não existir, cria o streak para o usuário
             streak = new Streaks({
                 IDuser: userId,
                 lastDateAccessed: today,
@@ -72,10 +71,8 @@ exports.updateStreak = async (req, res) => {
             }
         }
 
-        // Atualiza a última data de acesso para hoje
         streak.lastDateAccessed = today;
 
-        // Incrementa o streak se acessou ontem
         if (accessedYesterday) {
             streak.streaks += 1;
         }
