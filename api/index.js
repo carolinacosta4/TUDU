@@ -20,6 +20,7 @@ app.use("/mascots", require("./routes/mascots.routes.js"));
 app.use("/achievements", require("./routes/achievement.routes.js"));
 app.use("/streaks", require("./routes/streaks.routes.js"));
 app.use("/tasks", require("./routes/tasks.routes.js"));
+app.use("/bills", require("./routes/bills.routes.js"));
 
 app.all("*", function (req, res) {
   res.status(400).json({
