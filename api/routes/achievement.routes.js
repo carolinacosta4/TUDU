@@ -1,6 +1,6 @@
 const express = require("express");
 let router = express.Router();
-const achievementController = require("../controllers/achievement.controller");
+const achievementController = require("../controllers/achievements.controller");
 
 router.route("/")
   .get(achievementController.findAll)
