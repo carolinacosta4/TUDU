@@ -94,6 +94,14 @@ exports.register = async (req, res) => {
         msg: "You need to provide the name, email, password and confirm password.",
       });
 
+    const userFound = await User.findOne({ email: req.body.email });
+    if (userFound)
+      return res.status(400).json({
+        success: false,
+        error: "Email in use",
+        msg: "The email you provided is already in use.",
+      });
+
     if (req.body.password != req.body.confirmPassword)
       return res.status(400).json({
         success: false,
@@ -159,6 +167,7 @@ exports.login = async (req, res) => {
       success: true,
       msg: "User logged in successfully.",
       accessToken: token,
+      userID: user._id,
     });
   } catch (error) {
     handleErrorResponse(res, error);
