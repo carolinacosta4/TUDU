@@ -8,28 +8,40 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams } from "expo-router";
 import InputField from "@/components/InputField";
 import useFonts from "@/hooks/useFonts";
 
 export default function RecoverPasswordScreen() {
-  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const fontsLoaded = useFonts();
+  const { id } = useLocalSearchParams();
 
   const handleSendEmail = async () => {
-    if (email) {
+    if (password && confirmPassword) {
       setShowError(false);
       try {
-        await users.post("users/password-recovery", {
-          email: email,
+        const response = await users.post(`users/reset-password/${id}`, {
+          password: password,
+          confirmPassword: confirmPassword,
         });
-        setShowSuccess(true);
-        setSuccess("Recovery email sent!");
-      } catch (error) {
-        console.error(error);
+
+        if (response.data.success) {
+          setShowSuccess(true);
+          setSuccess('Password updated successfully');
+        }
+      } catch (error: any) {
+        if (error.response) {
+          setError(error.response.data.msg);
+          setShowError(true);
+        } else {
+          console.error("Error message:", error);
+        }
       }
     } else {
       setShowError(true);
@@ -50,32 +62,6 @@ export default function RecoverPasswordScreen() {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <Image
-            source={{
-              uri: "https://res.cloudinary.com/ditdnslga/image/upload/v1734716116/qjdu28or1nmu7auc9ldw.png",
-            }}
-            style={{
-              width: 132.49,
-              height: 119.52,
-              transform: [{ rotate: "-42.48deg" }],
-              position: "absolute",
-              top: 50,
-              right: -52,
-            }}
-          />
-          <Image
-            source={{
-              uri: "https://res.cloudinary.com/ditdnslga/image/upload/v1734716116/jlihlvzvfwruvoh5midg.png",
-            }}
-            style={{
-              width: 155.25,
-              height: 174,
-              transform: [{ rotate: "43.44deg" }],
-              position: "absolute",
-              bottom: 20,
-              left: -70,
-            }}
-          />
           <View
             style={{
               flex: 1,
@@ -87,6 +73,7 @@ export default function RecoverPasswordScreen() {
               source={require("@/assets/images/logo_purple.png")}
               style={{ width: 170, height: 67.32, marginTop: 20 }}
             />
+
             <View
               style={{
                 flex: 1,
@@ -110,19 +97,18 @@ export default function RecoverPasswordScreen() {
                     textAlign: "center",
                   }}
                 >
-                  Don't stress! We will help you!
+                  Ready to get back in?
                 </Text>
                 <Text
                   style={{
                     fontSize: 19.2,
                     color: "#562CAF",
                     fontFamily: "Rebond-Grotesque-Regular",
-                    paddingHorizontal: 40,
+                    paddingHorizontal: 70,
                     textAlign: "center",
                   }}
                 >
-                  We'll send reset instructions to your inbox - check your email
-                  soon!
+                  Set a strong new password to protect your account!
                 </Text>
               </View>
               <View
@@ -132,13 +118,22 @@ export default function RecoverPasswordScreen() {
                   width: "100%",
                 }}
               >
-                <InputField
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="Email"
-                  icon={"email-outline"}
-                />
-
+                <View style={{ rowGap: 16 }}>
+                  <InputField
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={true}
+                    placeholder="Password"
+                    icon={"lock-outline"}
+                  />
+                  <InputField
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    placeholder="Confirm password"
+                    secureTextEntry={true}
+                    icon={"lock-outline"}
+                  />
+                </View>
                 <TouchableHighlight
                   onPress={handleSendEmail}
                   style={{
@@ -158,7 +153,7 @@ export default function RecoverPasswordScreen() {
                       fontFamily: "Rebond-Grotesque-Bold",
                     }}
                   >
-                    Recover password
+                    Continue
                   </Text>
                 </TouchableHighlight>
                 {showError && (
@@ -185,6 +180,23 @@ export default function RecoverPasswordScreen() {
                 )}
               </View>
             </View>
+            <Image
+              source={require("@/assets/images/Ellipse.png")}
+              style={{
+                bottom: 0,
+              }}
+            />
+            <Image
+              source={{
+                uri: "https://res.cloudinary.com/ditdnslga/image/upload/v1734716116/mvcli5lsp2uwp7uvhcwo.png",
+              }}
+              style={{
+                width: 146,
+                height: 109,
+                position: "absolute",
+                bottom: 100,
+              }}
+            />
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -81,7 +81,7 @@ export default function LoginScreen() {
           >
             <Image
               source={require("@/assets/images/logo_purple.png")}
-              style={{ width: 170, height: 67.32 }}
+              style={{ width: 170, height: 67.32, marginTop: 20 }}
             />
             <Image
               source={{
