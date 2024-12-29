@@ -214,7 +214,7 @@ exports.recoverEmail = async (req, res) => {
           <p style="margin: 10px 0; font-size: 16px;">Hi ${user.name},</p>
           <p style="margin: 10px 0; font-size: 16px;">We noticed you've requested to reset your password. No worries! For your security and convenience, click the button below to create a new password:</p>       
           <p style="margin: 30px 0;">
-            <a href="http://localhost:4000/reset-password/${user.id}" 
+            <a href="http://192.168.1.100:8081/resetPassword/${user._id}" 
               style="color: #ffffff; background-color: #6F36C9; padding: 15px 25px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
               Reset Password
             </a>
@@ -277,17 +277,7 @@ exports.resetPassword = async (req, res) => {
       msg: `User ${req.params.idU} was updated successfully.`,
     });
   } catch (error) {
-    if (error instanceof Sequelize.ConnectionError) {
-      return res.status(503).json({
-        error: "Database Error",
-        msg: "There was an issue connecting to the database. Please try again later",
-      });
-    } else {
-      return res.status(500).json({
-        error: "Server Error",
-        msg: "An unexpected error occurred. Please try again later.",
-      });
-    }
+    handleErrorResponse();
   }
 };
 
@@ -459,13 +449,10 @@ exports.unlockAchievement = async (req, res) => {
   }
 }
 
-
 exports.assignMascotToUser = async (req, res) => {
   try {
     const idMascot = req.params.idM
     const idUser = req.params.idU
-    console.log(idUser);
-
 
     const mascot = await db.Mascot.findOne({ _id: idMascot }).exec();
     const user = await db.User.findOne({ _id: idUser }).exec();
