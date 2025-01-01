@@ -27,14 +27,18 @@ exports.findBills = async (req, res) => {
       });
     }
 
+    const startOfDay = new Date(dateQuery.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(dateQuery.setHours(23, 59, 59, 999));
+
     const bills = await Bill.find({
-      $and: [{ IDuser: req.loggedUserId }, { dueDate: dateQuery }],
+      IDuser: req.loggedUserId,
+      dueDate: { $gte: startOfDay, $lte: endOfDay },
     })
       .populate(
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
-      .select("-_id -__v")
+      .select("-__v")
       .exec();
 
     if (!bills || bills.length === 0) {
@@ -154,7 +158,7 @@ exports.edit = async (req, res) => {
         msg: "You need to provide the body with the request.",
       });
 
-    if (!req.body.periodicity && !req.body.dueDate)
+    if (!req.body.periodicity && !req.body.dueDate && req.body.status == null)
       return res.status(400).json({
         success: false,
         error: "Fields missing",
@@ -162,14 +166,17 @@ exports.edit = async (req, res) => {
       });
 
     await Bill.findByIdAndUpdate(req.params.idB, {
-      periodicity: req.body.periodicity || bill.periodicity,
-      dueDate: req.body.dueDate || bill.dueDate,
+      periodicity: req.body.periodicity
+        ? req.body.periodicity
+        : bill.periodicity,
+      dueDate: req.body.dueDate ? req.body.dueDate : bill.dueDate,
+      status: req.body.status != null ? req.body.status : bill.status,
     });
 
-    const updatedTask = await Bill.findById(req.params.idB);
+    const updatedBill = await Bill.findById(req.params.idB);
     return res.status(200).json({
       success: true,
-      data: updatedTask,
+      data: updatedBill,
     });
   } catch (error) {
     handleErrorResponse(res, error);

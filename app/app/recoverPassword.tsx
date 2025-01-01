@@ -1,4 +1,4 @@
-import users from "@/api/users";
+import api from "@/api/api";
 import { useState } from "react";
 import {
   Image,
@@ -23,7 +23,7 @@ export default function RecoverPasswordScreen() {
     if (email) {
       setShowError(false);
       try {
-        await users.post("users/password-recovery", {
+        await api.post("users/password-recovery", {
           email: email,
         });
         setShowSuccess(true);

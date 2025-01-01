@@ -1,6 +1,7 @@
 const db = require("../models/index.js");
 const mongoose = require("mongoose");
 const Task = db.Task;
+const Category = db.CategoryTask;
 
 const handleErrorResponse = (res, error) => {
   return res
@@ -27,17 +28,18 @@ exports.findTasks = async (req, res) => {
       });
     }
 
+    const startOfDay = new Date(dateQuery.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(dateQuery.setHours(23, 59, 59, 999));
+
     const tasks = await Task.find({
-      $and: [
-        { IDuser: req.loggedUserId },
-        { $or: [{ startDate: dateQuery }, { endDate: dateQuery }] },
-      ],
+      IDuser: req.loggedUserId,
+      $or: [{ startDate: { $lte: endOfDay }, endDate: { $gte: startOfDay } }],
     })
       .populate(
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
-      .select("-_id -__v")
+      .select("-__v")
       .exec();
 
     if (!tasks || tasks.length === 0) {
@@ -125,6 +127,7 @@ exports.findTask = async (req, res) => {
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
+      .populate("IDcategory", "-_id -__v")
       .select("-_id -__v")
       .exec();
 
@@ -173,7 +176,12 @@ exports.edit = async (req, res) => {
         msg: "You need to provide the body with the request.",
       });
 
-    if (!req.body.periodicity && !req.body.startDate && !req.body.endDate)
+    if (
+      !req.body.periodicity &&
+      !req.body.startDate &&
+      !req.body.endDate &&
+      req.body.status == null
+    )
       return res.status(400).json({
         success: false,
         error: "Fields missing",
@@ -181,9 +189,12 @@ exports.edit = async (req, res) => {
       });
 
     await Task.findByIdAndUpdate(req.params.idT, {
-      periodicity: req.body.periodicity || task.periodicity,
-      startDate: req.body.startDate || task.startDate,
-      endDate: req.body.endDate || task.endDate,
+      periodicity: req.body.periodicity
+        ? req.body.periodicity
+        : task.periodicity,
+      startDate: req.body.startDate ? req.body.startDate : task.startDate,
+      endDate: !req.body.endDate ? req.body.endDate : task.endDate,
+      status: req.body.status != null ? req.body.status : task.status,
     });
 
     const updatedTask = await Task.findById(req.params.idT);
@@ -225,6 +236,28 @@ exports.delete = async (req, res) => {
       msg: "Task deleted successfully.",
     });
   } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+exports.findCategories = async (req, res) => {
+  try {
+    const categories = await Category.find().exec();
+
+    if (!categories || categories.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "No categories found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: categories,
+    });
+  } catch (error) {
+    console.log(error);
+
     handleErrorResponse(res, error);
   }
 };
