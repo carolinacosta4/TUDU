@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { useTipCategories } from '@/hooks/useCategoryTip';
 //import { SearchAndCategoriesProps } from '@/types/searchAndCategoriesProps';
-import  SvgUri  from 'react-native-svg';
-import { Asset } from 'expo-asset';
+import SvgUri from 'react-native-svg-uri';
 
 interface SearchAndCategoriesProps {
   selectedCategory: string; 
@@ -28,6 +27,11 @@ const SearchAndCategories: React.FC<SearchAndCategoriesProps> = ({ selectedCateg
         <View style={styles.searchBox}>
           <View style={styles.searchContent}>
             <View  />
+                    <SvgUri
+                    width="16"
+                    height="16"
+                    source={require('@/assets/icons/search_icon.svg')}
+                        />
                       <TextInput
                         style={styles.searchInput}
                         placeholder="Search"
@@ -114,10 +118,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Rebond-Grotesque-Medium',
     fontWeight: '500',
   },
+
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    marginLeft: 8,
+    fontFamily: 'Rebond-Grotesque-Regular',
+    color: '#635C54',
   },
 });
 

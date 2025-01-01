@@ -10,6 +10,8 @@ import TipItemList from '@/components/TipItemList';
 import { getCategoryById } from '@/api/tipsCategory';
 import RecentTips from '@/components/RecentTips';
 import useFonts from "@/hooks/useFonts";
+import SvgUri from 'react-native-svg-uri';
+import { Asset } from 'expo-asset';
 
 const TipsPage = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -55,12 +57,20 @@ const TipsPage = () => {
       },
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate('tips/favorites')}>
-          <Text style={{ color: '#291752', fontSize: 17 }}>Favorites</Text>
+        <SvgUri
+              width="24"
+              height="24"
+              source={require('@/assets/icons/heart.svg')}
+            />
         </TouchableOpacity>
       ),
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={{ color: '#291752', fontSize: 17 }}>Back</Text>
+        <SvgUri
+              width="16"
+              height="16"
+              source={require('@/assets/icons/back.svg')}
+            />
         </TouchableOpacity>
       ),
     });
