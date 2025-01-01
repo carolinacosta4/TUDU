@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useUser } from "@/hooks/useUser";
 import { useUserInfo } from "@/hooks/useUserInfo";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { useEffect } from "react";
 import useFonts from "@/hooks/useFonts";
-
+import { useRouter } from "expo-router";
+import { NavigationContainer } from "@react-navigation/native";
 export default function HomeScreen() {
   const today = new Date();
   const { user, loading } = useUser();
@@ -13,7 +14,7 @@ export default function HomeScreen() {
   const day = today.getDate();
   const weekday = today.toLocaleDateString("en-US", { weekday: "short" });
   const fontsLoaded = useFonts();
-
+  const router = useRouter();
   useEffect(() => {
     if (logged === false) {
       router.push("/register");
@@ -41,7 +42,15 @@ export default function HomeScreen() {
           }}
         >
           Hello, {user.data.name}!
+
         </Text>
+      <View>
+      <TouchableOpacity onPress={() => router.push("/tips")}>
+          <Text>
+            Go to tasks
+          </Text>
+        </TouchableOpacity>
+      </View>
         <View style={{ flexDirection: "row", columnGap: 4 }}>
           <Text
             style={{

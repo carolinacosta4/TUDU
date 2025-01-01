@@ -29,4 +29,7 @@ app.all("*", function (req, res) {
   });
 });
 
-app.listen(port, () => console.log(`App listening at http://${host}:${port}/`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => { 
+    console.log(`Servidor a correr na porta http://0.0.0.0:${PORT}`);
+});
