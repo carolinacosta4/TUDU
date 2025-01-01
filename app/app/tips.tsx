@@ -11,7 +11,7 @@ import { getCategoryById } from '@/api/tipsCategory';
 import RecentTips from '@/components/RecentTips';
 import useFonts from "@/hooks/useFonts";
 import SvgUri from 'react-native-svg-uri';
-import { Asset } from 'expo-asset';
+import { useRouter } from 'expo-router';
 
 const TipsPage = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -20,7 +20,7 @@ const TipsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All'); 
   const [searchText, setSearchText] = useState<string>('');
   const fontsLoaded = useFonts();
-
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCategoryNames = async () => {
@@ -76,6 +76,12 @@ const TipsPage = () => {
     });
   }, [navigation]);
   
+  const handleNavigateToTip = (tipId: string) => {
+      router.push(`/tips/${tipId}`);
+  };
+  
+  
+
   const filteredTips = tips.filter(tip => {
     const categoryMatch =
       selectedCategory === 'All' || tip.IDcategory === selectedCategory; 
@@ -83,10 +89,6 @@ const TipsPage = () => {
     return categoryMatch && titleMatch;
   });
   
-
-  const handleNavigateToTip = (tipId: string) => {
-    navigation.navigate('tips/[tipId]', { tipId });
-  };
 
   const formatRelativeTime = (date: Date) => {
     let relativeTime = formatDistanceToNow(date, { addSuffix: true });

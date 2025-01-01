@@ -25,6 +25,7 @@ export async function getTips(): Promise<Tip[]> {
 export async function getTip(id: string): Promise<Tip> {
   try {
     const response = await apiClient.get<Tip>(`/tips/${id}`);
+    console.log('response from api:', response);
     return response.data;
   } catch (error: any) {
     handleApiError(error);

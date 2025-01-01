@@ -9,6 +9,7 @@ export default function RootLayout() {
       <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="recoverPassword" options={{ headerShown: false }} />
       <Stack.Screen name="resetPassword" options={{ headerShown: false }} />
+      <Stack.Screen name="tips/[tipId]" />
       <Stack.Screen
         name="resetPassword/[id]"
         options={{ headerShown: false }}
