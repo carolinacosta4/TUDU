@@ -11,6 +11,8 @@ const useFonts = () => {
           "Rebond-Grotesque-Regular": require("@/assets/fonts/ESRebondGrotesqueTRIAL-Regular-BF66189040b697b.otf"),
           "Rebond-Grotesque-Medium": require("@/assets/fonts/ESRebondGrotesqueTRIAL-Medium-BF6618904088566.otf"),
           "Rebond-Grotesque-Bold": require("@/assets/fonts/ESRebondGrotesqueTRIAL-Bold-BF66189040400df.otf"),
+          "SF-Pro-Display-Medium": require("@/assets/fonts/SFPRODISPLAYMEDIUM.otf"),
+          "SF-Pro-Display-Bold": require("@/assets/fonts/SFPRODISPLAYBOLD.otf"),
         });
         setFontsLoaded(true);
       } catch (error) {

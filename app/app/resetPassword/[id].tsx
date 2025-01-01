@@ -1,4 +1,4 @@
-import users from "@/api/users";
+import api from "@/api/api";
 import { useState } from "react";
 import {
   Image,
@@ -26,7 +26,7 @@ export default function RecoverPasswordScreen() {
     if (password && confirmPassword) {
       setShowError(false);
       try {
-        const response = await users.post(`users/reset-password/${id}`, {
+        const response = await api.post(`users/reset-password/${id}`, {
           password: password,
           confirmPassword: confirmPassword,
         });

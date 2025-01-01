@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import users from "@/api/users";
+import api from "@/api/api";
 import User from "@/interfaces/User";
 import { useUserInfo } from "./useUserInfo";
 
@@ -9,7 +9,7 @@ export function useUser() {
 
   const handleGetUser = async (userID: string) => {
     try {
-      const response = await users.get(`users/${userID}`);
+      const response = await api.get(`users/${userID}`);
       setUser(response.data);
     } catch (error) {
       console.error(error);

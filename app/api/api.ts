@@ -49,6 +49,27 @@ export async function post(
   }
 }
 
+export async function patch(
+  apiBaseUrl: string,
+  endpoint: string,
+  data: any,
+  token: string
+) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/${endpoint}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function handleResponse(response: Response) {
   if (!response.ok) {
     const errorMessage = await response.text();
