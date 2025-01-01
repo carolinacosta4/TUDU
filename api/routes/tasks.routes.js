@@ -7,6 +7,7 @@ router
   .route("/")
   .post(authController.verifyToken, tasksController.create)
   .get(authController.verifyToken, tasksController.findTasks);
+router.route("/categories").get(tasksController.findCategories);
 router
   .route("/:idT")
   .get(tasksController.findTask)
