@@ -1,4 +1,4 @@
-import users from "@/api/users";
+import api from "@/api/api";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -33,14 +33,14 @@ export default function RegisterScreen() {
     if (name && email && password && confirmPassword) {
       setShowError(false);
       try {
-        await users.post("users", {
+        await api.post("users", {
           name: name,
           email: email,
           password: password,
           confirmPassword: confirmPassword,
         });
 
-        const response = await users.post("users/login", {
+        const response = await api.post("users/login", {
           email: email,
           password: password,
         });
