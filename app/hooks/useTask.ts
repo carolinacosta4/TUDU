@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import users from "@/api/api";
+import api from "@/api/api";
 import { useUserInfo } from "./useUserInfo";
 
 export function useTask() {
   const { userInfo, loading } = useUserInfo();
   const [tasks, setTasks] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<{ _id: string; name: string; backgroundColor: string; color: string }[]>([]);
 
   const handleGetTasks = async (date: Date, authToken: string) => {
     try {
-      const response = await users.get(`tasks?date=${date.toISOString()}`, {
+      const response = await api.get(`tasks?date=${date.toISOString()}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -22,7 +22,7 @@ export function useTask() {
 
   const handleGetTasksCategories = async () => {
     try {
-      const response = await users.get(`tasks/categories`);
+      const response = await api.get(`tasks/categories`);
       setCategories(response.data.data);
     } catch (error) {
       console.warn(error);
@@ -41,7 +41,7 @@ export function useTask() {
 
   const editTask = async (id: string, data: any) => {
     try {
-      await users.patch(`tasks/${id}`, data, {
+      await api.patch(`tasks/${id}`, data, {
         headers: {
           Authorization: `Bearer ${userInfo?.authToken}`,
         },
@@ -51,5 +51,38 @@ export function useTask() {
     }
   };
 
-  return { tasks, setTasks, loading, getTasks, editTask, categories };
+  const createTask = async (data: any) => {
+    try {
+      await api.post(`tasks`, data, {
+        headers: {
+          Authorization: `Bearer ${userInfo?.authToken}`,
+        },
+      });
+    } catch (error) {     
+      console.error(error);
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    try {
+      await api.delete(`tasks/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userInfo?.authToken}`,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return {
+    tasks,
+    setTasks,
+    loading,
+    getTasks,
+    editTask,
+    categories,
+    deleteTask,
+    createTask,
+  };
 }

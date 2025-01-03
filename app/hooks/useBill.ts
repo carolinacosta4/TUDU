@@ -1,5 +1,5 @@
 import { useState } from "react";
-import users from "@/api/api";
+import api from "@/api/api";
 import { useUserInfo } from "./useUserInfo";
 
 export function useBill() {
@@ -8,7 +8,7 @@ export function useBill() {
 
   const handleGetBills = async (date: Date, authToken: string) => {
     try {
-      const response = await users.get(`bills?date=${date.toISOString()}`, {
+      const response = await api.get(`bills?date=${date.toISOString()}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -27,7 +27,7 @@ export function useBill() {
 
   const editBill = async (id: string, data: any) => {
     try {
-      await users.patch(`bills/${id}`, data, {
+      await api.patch(`bills/${id}`, data, {
         headers: {
           Authorization: `Bearer ${userInfo?.authToken}`,
         },
@@ -37,5 +37,31 @@ export function useBill() {
     }
   };
 
-  return { bills, setBills, loading, getBills, editBill };
+  const createBill = async (data: any) => {
+      try {
+        await api.post(`bills`, data, {
+          headers: {
+            Authorization: `Bearer ${userInfo?.authToken}`,
+          },
+        });
+      } catch (error) {     
+        console.log(error);
+        
+        console.error(error);
+      }
+    };
+
+  const deleteBill = async (id: string) => {
+    try {
+      await api.delete(`bills/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userInfo?.authToken}`,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return { bills, setBills, loading, getBills, editBill, deleteBill, createBill };
 }
