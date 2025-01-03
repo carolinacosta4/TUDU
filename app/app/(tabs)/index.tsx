@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Text, View, Vibration, Platform } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Text, View, Vibration, Platform, Image } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useUser } from "@/hooks/useUser";
@@ -36,6 +35,29 @@ export default function HomeScreen() {
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
+
+  const getMascotStyle = (mascot: string) => {
+    console.log(mascot);
+    
+    switch (mascot) {
+      case "Lady Mess":
+        return {
+          backgroundColor: "#8B9FE8",
+        };
+      case "Miss Perfect":
+        return {
+          backgroundColor: "#FBD160",
+        };
+      case "Mr. Lazy":
+        return {
+          backgroundColor: "#12BA5B",
+        };
+      default:
+        return {
+          backgroundColor: "#000000",
+        };
+    }
+  };
 
   useEffect(() => {
     if (logged === false) {
@@ -186,12 +208,21 @@ export default function HomeScreen() {
               username={user.data.name}
               tasksToday={tasks?.length}
               billsToday={bills?.length}
+              mascotStyle={() => getMascotStyle(user.data.IDmascot.name)}
             />
-            <Button onPress={() => AsyncStorage.clear()} title="Logout" />
           </View>
+          <Image
+            source={{ uri: user.data.IDmascot.image }}
+            style={{
+              height: 151,
+              objectFit: "contain",
+              marginTop: "10%",
+              marginBottom: "-2%",
+              zIndex: 10,
+            }}
+          />
           <View
             style={{
-              marginTop: "50%",
               backgroundColor: "#EEEADF",
               minHeight: "100%",
               padding: 24,

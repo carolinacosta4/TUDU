@@ -8,11 +8,55 @@ import Task from "@/interfaces/Task";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Reanimated, {
-  SharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import Reanimated, { useAnimatedStyle } from "react-native-reanimated";
 import { useDerivedValue } from "react-native-reanimated";
+
+const RightAction = ({
+  progress,
+  dragX,
+  handleDelete,
+  task,
+}: {
+  progress: Reanimated.SharedValue<number>;
+  dragX: Reanimated.SharedValue<number>;
+  handleDelete: (id: string, type: string) => void;
+  task: Task;
+}) => {
+  const derivedTranslation = useDerivedValue(() => dragX.value + 60);
+
+  const styleAnimation = useAnimatedStyle(() => ({
+    transform: [{ translateX: derivedTranslation.value }],
+  }));
+
+  return (
+    <Reanimated.View style={styleAnimation}>
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#EF4444",
+          justifyContent: "center",
+          alignItems: "center",
+          width: 60,
+          height: "100%",
+          borderTopRightRadius: 16,
+          borderBottomRightRadius: 16,
+        }}
+        onPress={() => handleDelete(task._id, "task")}
+      >
+        <Text
+          style={{
+            width: 50,
+            color: "#F7F6F0",
+            textAlign: "center",
+            fontFamily: "Rebond-Grotesque-Medium",
+            fontSize: 13.3,
+          }}
+        >
+          Delete
+        </Text>
+      </TouchableOpacity>
+    </Reanimated.View>
+  );
+};
 
 type TaskItemProps = {
   task: Task;
@@ -37,47 +81,6 @@ const TaskCardItem = ({
     const minutes = Math.round(durationInMinutes % 60);
     return `${hours > 0 ? `${hours} hours ` : ""}${minutes} minutes`;
   };
-
-  function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {
-    const derivedDrag = useDerivedValue(() => drag.value + 60);
-
-    const styleAnimation = useAnimatedStyle(() => {
-      return {
-        transform: [{ translateX: derivedDrag.value }],
-      };
-    });
-
-    return (
-      <Reanimated.View style={styleAnimation}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#EF4444",
-            justifyContent: "center",
-            alignItems: "center",
-            width: 60,
-            height: "100%",
-            borderTopRightRadius: 16,
-            borderBottomRightRadius: 16,
-          }}
-          onPress={() => {
-            handleDelete(task._id, 'task');
-          }}
-        >
-          <Text
-            style={{
-              width: 50,
-              color: "#F7F6F0",
-              textAlign: "center",
-              fontFamily: "Rebond-Grotesque-Medium",
-              fontSize: 13.3,
-            }}
-          >
-            Delete
-          </Text>
-        </TouchableOpacity>
-      </Reanimated.View>
-    );
-  }
 
   const duration = calculateDuration(
     task.startDate.toString(),
@@ -113,7 +116,14 @@ const TaskCardItem = ({
         friction={2}
         enableTrackpadTwoFingerGesture
         rightThreshold={40}
-        renderRightActions={RightAction}
+        renderRightActions={(progress, dragX) => (
+          <RightAction
+            progress={progress}
+            dragX={dragX}
+            handleDelete={handleDelete}
+            task={task}
+          />
+        )}
       >
         <View
           style={{

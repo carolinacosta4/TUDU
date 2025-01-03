@@ -8,6 +8,7 @@ type HeaderHomeScreenProps = {
   username: string;
   tasksToday: number;
   billsToday: number;
+  mascotStyle: () => { backgroundColor: string };
 };
 
 const HeaderHomeScreen = ({
@@ -17,6 +18,7 @@ const HeaderHomeScreen = ({
   username,
   tasksToday,
   billsToday,
+  mascotStyle,
 }: HeaderHomeScreenProps) => {
   return (
     <View style={{ marginRight: 20, paddingTop: 10 }}>
@@ -31,8 +33,8 @@ const HeaderHomeScreen = ({
           style={{
             width: 17,
             height: 17,
-            backgroundColor: "black",
             borderRadius: 50,
+            ...mascotStyle
           }}
         ></View>
         <Text

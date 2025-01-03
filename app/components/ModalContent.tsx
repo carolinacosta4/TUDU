@@ -275,7 +275,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
     backgroundColor: "#F7F6F0",
-    borderRadius: 16,
+    borderTopRightRadius: 16,
+    borderTopLeftRadius: 16,
     bottom: 0,
     position: "absolute",
     width: "100%",
