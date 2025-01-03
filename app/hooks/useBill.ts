@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "@/api/api";
 import { useUserInfo } from "./useUserInfo";
 
 export function useBill() {
   const { userInfo, loading } = useUserInfo();
   const [bills, setBills] = useState([]);
+  const [currencies, setCurrencies] = useState<{ _id: string; name: string; symbol: string }[]>([]);
 
   const handleGetBills = async (date: Date, authToken: string) => {
     try {
@@ -18,6 +19,19 @@ export function useBill() {
       console.warn(error);
     }
   };
+
+  const handleGetBillsCurrencies = async () => {
+    try {
+      const response = await api.get(`bills/currencies`);
+      setCurrencies(response.data.data);
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetBillsCurrencies();
+  }, []);
 
   const getBills = async (date: Date) => {
     if (userInfo && userInfo.authToken && !loading) {
@@ -38,18 +52,18 @@ export function useBill() {
   };
 
   const createBill = async (data: any) => {
-      try {
-        await api.post(`bills`, data, {
-          headers: {
-            Authorization: `Bearer ${userInfo?.authToken}`,
-          },
-        });
-      } catch (error) {     
-        console.log(error);
-        
-        console.error(error);
-      }
-    };
+    try {     
+      await api.post(`bills`, data, {
+        headers: {
+          Authorization: `Bearer ${userInfo?.authToken}`,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+
+      console.error(error);
+    }
+  };
 
   const deleteBill = async (id: string) => {
     try {
@@ -63,5 +77,14 @@ export function useBill() {
     }
   };
 
-  return { bills, setBills, loading, getBills, editBill, deleteBill, createBill };
+  return {
+    bills,
+    setBills,
+    loading,
+    getBills,
+    editBill,
+    deleteBill,
+    createBill,
+    currencies
+  };
 }

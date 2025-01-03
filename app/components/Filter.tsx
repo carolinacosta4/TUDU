@@ -14,6 +14,20 @@ interface FilterProps {
     sortBy: string;
   }) => void;
   categories: { _id: string; name: string }[];
+  filterSelection: {
+    category: string;
+    filter: string;
+    group: string;
+    layout: string;
+    sortBy: string;
+  };
+  setFilterSelection: (selection: {
+    category: string;
+    filter: string;
+    group: string;
+    layout: string;
+    sortBy: string;
+  }) => void;
 }
 
 const Filter = ({
@@ -21,21 +35,16 @@ const Filter = ({
   visible,
   onFilterChange,
   categories,
+  filterSelection,
+  setFilterSelection,
 }: FilterProps) => {
   const [shownModal, setShownModal] = useState("default");
-  const [selectedFilters, setSelectedFilters] = useState({
-    group: "all",
-    sortBy: "ascending",
-    layout: "cards",
-    filter: "all",
-    category: "all",
-  });
   const fontsLoaded = useFonts();
   if (!fontsLoaded) return null;
 
   const handleFilterSelection = (key: string, selection: string) => {
-    const newFilters = { ...selectedFilters, [key]: selection };
-    setSelectedFilters(newFilters);
+    const newFilters = { ...filterSelection, [key]: selection };
+    setFilterSelection(newFilters);
     onFilterChange(newFilters);
   };
 
@@ -63,7 +72,7 @@ const Filter = ({
               setShownModal={setShownModal}
               onClose={onClose}
               title="default"
-              selectedParams={selectedFilters}
+              selectedParams={filterSelection}
             />
           )}
 
@@ -81,7 +90,7 @@ const Filter = ({
                 () => handleFilterSelection("group", "tasks"),
                 () => handleFilterSelection("group", "bills"),
               ]}
-              selected={selectedFilters.group}
+              selected={filterSelection.group}
             />
           )}
 
@@ -97,7 +106,7 @@ const Filter = ({
                 () => handleFilterSelection("sortBy", "ascending"),
                 () => handleFilterSelection("sortBy", "descending"),
               ]}
-              selected={selectedFilters.sortBy}
+              selected={filterSelection.sortBy}
             />
           )}
 
@@ -113,7 +122,7 @@ const Filter = ({
                 () => handleFilterSelection("layout", "cards"),
                 () => handleFilterSelection("layout", "list"),
               ]}
-              selected={selectedFilters.layout}
+              selected={filterSelection.layout}
             />
           )}
 
@@ -133,7 +142,7 @@ const Filter = ({
                 () => handleFilterSelection("filter", "medium"),
                 () => handleFilterSelection("filter", "low"),
               ]}
-              selected={selectedFilters.filter}
+              selected={filterSelection.filter}
             />
           )}
 
@@ -155,7 +164,7 @@ const Filter = ({
                     handleFilterSelection("category", category._id)
                 ),
               ]}
-              selected={selectedFilters.category}
+              selected={filterSelection.category}
             />
           )}
         </View>

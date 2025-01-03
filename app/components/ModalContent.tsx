@@ -8,6 +8,7 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useFonts from "@/hooks/useFonts";
 import { useState } from "react";
+import { useTask } from "@/hooks/useTask";
 
 interface ModalContentProps {
   setShownModal: (modal: string) => void;
@@ -38,6 +39,7 @@ const ModalContent = ({
   selectedParams,
 }: ModalContentProps) => {
   const fontsLoaded = useFonts();
+  const { categories } = useTask();
   const [selectedParameter, setSelectedParameter] = useState();
   if (!fontsLoaded) return <Text>Loading...</Text>;
 
@@ -83,15 +85,28 @@ const ModalContent = ({
             alignItems: "center",
           }}
         >
-          <Text
-            style={{
-              color: "#A5A096",
-              fontSize: 16,
-              fontFamily: "Rebond-Grotesque-Regular",
-            }}
-          >
-            {selected.charAt(0).toUpperCase() + selected.slice(1)}
-          </Text>
+          {modal == "category" ? (
+            <Text
+              style={{
+                color: "#A5A096",
+                fontSize: 16,
+                fontFamily: "Rebond-Grotesque-Regular",
+              }}
+            >
+              {categories?.find((category) => category._id === selected)
+                ?.name || "All"}
+            </Text>
+          ) : (
+            <Text
+              style={{
+                color: "#A5A096",
+                fontSize: 16,
+                fontFamily: "Rebond-Grotesque-Regular",
+              }}
+            >
+              {selected.charAt(0).toUpperCase() + selected.slice(1)}
+            </Text>
+          )}
           <Icon name="chevron-right" size={14} color="#A5A096" />
         </View>
       </View>

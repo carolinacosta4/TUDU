@@ -37,25 +37,15 @@ export default function HomeScreen() {
   const [showList, setShowList] = useState(false);
 
   const getMascotStyle = (mascot: string) => {
-    console.log(mascot);
-    
     switch (mascot) {
       case "Lady Mess":
-        return {
-          backgroundColor: "#8B9FE8",
-        };
+        return "#8B9FE8";
       case "Miss Perfect":
-        return {
-          backgroundColor: "#FBD160",
-        };
+        return "#FBD160";
       case "Mr. Lazy":
-        return {
-          backgroundColor: "#12BA5B",
-        };
+        return "#12BA5B";
       default:
-        return {
-          backgroundColor: "#000000",
-        };
+        return "#000000";
     }
   };
 
@@ -208,7 +198,7 @@ export default function HomeScreen() {
               username={user.data.name}
               tasksToday={tasks?.length}
               billsToday={bills?.length}
-              mascotStyle={() => getMascotStyle(user.data.IDmascot.name)}
+              mascotStyle={getMascotStyle(user.data.IDmascot.name)}
             />
           </View>
           <Image
@@ -269,6 +259,8 @@ export default function HomeScreen() {
               visible={true}
               onFilterChange={handleFilterChange}
               categories={categories}
+              filterSelection={filterSelection}
+              setFilterSelection={setFilterSelection}
             />
           )}
         </SafeAreaView>
