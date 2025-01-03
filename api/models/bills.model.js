@@ -8,8 +8,12 @@ module.exports = (mongoose) => {
       notification: { type: Boolean, default: true },
       notes: { type: String },
       status: { type: Boolean, default: false },
-      periodicity: { type: String, enum: ["once", "monthly", "yearly"] },
+      periodicity: {
+        type: String,
+        enum: ["never", "daily", "weekly", "monthly"],
+      },
       IDuser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      IDcurrency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
     },
     {
       collection: "bill",
