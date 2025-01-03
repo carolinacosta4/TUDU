@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, TouchableWithoutFeedback, Modal, Text } from "react-native";
+import { View, TouchableWithoutFeedback, Modal } from "react-native";
 import useFonts from "@/hooks/useFonts";
 import ModalContent from "./ModalContent";
 
@@ -46,7 +46,11 @@ const Filter = ({
       visible={visible}
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
+      <TouchableWithoutFeedback
+        onPress={(e) => {
+          e.target === e.currentTarget && onClose();
+        }}
+      >
         <View
           style={{
             flex: 1,

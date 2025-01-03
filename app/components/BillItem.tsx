@@ -1,66 +1,135 @@
 import Bill from "@/interfaces/Bill";
-import { Text, View, TouchableWithoutFeedback } from "react-native";
+import {
+  Text,
+  View,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import Reanimated, {
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+import { useDerivedValue } from "react-native-reanimated";
 
 type BillItemProps = {
   bill: Bill;
   changeStatus: (data: Bill, name: "bill") => void;
   type: string;
+  handleDelete: (id: string, type: string) => void;
 };
 
-const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
+const BillItem = ({
+  bill,
+  changeStatus,
+  type,
+  handleDelete,
+}: BillItemProps) => {
+  function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {
+    const derivedDrag = useDerivedValue(() => drag.value + 60);
+    const styleAnimation = useAnimatedStyle(() => {
+      return {
+        transform: [{ translateX: derivedDrag.value }],
+      };
+    });
+
+    return (
+      <Reanimated.View style={styleAnimation}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#EF4444",
+            justifyContent: "center",
+            alignItems: "center",
+            width: 60,
+            height: "100%",
+            borderTopRightRadius: 16,
+            borderBottomRightRadius: 16,
+          }}
+          onPress={() => {
+            handleDelete(bill._id, 'bill');
+          }}
+        >
+          <Text
+            style={{
+              width: 50,
+              color: "#F7F6F0",
+              textAlign: "center",
+              fontFamily: "Rebond-Grotesque-Medium",
+              fontSize: 13.3,
+            }}
+          >
+            Delete
+          </Text>
+        </TouchableOpacity>
+      </Reanimated.View>
+    );
+  }
+
   return type == "cards" ? (
-    <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: "#F7F6F0",
-        padding: 10,
-        borderRadius: 16,
-        alignItems: "center",
-      }}
-    >
-      <View
-        style={{
-          width: "90%",
+    <GestureHandlerRootView>
+      <ReanimatedSwipeable
+        containerStyle={{
+          backgroundColor: "#DDD8CE",
+          borderRadius: 16,
         }}
+        friction={2}
+        enableTrackpadTwoFingerGesture
+        rightThreshold={40}
+        renderRightActions={RightAction}
       >
-        <Text
+        <View
           style={{
-            fontSize: 16,
-            color: "#291752",
-            fontFamily: "Rebond-Grotesque-Medium",
+            flexDirection: "row",
+            padding: 10,
+            alignItems: "center",
           }}
         >
-          {bill.name}
-        </Text>
-        <Text
-          style={{
-            fontSize: 13.3,
-            color: "#A5A096",
-            fontFamily: "Rebond-Grotesque-Regular",
-          }}
-        >
-          {bill.amount}€
-        </Text>
-      </View>
-      {bill.status ? (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(bill, "bill");
-          }}
-        >
-          <Icon name="check-circle" size={20} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      ) : (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(bill, "bill");
-          }}
-        >
-          <Icon name="circle-outline" size={20} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      )}
-    </View>
+          <View
+            style={{
+              width: "90%",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#291752",
+                fontFamily: "Rebond-Grotesque-Medium",
+              }}
+            >
+              {bill.name}
+            </Text>
+            <Text
+              style={{
+                fontSize: 13.3,
+                color: "#A5A096",
+                fontFamily: "Rebond-Grotesque-Regular",
+              }}
+            >
+              {bill.amount}€
+            </Text>
+          </View>
+          {bill.status ? (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                changeStatus(bill, "bill");
+              }}
+            >
+              <Icon name="check-circle" size={20} color="#562CAF" />
+            </TouchableWithoutFeedback>
+          ) : (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                changeStatus(bill, "bill");
+              }}
+            >
+              <Icon name="circle-outline" size={20} color="#562CAF" />
+            </TouchableWithoutFeedback>
+          )}
+        </View>
+      </ReanimatedSwipeable>
+    </GestureHandlerRootView>
   ) : (
     <View
       style={{

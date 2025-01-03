@@ -1,5 +1,10 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import {
+  Dimensions,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { Fragment } from "react";
 import BillItem from "@/components/BillItem";
 import TaskItem from "@/components/TaskItem";
@@ -12,6 +17,7 @@ type CardsHomeProps = {
   filteredBills: Bill[];
   changeStatus: (data: Task | Bill, name: string) => void;
   user: any;
+  handleDelete: (id: string, type: string) => void;
 };
 
 const CardsHome = ({
@@ -20,10 +26,13 @@ const CardsHome = ({
   filteredBills,
   changeStatus,
   user,
+  handleDelete
 }: CardsHomeProps) => {
+  const width = Dimensions.get("window").width;
+  
   return (
     <ScrollView>
-      <View style={{ marginBottom: 450 }}>
+      <View style={{ marginBottom: width / 0.8 }}>
         {(filteredBills.length > 0 || allDayTasks.length > 0) && (
           <>
             <View
@@ -50,6 +59,7 @@ const CardsHome = ({
                       task={task}
                       allDay={true}
                       type="cards"
+                      handleDelete={handleDelete}
                     />
                   </Fragment>
                 ))}
@@ -60,6 +70,7 @@ const CardsHome = ({
                         bill={bill}
                         changeStatus={changeStatus}
                         type="cards"
+                        handleDelete={handleDelete}
                       />
                     </Fragment>
                   ))}
@@ -106,6 +117,7 @@ const CardsHome = ({
                       task={task}
                       allDay={false}
                       type="cards"
+                      handleDelete={handleDelete}
                     />
                   </Fragment>
                 ))}

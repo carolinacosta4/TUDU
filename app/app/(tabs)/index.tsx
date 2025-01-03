@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Text, View } from "react-native";
+import { Button, Text, View, Vibration, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -31,8 +31,8 @@ export default function HomeScreen() {
     layout: "cards",
     sortBy: "ascending",
   });
-  const { getTasks, tasks, editTask, categories } = useTask();
-  const { getBills, bills, editBill } = useBill();
+  const { getTasks, tasks, editTask, categories, deleteTask } = useTask();
+  const { getBills, bills, editBill, deleteBill } = useBill();
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -64,6 +64,9 @@ export default function HomeScreen() {
   if (loading || !fontsLoaded || loadingTasks || !loaded)
     return <Text>Loading...</Text>;
 
+  const ONE_SECOND_IN_MS = 1000;
+  const PATTERN = [1 * ONE_SECOND_IN_MS];
+
   const changeStatus = async (data: Task | Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
@@ -71,9 +74,19 @@ export default function HomeScreen() {
         const updatedStatus = !data.status;
         await editTask(data._id, { status: updatedStatus });
         getTasks(today);
+        if (user?.data.vibration && updatedStatus === true) {
+          Platform.OS === "android"
+            ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+            : Vibration.vibrate(PATTERN);
+        }
       } else {
         await editBill(data._id, { status: updatedStatus });
         getBills(today);
+        if (user?.data.vibration && updatedStatus === true) {
+          Platform.OS === "android"
+            ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+            : Vibration.vibrate(PATTERN);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -139,6 +152,20 @@ export default function HomeScreen() {
     return { filteredTasks, filteredBills };
   };
 
+  const handleDelete = async (id: string, type: string) => {
+    try {
+      if (type == "task") {
+        await deleteTask(id);
+        getTasks(today);
+      } else if (type == "bill") {
+        await deleteBill(id);
+        getBills(today);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const { filteredTasks, filteredBills } = applyFilters(
     tasks ?? [],
     bills ?? []
@@ -151,7 +178,7 @@ export default function HomeScreen() {
     user && (
       <SafeAreaProvider>
         <SafeAreaView style={{ backgroundColor: "#F7F6F0", flex: 1 }}>
-          <View style={{ paddingLeft: 20, paddingTop: 10 }}>
+          <View style={{ marginHorizontal: 20, paddingTop: 10 }}>
             <HeaderHomeScreen
               month={today.toLocaleDateString("en-US", { month: "short" })}
               day={today.getDate()}
@@ -197,6 +224,7 @@ export default function HomeScreen() {
                     filteredBills={filteredBills}
                     changeStatus={changeStatus}
                     user={user}
+                    handleDelete={handleDelete}
                   />
                 )
               ) : (

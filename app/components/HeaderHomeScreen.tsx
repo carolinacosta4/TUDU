@@ -19,12 +19,12 @@ const HeaderHomeScreen = ({
   billsToday,
 }: HeaderHomeScreenProps) => {
   return (
-    <View>
+    <View style={{ marginRight: 20, paddingTop: 10 }}>
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
-          columnGap: 4,
+          columnGap: 2,
         }}
       >
         <View
@@ -63,28 +63,33 @@ const HeaderHomeScreen = ({
       >
         Hello, {username}!
       </Text>
-      {tasksToday != 0 && billsToday != 0 ? (
+      {tasksToday != 0 || billsToday != 0 ? (
         <View
           style={{
             flexDirection: "row",
-            columnGap: 4,
+            flexWrap: "wrap",
+            columnGap: 2,
           }}
         >
           <Text style={styles.textGrey}>You have </Text>
           {tasksToday != 0 && (
-            <Text style={styles.textPurple}>
+            <View style={{ flexDirection: "row", columnGap: 2 }}>
               <Icon name="calendar-blank-outline" size={20} color="#562CAF" />
-              {tasksToday} {tasksToday === 1 ? "task" : "tasks"}
-            </Text>
+              <Text style={styles.textPurple}>
+                {tasksToday} {tasksToday === 1 ? "task" : "tasks"}
+              </Text>
+            </View>
           )}
           {tasksToday != 0 && billsToday != 0 && (
             <Text style={styles.textGrey}> and </Text>
           )}
           {billsToday != 0 && (
-            <Text style={styles.textPurple}>
+            <View style={{ flexDirection: "row", columnGap: 2 }}>
               <Icon name="cash-multiple" size={20} color="#562CAF" />
-              {billsToday} {billsToday === 1 ? "bill" : "bills"}
-            </Text>
+              <Text style={styles.textPurple}>
+                {billsToday} {billsToday === 1 ? "bill" : "bills"}
+              </Text>
+            </View>
           )}
           <Text style={styles.textGrey}> due today.</Text>
         </View>
