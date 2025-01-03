@@ -36,3 +36,24 @@ exports.findAll = async (req, res) => {
         handleErrorResponse(res, error);
     }
 }
+
+exports.findOne = async (req, res) => {
+    let idM = req.params.idM
+    try {
+        const mascot = await Mascots.findOne({ _id: idM }).exec();
+
+        if (!mascot) {
+            return res.status(404).json({
+                success: false,
+                msg: "Mascot not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: mascot,
+        });
+    } catch (error) {
+        handleErrorResponse(res, error);
+    }
+}
