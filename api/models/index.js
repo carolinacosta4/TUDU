@@ -26,5 +26,6 @@ db.Streaks = require("./streaks.model.js")(mongoose);
 db.Mascot = require("./mascots.model.js")(mongoose);
 db.CategoryTask = require("./categorytasks.model.js")(mongoose);
 db.Achievements = require("./achievements.model.js")(mongoose);
+db.Currency = require("./currency.model.js")(mongoose);
 
 module.exports = db;
