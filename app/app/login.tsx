@@ -104,7 +104,15 @@ export default function LoginScreen() {
               >
                 Back to planning, back to progress.
               </Text>
-              <Text style={{ fontSize: 16, color: "#562CAF" }}>Let's go!</Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "#562CAF",
+                  fontFamily: "Rebond-Grotesque-Regular",
+                }}
+              >
+                Let's go!
+              </Text>
             </View>
             <View style={{ rowGap: 24, alignItems: "center" }}>
               <View style={{ rowGap: 16 }}>
