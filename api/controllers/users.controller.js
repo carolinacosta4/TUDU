@@ -10,6 +10,13 @@ const Bill = db.Bill;
 const UserAchievements = db.UserAchievements;
 const Streaks = db.Streaks;
 const nodemailer = require("nodemailer");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: config.C_CLOUD_NAME,
+  api_key: config.C_API_KEY,
+  api_secret: config.C_API_SECRET
+});
 
 const handleErrorResponse = (res, error) => {
   return res
@@ -112,7 +119,7 @@ exports.register = async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10),
-      profilePicture: "https://example.com/profile.jpg",
+      profilePicture: "https://res.cloudinary.com/ditdnslga/image/upload/v1735949539/eqobxesykavqgbc1keyj.png",
       cloudinary_id: 0,
       IDmascot: "6763080a51fd2aabdb86aab3",
     });
@@ -484,3 +491,48 @@ exports.assignMascotToUser = async (req, res) => {
     handleErrorResponse(res, error);
   }
 }
+
+exports.changeProfilePicture = async (req, res) => {
+  try {
+    let user = await User.findById(req.params.idU);
+    if (user === null) {
+      return res.status(404).json({
+        success: false,
+        msg: `Cannot find any user with username ${req.params.idU}`,
+      });
+    }
+    if (req.loggedUserId == req.params.idU) {
+      let user_image = null;
+      if (req.file) {
+        if (user.cloudinary_id) {
+          await cloudinary.uploader.destroy(user.cloudinary_id);
+        }
+        const b64 = Buffer.from(req.file.buffer).toString("base64");
+        let dataURI = `data:${req.file.mimetype};base64,${b64}`;
+        let result = await cloudinary.uploader.upload(dataURI, { resource_type: "auto" });
+        user_image = result;
+      }
+
+      await User.findByIdAndUpdate(req.params.idU, {
+        profile_image: user_image ? user_image.url : null,
+        cloudinary_id: user_image ? user_image.public_id : null
+      });
+
+      return res.status(201).json({
+        success: true,
+        profile_image: user_image ? user_image.url : null,
+        cloudinary_id: user_image ? user_image.public_id : null,
+        msg: "Profile picture updated successfully!"
+      });
+    }
+
+    return res.status(403).json({
+      success: false,
+      msg: "You are not authorized to edit other users.",
+    });
+  } catch (error) {
+    console.log(error);
+    
+    return res.status(500).json({ success: false, msg: 'An error occurred while updating profile picture.' });
+  }
+};

@@ -92,6 +92,7 @@ exports.create = async (req, res) => {
       notes: req.body.notes || "",
       status: false,
       IDuser: req.loggedUserId,
+      IDcurrency: req.body.IDcurrency,
     });
 
     const newBill = await bill.save();
