@@ -25,13 +25,38 @@ export async function getTips(): Promise<Tip[]> {
 export async function getTip(id: string): Promise<Tip> {
   try {
     const response = await apiClient.get<Tip>(`/tips/${id}`);
-    console.log('response from api:', response);
     return response.data;
   } catch (error: any) {
     handleApiError(error);
   }
 }
 
+export const markAsFavorite = async (tipId: string, token: string) => {
+  try {
+    console.log('token', token)
+    const response = await apiClient.post(`/tips/${tipId}/favorite`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    console.log('response:', response);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export async function removeFromFavorite(tipId: string, token: string): Promise<void> {
+  try {
+    console.log('inside remove from favorite')
+    console.log('token', token)
+    const response = await apiClient.delete(`/tips/${tipId}/favorite`);
+    console.log(response.data.msg);
+  } catch (error: any) {
+    handleApiError(error);
+  }
+}
 function handleApiError(error: any): never {
   if (error.response) {
     const apiError: ApiError = {

@@ -15,7 +15,7 @@ const TipItemList: React.FC<TipItemListProps> = ({
   formatRelativeTime,
   handleNavigateToTip,
 }) => {
-console.log('category names',categoryNames);
+//console.log('category names',categoryNames);
   return (
     <>
       {filteredTips.length > 0 ? (

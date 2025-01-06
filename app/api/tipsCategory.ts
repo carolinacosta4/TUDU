@@ -21,8 +21,8 @@ const apiClient = axios.create({
 export async function getCategories(): Promise<ApiResponse<TipCategory[]>> {
   try {
     const response = await apiClient.get<ApiResponse<TipCategory[]>>("/tipCategory");
-    console.log('response:', response);
-    console.log('response.data:', response.data);
+   // console.log('response:', response);
+    //console.log('response.data:', response.data);
     return response.data; 
   } catch (error: any) {
     handleApiError(error);

@@ -56,7 +56,7 @@ const TipsPage = () => {
         color: '#291752', 
       },
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('tips/favorites')}>
+        <TouchableOpacity onPress={() => router.push('/favorites')}>
         <SvgUri
               width="24"
               height="24"

@@ -17,10 +17,10 @@ const SearchAndCategories: React.FC<SearchAndCategoriesProps> = ({ selectedCateg
     onSearchChange(text);
   }
 
-  console.log('selectedCategory:', selectedCategory);
+ // console.log('selectedCategory:', selectedCategory);
 
  const {tipCategories, loading, error} = useTipCategories();
- console.log('tipCategories:', tipCategories);
+ //console.log('tipCategories:', tipCategories);
   return (
     <View style={styles.container}>
       <View>

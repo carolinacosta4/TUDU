@@ -2,7 +2,11 @@ const jwt = require("jsonwebtoken");
 const config = require("../config/db.config.js");
 
 exports.verifyToken = (req, res, next) => {
+  console.log('WHYYYYYYYYYYY')
+  console.log('hola en el verify token')
+  console.log('inside verify token', req.headers);
   const header = req.headers["x-access-token"] || req.headers.authorization;
+  console.log('Header:', header);  
   if (typeof header == "undefined")
     return res
       .status(401)

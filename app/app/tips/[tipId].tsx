@@ -8,10 +8,11 @@ import { useTip } from '@/hooks/useTip';
 import { formatDistanceToNow } from 'date-fns';
 import { Asset } from 'expo-asset';
 import SvgUri from 'react-native-svg-uri';
+import { removeFromFavorite, markAsFavorite } from '@/api/tips';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 const TipDetail = () => {
-
-
+  const { userInfo } = useUserInfo();
   const { tipId } = useLocalSearchParams();
   console.log('tipId:', tipId);
   const navigation = useNavigation(); 
@@ -19,7 +20,7 @@ const TipDetail = () => {
   
   const [isLiked, setIsLiked] = useState(false); 
 
-  console.log('tip:', tip);
+  //console.log('tip:', tip);
   const formatRelativeTime = (date: string | Date | null) => {
     if (!date) return 'Unknown time';
     try {
@@ -29,9 +30,31 @@ const TipDetail = () => {
       return 'Invalid date';
     }
   };
-    const handleHeartClick = () => {
-      setIsLiked(!isLiked); 
-    };
+  const handleHeartClick = async () => {
+    if (!userInfo?.authToken) {
+      console.error("User is not logged in or token is not available.");
+      return;
+    }
+  
+    console.log('isLiked:', isLiked);
+    setIsLiked(!isLiked);
+    console.log('isLiked:', isLiked);
+  
+    try {
+      const id = String(tipId);
+      if (isLiked) {
+        await removeFromFavorite(id, userInfo.authToken);
+      } else {
+        await markAsFavorite(id, userInfo.authToken);
+      }
+    } catch (error) {
+      console.error("Error with favorite action", error);
+      setIsLiked(isLiked); // Revert the like state if an error occurs
+    }
+  };
+  
+
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false,}

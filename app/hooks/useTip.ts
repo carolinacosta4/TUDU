@@ -7,8 +7,6 @@ export const useTip = (tipId: string | undefined) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  console.log('hola');
-  console.log('tipId:', tipId);
 
   useEffect(() => {
     console.log('useEffect triggered with tipId:', tipId);
