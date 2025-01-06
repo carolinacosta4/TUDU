@@ -8,7 +8,7 @@ export interface UserDetails {
 }
 
 export default axios.create({
-  baseURL: "http://192.168.0.14:3000",
+  baseURL: "http://172.28.2.174:3000",
   headers: {
     "Content-type": "application/json",
   },
