@@ -9,25 +9,25 @@ import {
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import useFonts from "@/hooks/useFonts";
-import Task from "@/interfaces/Task";
-import { useTask } from "@/hooks/useTask";
+import Bill from "@/interfaces/Bill";
+import { useBill } from "@/hooks/useBill";
 import { formatDate } from "@/utils/taskUtils";
 
-const TaskDetail = () => {
+const BillDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { editTask, handleGetTask, task, handleDeleteTask } = useTask();
+  const { editBill, handleGetBill, handleDeleteBill, bill } = useBill();
 
   useEffect(() => {
     if (typeof id === "string") {
-      handleGetTask(id);
+        handleGetBill(id);
     }
-  }, [task]);
+  }, [bill]);
 
-  if (!task || !fontsLoaded) {
+  if (!bill || !fontsLoaded) {
     return (
       <View style={styles.container}>
-        <Text>Loading task details...</Text>
+        <Text>Loading bill details...</Text>
       </View>
     );
   }
@@ -57,59 +57,27 @@ const TaskDetail = () => {
     }
   };
 
-  const getCountdown = (startDate: Date): string => {
-    const now = new Date();
-    const start = new Date(startDate);
 
-    if (start <= now) {
-      return "Today";
-    }
-
-    const isToday = start.toDateString() === now.toDateString();
-    if (isToday) {
-      const timeRemaining = start.getTime() - now.getTime();
-      const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
-      const minutes = Math.floor(
-        (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
-      );
-
-      return `${hours}h ${minutes}m`;
-    }
-
-    return formatDate(start);
-  };
-
-  const formatTime = (dateInput: Date | string): string => {
-    const date = new Date(dateInput);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-
-    const formattedHours = hours < 10 ? `0${hours}` : `${hours}`;
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
-
-    return `${formattedHours}h${formattedMinutes}`;
-  };
-
-  const deleteTask = () => {
-    handleDeleteTask(task._id);
+  const deleteBill = () => {
+    handleDeleteBill(bill._id);
     router.push("/");
   };
 
-  const handleMarkAsDone = async (task: Task) => {
+  const handleMarkAsDone = async (bill: Bill) => {
     try {
-      let newStatus = !task.status;
-      await editTask(task._id, { status: newStatus });
+      let newStatus = !bill.status;
+      await editBill(bill._id, { status: newStatus });
     } catch (error: any) {
       console.error("Error message:", error);
     }
   };
 
   return (
-    task && (
+    bill && (
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F6F0" }}>
           <ScrollView style={styles.container}>
-            <View style={styles.taskHeader}>
+            <View style={styles.billHeader}>
               <View
                 style={{
                   flex: 1,
@@ -126,11 +94,11 @@ const TaskDetail = () => {
                     padding: 4,
                     textAlign: "center",
                     lineHeight: 24,
-                    ...getPriorityStyle(task.priority),
+                    ...getPriorityStyle(bill.priority),
                   }}
                 >
-                  {task.priority.charAt(0).toUpperCase() +
-                    task.priority.slice(1)}
+                  {bill.priority.charAt(0).toUpperCase() +
+                    bill.priority.slice(1)}
                 </Text>
                 <TouchableOpacity>
                   <Text
@@ -145,68 +113,49 @@ const TaskDetail = () => {
                   </Text>
                 </TouchableOpacity>
               </View>
-              <Text style={styles.taskTitle}>{task.name}</Text>
+              <Text style={styles.billTitle}>{bill.name}</Text>
             </View>
-            <Text
-                style={{
-                  fontSize: 13.33,
-                  fontFamily: "Rebond-Grotesque-Medium",
-                  padding: 7,
-                  lineHeight: 15,
-                  borderRadius: 100,
-                  marginBottom: 20,
-                  textAlign: "center",
-                  color: task.IDcategory.color,
-                  backgroundColor: task.IDcategory.backgroundColor,
-                }}
-              >
-                {task.IDcategory.name}
-              </Text>
 
-            <View style={styles.startInfo}>
-              <Text style={styles.countdown}>Starts in</Text>
-              <Text style={styles.timeRemaining}>
-                {getCountdown(task.startDate)}
-              </Text>
-              <Text style={styles.startDate}>{formatDate(task.startDate)}</Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Due date</Text>
+              <Text style={{...styles.startDate, backgroundColor: "#EEEADF",}}>{formatDate(bill.dueDate)}</Text>
             </View>
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Schedule</Text>
               <Text style={styles.schedule}>
-                {task.periodicity.charAt(0).toUpperCase() +
-                  task.periodicity.slice(1)}{" "}
-                - {formatTime(task.startDate)}
+                {bill.periodicity.charAt(0).toUpperCase() +
+                  bill.periodicity.slice(1)}{" "}
               </Text>
             </View>
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Notes</Text>
-              {task.notes && <Text style={styles.notes}>{task.notes}</Text>}
-              {!task.notes && <Text style={styles.notes}>No notes yet!</Text>}
+              {bill.notes && <Text style={styles.notes}>{bill.notes}</Text>}
+              {!bill.notes && <Text style={styles.notes}>No notes yet!</Text>}
             </View>
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Options</Text>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={deleteTask}
+                onPress={deleteBill}
               >
-                <Text style={styles.deleteText}>Delete Task</Text>
+                <Text style={styles.deleteText}>Delete Bill</Text>
               </TouchableOpacity>
             </View>
 
-            {!task.status ? (
+            {!bill.status ? (
               <TouchableOpacity
                 style={{ ...styles.checkButton, backgroundColor: "#6A60F0" }}
-                onPress={() => handleMarkAsDone(task)}
+                onPress={() => handleMarkAsDone(bill)}
               >
                 <Text style={styles.checkText}>Check as done</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 style={{ ...styles.checkButton, backgroundColor: "#837D74" }}
-                onPress={() => handleMarkAsDone(task)}
+                onPress={() => handleMarkAsDone(bill)}
               >
                 <Text style={styles.checkText}>Uncheck as done</Text>
               </TouchableOpacity>
@@ -233,7 +182,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#888",
   },
-  taskHeader: {
+  billHeader: {
     marginBottom: 20,
     flex: 1,
   },
@@ -246,7 +195,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 5,
   },
-  taskTitle: {
+  billTitle: {
     fontSize: 33.18,
     fontWeight: "bold",
     color: "#291752",
@@ -263,21 +212,14 @@ const styles = StyleSheet.create({
     fontFamily: "Rebond-Grotesque-Medium",
     fontSize: 13.33,
   },
-  countdown: {
-    fontSize: 18,
-    color: "#AA8BD3",
-    fontFamily: "Rebond-Grotesque-Medium",
-  },
-  timeRemaining: {
-    fontSize: 27.65,
-    color: "#562CAF",
-    fontFamily: "SF-Pro-Display-Medium",
-  },
   startDate: {
     fontSize: 16,
-    color: "#562CAF",
-    fontFamily: "Rebond-Grotesque-Medium",
+    color: "#291752",
     lineHeight: 24,
+    fontFamily: "Rebond-Grotesque-Medium",
+    backgroundColor: "#EEEADF",
+    padding: 10,
+    borderRadius: 8,
   },
   section: {
     marginBottom: 20,
@@ -317,7 +259,6 @@ const styles = StyleSheet.create({
   deleteText: {
     fontSize: 16,
     color: "#D32F2F",
-    fontWeight: "bold",
     fontFamily: "Rebond-Grotesque-Medium",
   },
   checkButton: {
@@ -333,4 +274,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TaskDetail;
+export default BillDetail;
