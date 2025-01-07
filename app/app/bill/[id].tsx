@@ -260,6 +260,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#D32F2F",
     fontFamily: "Rebond-Grotesque-Medium",
+    lineHeight: 24
   },
   checkButton: {
     padding: 15,
