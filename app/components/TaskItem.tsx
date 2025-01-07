@@ -1,6 +1,7 @@
 import { Text, TouchableWithoutFeedback, View } from "react-native";
 import Task from "@/interfaces/Task";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Link } from "expo-router";
 
 type TaskItemProps = {
   task: Task;
@@ -50,32 +51,102 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
   };
 
   return type === "cards" ? (
-    <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: "#DDD8CE",
-        padding: 10,
-        borderRadius: 16,
-        alignItems: "center",
-      }}
-    >
+    <Link href={{ pathname: "/task/[id]", params: { id: task._id, task: JSON.stringify(task) } }}>
       <View
         style={{
-          width: "90%",
+          flexDirection: "row",
+          backgroundColor: "#DDD8CE",
+          padding: 10,
+          borderRadius: 16,
+          alignItems: "center",
         }}
       >
-        <Text
+        <View
           style={{
-            fontSize: 13.33,
-            color: "#474038",
-            fontFamily: "Rebond-Grotesque-Medium",
-            padding: 4,
-            textAlign: "center",
-            ...getPriorityStyle(task.priority),
+            width: "90%",
           }}
         >
-          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-        </Text>
+          <Text
+            style={{
+              fontSize: 13.33,
+              color: "#474038",
+              fontFamily: "Rebond-Grotesque-Medium",
+              padding: 4,
+              textAlign: "center",
+              ...getPriorityStyle(task.priority),
+            }}
+          >
+            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#291752",
+              fontFamily: "Rebond-Grotesque-Medium",
+              marginTop: 6,
+            }}
+          >
+            {task.name}
+          </Text>
+          {!allDay && (
+            <Text
+              style={{
+                fontSize: 13.3,
+                color: "#A5A096",
+                fontFamily: "Rebond-Grotesque-Regular",
+              }}
+            >
+              {duration}
+            </Text>
+          )}
+        </View>
+        {task.status ? (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(task, "task");
+            }}
+          >
+            <Icon name="check-circle" size={20} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(task, "task");
+            }}
+          >
+            <Icon name="circle-outline" size={20} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        )}
+      </View>
+    </Link>
+  ) : (
+    <Link href={{ pathname: "/task/[id]", params: { id: task._id } }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          columnGap: 10,
+          rowGap: 16,
+        }}
+      >
+        {task.status ? (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(task, "task");
+            }}
+          >
+            <Icon name="check-circle" size={25} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(task, "task");
+            }}
+          >
+            <Icon name="circle-outline" size={25} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        )}
+
         <Text
           style={{
             fontSize: 16,
@@ -86,90 +157,24 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
         >
           {task.name}
         </Text>
-        {!allDay && (
+        <View
+          style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
+        >
           <Text
             style={{
-              fontSize: 13.3,
-              color: "#A5A096",
-              fontFamily: "Rebond-Grotesque-Regular",
+              fontSize: 13.33,
+              color: "#474038",
+              fontFamily: "Rebond-Grotesque-Medium",
+              padding: 4,
+              textAlign: "center",
+              ...getPriorityStyle(task.priority),
             }}
           >
-            {duration}
+            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
           </Text>
-        )}
+        </View>
       </View>
-      {task.status ? (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(task, "task");
-          }}
-        >
-          <Icon name="check-circle" size={20} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      ) : (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(task, "task");
-          }}
-        >
-          <Icon name="circle-outline" size={20} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      )}
-    </View>
-  ) : (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        columnGap: 10,
-        rowGap: 16,
-      }}
-    >
-      {task.status ? (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(task, "task");
-          }}
-        >
-          <Icon name="check-circle" size={25} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      ) : (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(task, "task");
-          }}
-        >
-          <Icon name="circle-outline" size={25} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      )}
-
-      <Text
-        style={{
-          fontSize: 16,
-          color: "#291752",
-          fontFamily: "Rebond-Grotesque-Medium",
-          marginTop: 6,
-        }}
-      >
-        {task.name}
-      </Text>
-      <View
-        style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
-      >
-        <Text
-          style={{
-            fontSize: 13.33,
-            color: "#474038",
-            fontFamily: "Rebond-Grotesque-Medium",
-            padding: 4,
-            textAlign: "center",
-            ...getPriorityStyle(task.priority),
-          }}
-        >
-          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-        </Text>
-      </View>
-    </View>
+    </Link>
   );
 };
 
