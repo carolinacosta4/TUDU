@@ -320,8 +320,8 @@ const styles = StyleSheet.create({
   deleteText: {
     fontSize: 16,
     color: "#D32F2F",
-    fontWeight: "bold",
     fontFamily: "Rebond-Grotesque-Medium",
+    lineHeight: 24
   },
   checkButton: {
     padding: 15,
