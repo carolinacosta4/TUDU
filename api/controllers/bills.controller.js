@@ -120,7 +120,7 @@ exports.findBill = async (req, res) => {
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated"
       )
       .populate("IDcurrency", "-__v")
-      .select("-_id -__v")
+      .select("-__v")
       .exec();
 
     return res.status(200).json({
