@@ -10,11 +10,24 @@ import {
 import { Tabs } from "expo-router";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useFonts from "@/hooks/useFonts";
+import { useTask } from "@/hooks/useTask";
+import { ScrollView } from "react-native";
+import CreateTaskModal from "@/components/CreateTaskModal";
+import CreateBillModal from "@/components/CreateBillModal";
 
 const { width, height } = Dimensions.get("window");
 
 export default function TabLayout() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [addTask, setAddTask] = useState(true);
+  const { categories } = useTask();
+
+  const dataRepeat = [
+    { label: "Never", value: "never" },
+    { label: "Daily", value: "daily" },
+    { label: "Weekly", value: "weekly" },
+    { label: "Monthly", value: "monthly" },
+  ];
   const fontsLoaded = useFonts();
 
   if (!fontsLoaded) {
@@ -36,16 +49,12 @@ export default function TabLayout() {
             marginVertical: height * 0.03,
             borderRadius: 48,
             height: height * 0.09,
-            alignItems: "center",
+            flexDirection: "row",
             justifyContent: "center",
             position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            flexDirection: "row",
+            paddingTop: (height * 0.09) / 4,
             paddingLeft: width * 0.32,
             paddingRight: width * 0.04,
-            paddingTop: height * 0.01,
           },
           tabBarActiveTintColor: "#F7F6F0",
           tabBarInactiveTintColor: "#F7F6F0",
@@ -117,8 +126,29 @@ export default function TabLayout() {
         />
       </Tabs>
 
-      <TouchableOpacity style={styles.addButton} onPress={toggleModal}>
-        <Text style={styles.addText}>+ Add</Text>
+      <TouchableOpacity
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 14,
+          backgroundColor: "#F7F6F0",
+          borderRadius: 24,
+          position: "absolute",
+          bottom: (height * 0.09) / 2,
+          left: width * 0.1,
+          width: width * 0.24,
+        }}
+        onPress={toggleModal}
+      >
+        <Text
+          style={{
+            color: "#562CAF",
+            fontSize: 19.2,
+            fontFamily: "Rebond-Grotesque-Bold",
+          }}
+        >
+          + Add
+        </Text>
       </TouchableOpacity>
 
       <Modal
@@ -127,17 +157,93 @@ export default function TabLayout() {
         transparent={true}
         onRequestClose={toggleModal}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalText}>This is your pop-up!</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={toggleModal}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "flex-end",
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              height: height * 0.8,
+              padding: height * 0.025,
+              backgroundColor: "#F7F6F0",
+              borderTopRightRadius: 24,
+              borderTopLeftRadius: 24,
+            }}
+          >
+            <ScrollView
+              contentContainerStyle={{
+                flexGrow: 1,
+                justifyContent: "flex-end",
+              }}
+            >
+              <View style={{ rowGap: 24 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    columnGap: 16,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => setAddTask(true)}
+                    style={
+                      addTask && {
+                        backgroundColor: "#DDD8CE",
+                        borderRadius: 50,
+                      }
+                    }
+                  >
+                    <Text
+                      style={{
+                        fontSize: 19.2,
+                        fontFamily: "Rebond-Grotesque-Medium",
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                      }}
+                    >
+                      Task
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setAddTask(false)}
+                    style={
+                      !addTask && {
+                        backgroundColor: "#DDD8CE",
+                        borderRadius: 50,
+                      }
+                    }
+                  >
+                    <Text
+                      style={{
+                        fontSize: 19.2,
+                        fontFamily: "Rebond-Grotesque-Medium",
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                      }}
+                    >
+                      Bill
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {addTask ? (
+                  <CreateTaskModal
+                    categories={categories}
+                    dataRepeat={dataRepeat}
+                    toggleModal={toggleModal}
+                  />
+                ) : (
+                  <CreateBillModal
+                    dataRepeat={dataRepeat}
+                    toggleModal={toggleModal}
+                  />
+                )}
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -146,57 +252,12 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  addButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 14,
-    backgroundColor: "#F7F6F0",
-    borderRadius: 24,
-    position: "absolute",
-    bottom: height * 0.045,
-    left: width * 0.1,
-    width: width * 0.24,
-    height: 48,
-  },
-  addText: {
-    color: "#562CAF",
-    fontSize: 19.2,
-    fontFamily: "Rebond-Grotesque-Bold",
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: width * 0.8,
-    padding: height * 0.025,
-    backgroundColor: "white",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  modalContent: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  modalText: {
-    fontSize: width * 0.045,
-    marginBottom: height * 0.025,
-    marginRight: width * 0.025,
-  },
-  closeButton: {
-    backgroundColor: "#6B47DC",
-    padding: height * 0.012,
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
   iconContainer: {
     justifyContent: "center",
     alignItems: "center",
+    // marginBottom: (height * 0.09) / 2,
   },
+
   activeIconBackground: {
     backgroundColor: "#EEE5F520",
     borderRadius: 36,

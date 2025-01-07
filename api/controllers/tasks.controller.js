@@ -43,9 +43,9 @@ exports.findTasks = async (req, res) => {
       .exec();
 
     if (!tasks || tasks.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
-        error: "No tasks found",
+        data: [],
       });
     }
 
@@ -259,8 +259,6 @@ exports.findCategories = async (req, res) => {
       data: categories,
     });
   } catch (error) {
-    console.log(error);
-
     handleErrorResponse(res, error);
   }
 };
