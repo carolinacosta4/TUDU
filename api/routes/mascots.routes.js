@@ -7,8 +7,8 @@ router
     .get(mascotsController.findAll)
 
 
-// router.route("/:idM")
-//   .get(tipsController.findOne)
+router.route("/:idM")
+  .get(mascotsController.findOne)
 
 
 router.all("*", function (req, res) {

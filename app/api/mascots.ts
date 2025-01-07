@@ -1,5 +1,5 @@
 import axios from "axios";
-import  Tip  from '@/interfaces/Tip'; 
+import  Mascot  from '@/interfaces/Mascot'; 
 
 export interface ApiError {
   message: string;
@@ -13,55 +13,23 @@ const apiClient = axios.create({
   },
 });
 
-export async function getTips(): Promise<Tip[]> {
+export async function getMascots(): Promise<Mascot[]> {
   try {
-    const response = await apiClient.get<Tip[]>("/tips");
+    const response = await apiClient.get<Mascot[]>("/mascots");
     return response.data;
   } catch (error: any) {
     handleApiError(error);
   }
 }
 
-export async function getTip(id: string): Promise<Tip> {
+export async function getMascot(id: string): Promise<Mascot> {
   try {
-    const response = await apiClient.get<Tip>(`/tips/${id}`);
+    const response = await apiClient.get<Mascot>(`/mascots/${id}`);
     return response.data;
   } catch (error: any) {
     handleApiError(error);
   }
 }
-
-export const markAsFavorite = async (tipId: string, token: string) => {
-  try {
-    console.log('token', token)
-    const response = await apiClient.post(`/tips/${tipId}/favorite`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      }
-    });
-    console.log('response:', response.data.msg);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
-
-
-export async function removeFromFavorite(tipId: string, token: string): Promise<void> {
-  try {
-    const response = await apiClient.delete(`/tips/${tipId}/favorite`, {
-      headers: {
-        Authorization: `Bearer ${token}`,  
-      },
-    });
-    
-    console.log(response.data.msg);
-  } catch (error: any) {
-    handleApiError(error);
-  }
-}
-
-
 
 function handleApiError(error: any): never {
   if (error.response) {

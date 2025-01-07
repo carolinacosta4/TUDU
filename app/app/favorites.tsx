@@ -1,35 +1,26 @@
 import React, { useLayoutEffect, useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '@/types/navigation'; 
-
-const ContentCard: React.FC<{
-  category: string;
-  title: string;
-  details: string;
-  timestamp: string;
-  author: string;
-  imageUri: string;
-}> = ({ category, title, details, timestamp, author, imageUri }) => {
-  return (
-    <View style={styles.card}>
-      <View style={styles.cardTextContainer}>
-        <Text style={styles.categoryText}>{category}</Text>
-        <View style={styles.detailsContainer}>
-          <Text style={styles.titleText}>{title}</Text>
-          <Text style={styles.detailsText}>{`${timestamp} • ${author}`}</Text>
-        </View>
-      </View>
-      <Image style={styles.cardImage} source={{ uri: imageUri }} />
-    </View>
-  );
-};
-
+import { RootStackParamList } from '@/types/navigation';
+import { useUser } from '@/hooks/useUser';
+import TipItemList from '@/components/TipItemList';
+import { getTip } from '@/api/tips'; 
+import { useRouter } from 'expo-router';
+import { getCategoryById } from '@/api/tipsCategory';
+import useFonts from "@/hooks/useFonts";
+import { formatDistanceToNow } from 'date-fns';
+import { useMascot } from '@/hooks/useMascot';
 const Favorites = () => {
-  const [tips, useTips] = useState([0]);
+  const [categoryNames, setCategoryNames] = useState<{ [key: string]: string }>({});
+  const [filteredTips, setFilteredTips] = useState<any[]>([]);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
+  const user = useUser();
+  const router = useRouter();
+  const fontsLoaded = useFonts();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const sadMascot = useMascot('676968aca5e78f1378a63a6b');
   useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: {
@@ -45,44 +36,94 @@ const Favorites = () => {
     });
   }, [navigation]);
 
-  return (
- <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-       {tips.length > 4 ? (
-      <View style={styles.popularContainer}>
-        <ContentCard
-          category="Lifestyle"
-          title="Simple Ways to Boost Your Morning Routine"
-          details="20 minutes ago • Alberta Fernandes"
-          timestamp="20 minutes ago"
-          author="Alberta Fernandes"
-          imageUri="https://via.placeholder.com/90x72"
-        />
-        <ContentCard
-          category="Lifestyle"
-          title="How to Make your Home Feel Like a Sanctuary"
-          details="4 days ago • João Augusto"
-          timestamp="4 days ago"
-          author="João Augusto"
-          imageUri="https://via.placeholder.com/90x72"
-        />
-        </View>
-        ) : (
-          <View style={styles.containerImage}>
-            <View>
-            </View>
-            <View style={styles.textContainer}>
-              <View style={styles.textWrapper}>
-                <Text style={styles.title}>Nothing here yet!</Text>
-                <Text style={styles.subtitle}>Start exploring and save tips that inspire you!</Text>
-              </View>
-            </View>
-        </View>
-        )}
+  useEffect(() => {
 
+    const fetchFavoriteTips = async () => {
+      if (user?.user?.FavoriteTip) {
+        const favoriteTipIds = user.user.FavoriteTip.map(fav => fav.IDtip);
+        const fetchedTips = await Promise.all(
+          favoriteTipIds.map(async (id) => {
+            try {
+              const tip = await getTip(id); 
+              return tip.data; 
+            } catch (error) {
+              console.error(`Error fetching tip with ID ${id}:`, error);
+              return null;
+            }
+          })
+        );
+
+        const validTips = fetchedTips.filter(tip => tip !== null);
+        setFilteredTips(validTips);
+
+        const categoryNameMap: { [key: string]: string } = {};
+           await Promise.all(
+       
+          validTips.map(async (tip) => {
+            try {
+              const category = await getCategoryById({ _id: tip.IDcategory });
+             // console.log('category:', category);
+              categoryNameMap[tip._id] = category.data;
+              //console.log('categoryNameMap:', categoryNameMap);
+            } catch (error) {
+              console.error(`Error fetching category for tip ${tip._id}:`, error);
+            }
+          })
+        );
+        setCategoryNames(categoryNameMap);
+      }
+    };
+
+    fetchFavoriteTips();
+  }, [user]);
+
+
+
+  const handleNavigateToTip = (tipId: string) => {
+    router.push(`/tips/${tipId}`);
+  };
+
+    const formatRelativeTime = (date: Date) => {
+      let relativeTime = formatDistanceToNow(date, { addSuffix: true });
+      return relativeTime.replace(/^about\s/, '');
+    };
+  
+    if (!fontsLoaded) {
+      return <Text>Loading tips...</Text>;
+    }
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      {filteredTips.length > 0 ? (
+        <View style={styles.popularContainer}>
+          <TipItemList
+            filteredTips={filteredTips}
+            categoryNames={categoryNames}
+            formatRelativeTime={formatRelativeTime} 
+            handleNavigateToTip={handleNavigateToTip}
+          />
+        </View>
+      ) : (
+        <View style={styles.containerImage}>
+          <View style={styles.textContainer}>
+          <View style={styles.textWrapper}>
+              {sadMascot?.mascot ? (
+                <Image 
+                  source={{ uri: sadMascot.mascot?.image }}
+                  style={styles.mascotImage}
+                />
+              ) : (
+                <Text>Loading mascot...</Text>
+              )}
+              <Text style={styles.title}>Nothing here yet!</Text>
+              <Text style={styles.subtitle}>Start exploring and save tips that inspire you!</Text>
+            </View>
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -95,57 +136,12 @@ const styles = StyleSheet.create({
   popularContainer: {
     marginTop: 0,
   },
-  card: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE5F5',
-  },
-  cardTextContainer: {
-    flex: 1,
-    marginRight: 8,
-  },
-  categoryText: {
-    color: '#562CAF',
-    fontSize: 13,
-    fontFamily: 'ES Rebond Grotesque TRIAL',
-    fontWeight: '500',
-    lineHeight: 16,
-  },
-  detailsContainer: {
-    marginTop: 4,
-  },
   containerImage: {
     flex: 1,
-    justifyContent: 'center', 
-    alignItems: 'center',      
+    justifyContent: 'center',
+    alignItems: 'center',
     height: 664,
     backgroundColor: '#F7F6F0',
-  },
-  titleText: {
-    color: '#22163D',
-    fontSize: 16,
-    fontFamily: 'ES Rebond Grotesque TRIAL',
-    fontWeight: '500',
-    lineHeight: 20,
-  },
-  detailsText: {
-    color: '#A5A096',
-    fontSize: 13,
-    fontFamily: 'ES Rebond Grotesque TRIAL',
-    fontWeight: '400',
-    lineHeight: 16,
-  },
-  cardImage: {
-    width: 142,
-    height: 156,
-    borderRadius: 4,
-  },
-  image: {
-    width: 175.3,
-    height: 190,
   },
   textContainer: {
     flexDirection: 'column',
@@ -167,7 +163,6 @@ const styles = StyleSheet.create({
     fontFamily: 'SF Pro Display',
     fontWeight: '500',
     lineHeight: 34.56,
-    wordWrap: 'break-word',
   },
   subtitle: {
     width: 274,
@@ -177,7 +172,11 @@ const styles = StyleSheet.create({
     fontFamily: 'ES Rebond Grotesque TRIAL',
     fontWeight: '400',
     lineHeight: 16,
-    wordWrap: 'break-word',
+  },
+  mascotImage: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
 });
 

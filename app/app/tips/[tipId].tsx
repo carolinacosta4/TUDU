@@ -2,7 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTip } from '@/hooks/useTip';
 import { formatDistanceToNow } from 'date-fns';
@@ -10,9 +10,10 @@ import { Asset } from 'expo-asset';
 import SvgUri from 'react-native-svg-uri';
 import { removeFromFavorite, markAsFavorite } from '@/api/tips';
 import { useUserInfo } from '@/hooks/useUserInfo';
-
+import { useUser } from '@/hooks/useUser';
 const TipDetail = () => {
   const { userInfo } = useUserInfo();
+  const {user} = useUser();
   const { tipId } = useLocalSearchParams();
   console.log('tipId:', tipId);
   const navigation = useNavigation(); 
@@ -30,6 +31,16 @@ const TipDetail = () => {
       return 'Invalid date';
     }
   };
+
+  useEffect(() => {
+    if (!userInfo?.authToken || !tipId || !user) return;
+    
+    const idToCheck = Array.isArray(tipId) ? tipId[0] : tipId;
+    const favoriteTipIds = user.FavoriteTip.map(fav => fav.IDtip);
+
+    setIsLiked(favoriteTipIds.includes(idToCheck));
+  }, [user, tipId, userInfo?.authToken]);
+
   const handleHeartClick = async () => {
     if (!userInfo?.authToken) {
       console.error("User is not logged in or token is not available.");
@@ -37,8 +48,7 @@ const TipDetail = () => {
     }
   
     console.log('isLiked:', isLiked);
-    setIsLiked(!isLiked);
-    console.log('isLiked:', isLiked);
+    setIsLiked(prevState => !prevState);
   
     try {
       const id = String(tipId);
@@ -49,11 +59,9 @@ const TipDetail = () => {
       }
     } catch (error) {
       console.error("Error with favorite action", error);
-      setIsLiked(isLiked); // Revert the like state if an error occurs
+      setIsLiked(isLiked); 
     }
   };
-  
-
 
   useLayoutEffect(() => {
     navigation.setOptions({

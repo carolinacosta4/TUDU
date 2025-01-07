@@ -1,5 +1,5 @@
 import axios from "axios";
-import { TipCategory } from "@/types/tipCategories";
+import TipCategory  from "@/interfaces/TipCategory";
 
 export interface ApiError {
   message: string;
@@ -12,7 +12,7 @@ export interface ApiResponse<T> {
 }
 
 const apiClient = axios.create({
-  baseURL: "http://172.28.2.174:3000",
+  baseURL: "http://172.23.116.206:3000",
   headers: {
     "Content-type": "application/json",
   },

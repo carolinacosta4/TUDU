@@ -20,7 +20,11 @@ const TipItemList: React.FC<TipItemListProps> = ({
     <>
       {filteredTips.length > 0 ? (
         filteredTips
-          .sort((a, b) => a.title.localeCompare(b.title))
+          .sort((a, b) => {
+            const titleA = a.title || ''; 
+            const titleB = b.title || ''; 
+            return titleA.localeCompare(titleB);
+          })
           .map((tip) => (
             <TouchableOpacity key={tip._id} onPress={() => handleNavigateToTip(tip._id)}>
               <View style={styles.footerContainer}>

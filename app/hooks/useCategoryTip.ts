@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getCategories } from '@/api/tipsCategory'; 
-import { TipCategory } from '@/types/tipCategories'; 
+import TipCategory  from '@/interfaces/TipCategory'; 
 
 export const useTipCategories = () => {
   const [tipCategories, setTipCategories] = useState<TipCategory[]>([]);

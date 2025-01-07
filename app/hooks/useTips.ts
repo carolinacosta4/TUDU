@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getTips } from '@/api/tips';
-import { Tip } from '@/types/tips'; 
+import  Tip  from '@/interfaces/Tip'; 
 
 export const useTips = () => {
   const [tips, setTips] = useState<Tip[]>([]);

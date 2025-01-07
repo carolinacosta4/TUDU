@@ -35,3 +35,5 @@ export function useUserInfo() {
 
   return { userInfo, setUserInfo, storeData, loading, logged };
 }
+
+//AsyncStorage.clear()

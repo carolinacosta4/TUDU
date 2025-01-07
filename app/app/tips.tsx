@@ -145,6 +145,8 @@ const TipsPage = () => {
   );
 };
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

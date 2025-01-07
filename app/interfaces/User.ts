@@ -19,4 +19,5 @@ export default interface User {
   };
   userTasks: Task[];
   userBills: Bill[];
+  FavoriteTip: { IDtip: string; IDuser: string }[]; 
 }

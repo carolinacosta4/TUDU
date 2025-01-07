@@ -136,13 +136,9 @@ exports.deleteTip = async (req, res) => {
 }
 
 exports.markAsFavorite = async (req, res) => {
-    console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
     try {
-        console.log('inside backend')
         const idT = req.params.idT
-        console.log('idT', idT)
         const tip = await Tip.findOne({ _id: idT }).exec();
-        console.log('tip', tip)
         if (!tip) {
             return res.status(404).json({
                 success: false,
