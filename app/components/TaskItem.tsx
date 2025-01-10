@@ -1,69 +1,16 @@
 import {
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import Task from "@/interfaces/Task";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-// import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-// import Reanimated, { useAnimatedStyle } from "react-native-reanimated";
-// import { useDerivedValue } from "react-native-reanimated";
-
-// const RightAction = ({
-//   progress,
-//   dragX,
-//   handleDelete,
-//   task,
-// }: {
-//   progress: Reanimated.SharedValue<number>;
-//   dragX: Reanimated.SharedValue<number>;
-//   handleDelete: (id: string, type: string) => void;
-//   task: Task;
-// }) => {
-//   const derivedTranslation = useDerivedValue(() => dragX.value + 60);
-
-//   const styleAnimation = useAnimatedStyle(() => ({
-//     transform: [{ translateX: derivedTranslation.value }],
-//   }));
-
-//   return (
-//     <Reanimated.View style={styleAnimation}>
-//       <TouchableOpacity
-//         style={{
-//           backgroundColor: "#EF4444",
-//           justifyContent: "center",
-//           alignItems: "center",
-//           width: 60,
-//           height: "100%",
-//           borderTopRightRadius: 16,
-//           borderBottomRightRadius: 16,
-//         }}
-//         onPress={() => handleDelete(task._id, "task")}
-//       >
-//         <Text
-//           style={{
-//             width: 50,
-//             color: "#F7F6F0",
-//             textAlign: "center",
-//             fontFamily: "Rebond-Grotesque-Medium",
-//             fontSize: 13.3,
-//           }}
-//         >
-//           Delete
-//         </Text>
-//       </TouchableOpacity>
-//     </Reanimated.View>
-//   );
-// };
 
 type TaskItemProps = {
   task: Task;
   allDay: boolean;
   changeStatus: (data: Task, name: "task") => void;
   type: string;
-  handleDelete: (id: string, type: string) => void;
 };
 
 const TaskCardItem = ({
@@ -71,9 +18,8 @@ const TaskCardItem = ({
   allDay,
   changeStatus,
   type,
-  handleDelete,
 }: TaskItemProps) => {
-  const calculateDuration = (startDate: string, endDate: string): string => {
+  const calculateDuration = (startDate: string, endDate: string): string => {  
     const start = new Date(startDate);
     const end = new Date(endDate);
     const durationInMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
@@ -107,24 +53,6 @@ const TaskCardItem = ({
   };
 
   return type === "cards" ? (
-    // <GestureHandlerRootView>
-    //   <ReanimatedSwipeable
-    //     containerStyle={{
-    //       backgroundColor: "#DDD8CE",
-    //       borderRadius: 16,
-    //     }}
-    //     friction={2}
-    //     enableTrackpadTwoFingerGesture
-    //     rightThreshold={40}
-    //     renderRightActions={(progress, dragX) => (
-    //       <RightAction
-    //         progress={progress}
-    //         dragX={dragX}
-    //         handleDelete={handleDelete}
-    //         task={task}
-    //       />
-    //     )}
-    //   >
     <View
       style={{
         flexDirection: "row",
@@ -154,6 +82,7 @@ const TaskCardItem = ({
               fontFamily: "Rebond-Grotesque-Medium",
               padding: 4,
               textAlign: "center",
+              lineHeight: 20,
             }}
           >
             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
@@ -165,6 +94,7 @@ const TaskCardItem = ({
             color: "#291752",
             fontFamily: "Rebond-Grotesque-Medium",
             marginTop: 6,
+            lineHeight: 20,
           }}
         >
           {task.name}
@@ -175,6 +105,7 @@ const TaskCardItem = ({
               fontSize: 13.3,
               color: "#A5A096",
               fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20,
             }}
           >
             {duration}
@@ -200,8 +131,6 @@ const TaskCardItem = ({
       )}
     </View>
   ) : (
-    // </ReanimatedSwipeable>
-    // </GestureHandlerRootView>
     <View
       style={{
         flexDirection: "row",
@@ -234,6 +163,7 @@ const TaskCardItem = ({
           color: "#291752",
           fontFamily: "Rebond-Grotesque-Medium",
           marginTop: 6,
+          lineHeight: 20,
         }}
       >
         {task.name}
@@ -256,6 +186,7 @@ const TaskCardItem = ({
               fontFamily: "Rebond-Grotesque-Medium",
               padding: 4,
               textAlign: "center",
+              lineHeight: 20,
             }}
           >
             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}

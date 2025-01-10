@@ -27,7 +27,13 @@ export const categorizeTasks = (tasks: Task[] = []) => {
   tasks.forEach((task) => {
     const start = new Date(task.startDate);
     const end = new Date(task.endDate);
-    const isAllDay = end.getTime() - start.getTime() >= 24 * 60 * 60 * 1000;
+    const duration = end.getTime() - start.getTime();
+    const isAllDay =
+      duration >= 24 * 60 * 60 * 1000 ||
+      (start.getHours() === 0 &&
+        start.getMinutes() === 0 &&
+        end.getHours() === 23 &&
+        end.getMinutes() === 59);
 
     isAllDay ? allDayTasks.push(task) : timedTasks.push(task);
   });
@@ -44,6 +50,7 @@ export const groupTasksByTime = (tasks: Task[] = []) => {
 
   tasks.forEach((task) => {
     const time = formatTime(task.startDate.toString());
+
     let group = groups.find((g) => g.time == time);
 
     if (!group) {
@@ -59,8 +66,68 @@ export const groupTasksByTime = (tasks: Task[] = []) => {
 
 const formatTime = (dateString: string): string => {
   const date = new Date(dateString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  if (minutes === 60 || (minutes === 0 && hours === 1)) {
+    return `${hours + 1}h`;
+  }
+
   return date.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
+};
+
+export const applyFilters = (
+  tasks: Task[],
+  bills: Bill[],
+  filterSelection: any
+) => {
+  let filteredTasks = [...tasks];
+  let filteredBills = [...bills];
+
+  if (filterSelection.category != "all") {
+    filteredTasks = filteredTasks.filter(
+      (task) => task.IDcategory === filterSelection.category
+    );
+    filteredBills = [];
+  }
+
+  if (filterSelection.group != "all") {
+    if (filterSelection.group == "tasks") {
+      filteredBills = [];
+    } else if (filterSelection.group == "bills") {
+      filteredTasks = [];
+    }
+  }
+
+  if (filterSelection.filter != "all") {
+    filteredTasks = filteredTasks.filter(
+      (task) => task.priority == filterSelection.filter
+    );
+    filteredBills = filteredBills.filter(
+      (bill) => bill.priority == filterSelection.filter
+    );
+  }
+
+  if (filterSelection.sortBy == "ascending") {
+    filteredTasks.sort(
+      (a, b) =>
+        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    );
+    filteredBills.sort(
+      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    );
+  } else {
+    filteredTasks.sort(
+      (a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+    );
+    filteredBills.sort(
+      (a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime()
+    );
+  }
+
+  return { filteredTasks, filteredBills };
 };

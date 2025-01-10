@@ -6,21 +6,34 @@ import { useUser } from "@/hooks/useUser";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import useFonts from "@/hooks/useFonts";
 import { useTask } from "@/hooks/useTask";
-import { useBill } from "@/hooks/useBill";
 import Filter from "@/components/Filter";
 import HeaderHomeScreen from "@/components/HeaderHomeScreen";
 import CardsHome from "@/components/CardsHome";
 import ListHome from "@/components/ListHome";
-import { groupTasksByTime, categorizeTasks } from "@/utils/taskUtils";
+import {
+  groupTasksByTime,
+  categorizeTasks,
+  applyFilters,
+} from "@/utils/taskUtils";
 import Task from "@/interfaces/Task";
 import Bill from "@/interfaces/Bill";
 import NoTasksView from "@/components/NoTasksView";
 import StuffHeader from "@/components/StuffHeader";
+import { useTaskStore } from "@/stores/taskStore";
+import { useBillStore } from "@/stores/billStore";
 
 export default function HomeScreen() {
   const today = new Date();
-  const { user, loading } = useUser();
-  const { logged } = useUserInfo();
+  const {
+    user,
+    loading,
+    editUserMascot,
+    handleGetUser,
+    userStreak,
+    handleUserStreak,
+    handleGetStreak,
+  } = useUser();
+  const { userInfo, logged } = useUserInfo();
   const fontsLoaded = useFonts();
   const [showFilter, setShowFilter] = useState(false);
   const [filterSelection, setFilterSelection] = useState({
@@ -30,8 +43,9 @@ export default function HomeScreen() {
     layout: "cards",
     sortBy: "ascending",
   });
-  const { getTasks, tasks, editTask, categories, deleteTask } = useTask();
-  const { getBills, bills, editBill, deleteBill } = useBill();
+  const { fetchTasks, tasks, updateTask, deleteTask } = useTaskStore();
+  const { fetchBills, bills, updateBill, deleteBill } = useBillStore();
+  const { categories } = useTask();
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -56,9 +70,9 @@ export default function HomeScreen() {
   }, [logged]);
 
   useEffect(() => {
-    if (loading === false && logged === true) {
-      getTasks(today);
-      getBills(today);
+    if (loading === false && logged === true && userInfo) {
+      fetchTasks(today, userInfo.authToken);
+      fetchBills(today, userInfo.authToken);
       setLoadingTasks(false);
     }
   }, [logged, loading]);
@@ -73,32 +87,75 @@ export default function HomeScreen() {
     setShowList(filterSelection.layout === "list");
   }, [filterSelection.layout]);
 
-  if (loading || !fontsLoaded || loadingTasks || !loaded)
+  useEffect(() => {
+    if ((tasks.length > 0 || bills.length > 0) && loaded == true) {
+      checkAndUpdateMascots(tasks, bills);
+      checkAndUpdateStreak(tasks, bills);
+    }
+  }, [tasks, bills, loaded]);
+
+  if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo)
     return <Text>Loading...</Text>;
 
   const ONE_SECOND_IN_MS = 1000;
   const PATTERN = [1 * ONE_SECOND_IN_MS];
 
+  const checkAndUpdateStreak = async (tasks: Task[], bills: Bill[]) => {
+    const totalItems = tasks.length + bills.length;
+    const completedItems =
+      tasks.filter((task) => task.status).length +
+      bills.filter((bill) => bill.status).length;
+    const seventyDone = Math.ceil(totalItems * 0.7);
+
+    if (user && completedItems == seventyDone) {
+      await handleUserStreak(user.data._id);
+      handleGetStreak(user.data._id);
+    }
+  };
+
+  const checkAndUpdateMascots = async (tasks: Task[], bills: Bill[]) => {
+    const totalItems = tasks.length + bills.length;
+    const completedItems =
+      tasks.filter((task) => task.status).length +
+      bills.filter((bill) => bill.status).length;
+    const halfItems = Math.ceil(totalItems / 2);
+
+    if (user) {
+      if (completedItems === totalItems) {
+        await editUserMascot(user.data._id, "676969ada5e78f1378a63a70");
+        handleGetUser(user.data._id);
+      } else if (completedItems >= halfItems) {
+        await editUserMascot(user.data._id, "67696917a5e78f1378a63a6e");
+        handleGetUser(user.data._id);
+      } else {
+        await editUserMascot(user.data._id, "676969dfa5e78f1378a63a71");
+        handleGetUser(user.data._id);
+      }
+    }
+  };
+
   const changeStatus = async (data: Task | Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
-      if (name === "task") {
-        const updatedStatus = !data.status;
-        await editTask(data._id, { status: updatedStatus });
-        getTasks(today);
-        if (user?.data.vibration && updatedStatus === true) {
-          Platform.OS === "android"
-            ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
-            : Vibration.vibrate(PATTERN);
-        }
+      if (name == "task") {
+        await updateTask(
+          data._id,
+          { status: updatedStatus },
+          userInfo.authToken
+        );
+        await fetchTasks(today, userInfo.authToken);
       } else {
-        await editBill(data._id, { status: updatedStatus });
-        getBills(today);
-        if (user?.data.vibration && updatedStatus === true) {
-          Platform.OS === "android"
-            ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
-            : Vibration.vibrate(PATTERN);
-        }
+        await updateBill(
+          data._id,
+          { status: updatedStatus },
+          userInfo.authToken
+        );
+        await fetchBills(today, userInfo.authToken);
+      }
+      if (user?.data.vibration && updatedStatus === true) {
+        Platform.OS === "android"
+          ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+          : Vibration.vibrate(PATTERN);
       }
     } catch (error) {
       console.error(error);
@@ -115,63 +172,14 @@ export default function HomeScreen() {
     setFilterSelection(selection);
   };
 
-  const applyFilters = (tasks: Task[], bills: Bill[]) => {
-    let filteredTasks = [...tasks];
-    let filteredBills = [...bills];
-
-    if (filterSelection.category != "all") {
-      filteredTasks = filteredTasks.filter(
-        (task) => task.IDcategory === filterSelection.category
-      );
-      filteredBills = [];
-    }
-
-    if (filterSelection.group != "all") {
-      if (filterSelection.group == "tasks") {
-        filteredBills = [];
-      } else if (filterSelection.group == "bills") {
-        filteredTasks = [];
-      }
-    }
-
-    if (filterSelection.filter != "all") {
-      filteredTasks = filteredTasks.filter(
-        (task) => task.priority == filterSelection.filter
-      );
-      filteredBills = filteredBills.filter(
-        (bill) => bill.priority == filterSelection.filter
-      );
-    }
-
-    if (filterSelection.sortBy == "ascending") {
-      filteredTasks.sort(
-        (a, b) =>
-          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-      );
-      filteredBills.sort(
-        (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-      );
-    } else {
-      filteredTasks.sort(
-        (a, b) =>
-          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-      );
-      filteredBills.sort(
-        (a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime()
-      );
-    }
-
-    return { filteredTasks, filteredBills };
-  };
-
   const handleDelete = async (id: string, type: string) => {
     try {
       if (type == "task") {
-        await deleteTask(id);
-        getTasks(today);
+        await deleteTask(id, userInfo.authToken);
+        fetchTasks(today, userInfo.authToken);
       } else if (type == "bill") {
-        await deleteBill(id);
-        getBills(today);
+        await deleteBill(id, userInfo.authToken);
+        fetchBills(today, userInfo.authToken);
       }
     } catch (error) {
       console.error(error);
@@ -180,7 +188,8 @@ export default function HomeScreen() {
 
   const { filteredTasks, filteredBills } = applyFilters(
     tasks ?? [],
-    bills ?? []
+    bills ?? [],
+    filterSelection
   );
   const categorizedTasks = categorizeTasks(filteredTasks);
   const { allDayTasks, timedTasks } = categorizedTasks;
@@ -190,15 +199,21 @@ export default function HomeScreen() {
     user && (
       <SafeAreaProvider>
         <SafeAreaView style={{ backgroundColor: "#F7F6F0", flex: 1 }}>
-          <View style={{ marginHorizontal: 20, paddingTop: 10 }}>
+          <View
+            style={{
+              marginHorizontal: 20,
+              paddingTop: 10,
+            }}
+          >
             <HeaderHomeScreen
               month={today.toLocaleDateString("en-US", { month: "short" })}
               day={today.getDate()}
               weekday={today.toLocaleDateString("en-US", { weekday: "short" })}
-              username={user.data.name}
+              name={user.data.name}
               tasksToday={tasks?.length}
               billsToday={bills?.length}
               mascotStyle={getMascotStyle(user.data.IDmascot.name)}
+              userStreak={userStreak}
             />
           </View>
           <Image

@@ -31,6 +31,7 @@ const StuffHeader = ({
             color: "#291752",
             fontSize: 23.04,
             fontFamily: "Rebond-Grotesque-Bold",
+            lineHeight: 24,
           }}
         >
           {filterSelection.group === "tasks"
@@ -55,6 +56,7 @@ const StuffHeader = ({
                     color: "#562CAF",
                     fontSize: 13.3,
                     fontFamily: "Rebond-Grotesque-Regular",
+                    lineHeight: 24,
                   }}
                 >
                   {getCompletedThingsCount(
@@ -70,6 +72,7 @@ const StuffHeader = ({
                     color: "#562CAF",
                     fontSize: 13.3,
                     fontFamily: "Rebond-Grotesque-Regular",
+                    lineHeight: 24,
                   }}
                 >
                   {getCompletedThingsCount(
@@ -85,6 +88,7 @@ const StuffHeader = ({
                     color: "#562CAF",
                     fontSize: 13.3,
                     fontFamily: "Rebond-Grotesque-Regular",
+                    lineHeight: 24,
                   }}
                 >
                   {getCompletedThingsCount(

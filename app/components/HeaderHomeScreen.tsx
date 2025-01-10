@@ -1,60 +1,69 @@
 import { StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import HeaderItem from "./Header";
 
 type HeaderHomeScreenProps = {
   month: string;
   day: number;
   weekday: string;
-  username: string;
+  name: string;
   tasksToday: number;
   billsToday: number;
   mascotStyle: string;
+  userStreak: {
+    date: any;
+    streak: number;
+  };
 };
 
 const HeaderHomeScreen = ({
   month,
   day,
   weekday,
-  username,
+  name,
   tasksToday,
   billsToday,
   mascotStyle,
+  userStreak,
 }: HeaderHomeScreenProps) => {
   return (
-    <View style={{ marginRight: 20, paddingTop: 10 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          columnGap: 2,
-        }}
-      >
+    <View style={{ paddingTop: 10 }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <View
           style={{
-            width: 17,
-            height: 17,
-            borderRadius: 50,
-            backgroundColor: mascotStyle,
-          }}
-        ></View>
-        <Text
-          style={{
-            color: "#C4BFB5",
-            fontSize: 23,
-            fontFamily: "SF-Pro-Display-Medium",
+            flexDirection: "row",
+            alignItems: "center",
+            columnGap: 2,
           }}
         >
-          {month}'{day}
-        </Text>
-        <Text
-          style={{
-            color: "#562CAF",
-            fontSize: 23,
-            fontFamily: "SF-Pro-Display-Medium",
-          }}
-        >
-          {weekday}
-        </Text>
+          <View
+            style={{
+              width: 17,
+              height: 17,
+              borderRadius: 50,
+              backgroundColor: mascotStyle,
+            }}
+          ></View>
+          <Text
+            style={{
+              color: "#C4BFB5",
+              fontSize: 23,
+              fontFamily: "SF-Pro-Display-Medium",
+            }}
+          >
+            {month}'{day}
+          </Text>
+          <Text
+            style={{
+              color: "#562CAF",
+              fontSize: 23,
+              fontFamily: "SF-Pro-Display-Medium",
+            }}
+          >
+            {weekday}
+          </Text>
+        </View>
+        <HeaderItem page="Home" userStreak={userStreak} />
       </View>
       <Text
         style={{
@@ -63,7 +72,7 @@ const HeaderHomeScreen = ({
           fontFamily: "SF-Pro-Display-Bold",
         }}
       >
-        Hello, {username}!
+        Hello, {name}!
       </Text>
       {tasksToday != 0 || billsToday != 0 ? (
         <View
@@ -107,12 +116,14 @@ const styles = StyleSheet.create({
     color: "#C4BFB5",
     fontSize: 19.2,
     fontFamily: "Rebond-Grotesque-Medium",
+    lineHeight: 20,
   },
 
   textPurple: {
     color: "#562CAF",
     fontSize: 19.2,
     fontFamily: "Rebond-Grotesque-Medium",
+    lineHeight: 20,
   },
 });
 
