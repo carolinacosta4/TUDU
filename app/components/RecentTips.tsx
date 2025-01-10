@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { Tip } from '@/types/tips';
+import  Tip from '@/interfaces/Tip';
 
 
 interface RecentTipsProps {

@@ -53,6 +53,7 @@ const TipDetail = () => {
     try {
       const id = String(tipId);
       if (isLiked) {
+        console.log('inside the remove from favorite')
         await removeFromFavorite(id, userInfo.authToken);
       } else {
         await markAsFavorite(id, userInfo.authToken);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
-import { Tip } from '@/types/tips';
+import  Tip  from '@/interfaces/Tip';
 
 interface TipItemListProps {
   filteredTips: Tip[];

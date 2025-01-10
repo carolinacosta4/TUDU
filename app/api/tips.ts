@@ -7,7 +7,7 @@ export interface ApiError {
 }
 
 const apiClient = axios.create({
-  baseURL: "http://172.23.116.206:3000",
+  baseURL: "http://192.168.137.1:3000",
   headers: {
     "Content-type": "application/json",
   },
@@ -49,13 +49,17 @@ export const markAsFavorite = async (tipId: string, token: string) => {
 
 export async function removeFromFavorite(tipId: string, token: string): Promise<void> {
   try {
+   // console.log(tipId)
+    console.log(token)
+    console.log('inside the api function')
     const response = await apiClient.delete(`/tips/${tipId}/favorite`, {
       headers: {
         Authorization: `Bearer ${token}`,  
       },
     });
-    
-    console.log(response.data.msg);
+
+    // console.log('remove favorites', response)
+    // console.log(response.data.msg);
   } catch (error: any) {
     handleApiError(error);
   }
