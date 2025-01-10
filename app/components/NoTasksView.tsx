@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ModalCreateStuff from "./ModalCreateStuff";
+// import ModalCreateStuff from "./ModalCreateStuff";
 
 const { width } = Dimensions.get("window");
 const NoTasksView = () => {
@@ -74,7 +74,7 @@ const NoTasksView = () => {
         </View>
       </ScrollView>
 
-      <ModalCreateStuff toggleModal={toggleModal} modalVisible={modalVisible} />
+      {/* <ModalCreateStuff toggleModal={toggleModal} modalVisible={modalVisible} /> */}
     </>
   );
 };

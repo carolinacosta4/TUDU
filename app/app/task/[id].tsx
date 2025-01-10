@@ -12,11 +12,15 @@ import useFonts from "@/hooks/useFonts";
 import Task from "@/interfaces/Task";
 import { useTask } from "@/hooks/useTask";
 import { formatDate } from "@/utils/taskUtils";
+import { useTaskStore } from "@/stores/taskStore";
+import { useUserInfo } from "@/hooks/useUserInfo";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { editTask, handleGetTask, task, handleDeleteTask } = useTask();
+  const { handleGetTask, task } = useTask();
+  const { updateTask, deleteTask } = useTaskStore()
+  const { userInfo } = useUserInfo();
 
   useEffect(() => {
     if (typeof id === "string") {
@@ -24,7 +28,7 @@ const TaskDetail = () => {
     }
   }, [task]);
 
-  if (!task || !fontsLoaded) {
+  if (!task || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
         <Text>Loading task details...</Text>
@@ -90,15 +94,15 @@ const TaskDetail = () => {
     return `${formattedHours}h${formattedMinutes}`;
   };
 
-  const deleteTask = () => {
-    handleDeleteTask(task._id);
+  const handleDeleteTask = () => {
+    deleteTask(task._id, userInfo.authToken);
     router.push("/");
   };
 
   const handleMarkAsDone = async (task: Task) => {
     try {
-      let newStatus = !task.status;
-      await editTask(task._id, { status: newStatus });
+      let newStatus = !task.status;      
+      await updateTask(task._id, { status: newStatus }, userInfo.authToken );
     } catch (error: any) {
       console.error("Error message:", error);
     }
@@ -190,7 +194,7 @@ const TaskDetail = () => {
               <Text style={styles.sectionTitle}>Options</Text>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={deleteTask}
+                onPress={handleDeleteTask}
               >
                 <Text style={styles.deleteText}>Delete Task</Text>
               </TouchableOpacity>

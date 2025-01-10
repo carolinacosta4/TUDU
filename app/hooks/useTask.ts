@@ -38,5 +38,7 @@ export function useTask() {
     setTasks,
     loading,
     categories,
+    handleGetTask,
+    task
   };
 }

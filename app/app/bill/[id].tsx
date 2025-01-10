@@ -12,19 +12,23 @@ import useFonts from "@/hooks/useFonts";
 import Bill from "@/interfaces/Bill";
 import { useBill } from "@/hooks/useBill";
 import { formatDate } from "@/utils/taskUtils";
+import { useBillStore } from "@/stores/billStore";
+import { useUserInfo } from "@/hooks/useUserInfo";
 
 const BillDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { editBill, handleGetBill, handleDeleteBill, bill } = useBill();
+  const { handleGetBill, bill } = useBill();
+  const {updateBill, deleteBill} = useBillStore();
+  const {userInfo} = useUserInfo()
 
   useEffect(() => {
     if (typeof id === "string") {
-        handleGetBill(id);
+      handleGetBill(id);
     }
   }, [bill]);
 
-  if (!bill || !fontsLoaded) {
+  if (!bill || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
         <Text>Loading bill details...</Text>
@@ -58,15 +62,15 @@ const BillDetail = () => {
   };
 
 
-  const deleteBill = () => {
-    handleDeleteBill(bill._id);
+  const handleDeleteBill = () => {
+    deleteBill(bill._id, userInfo.authToken);
     router.push("/");
   };
 
   const handleMarkAsDone = async (bill: Bill) => {
     try {
       let newStatus = !bill.status;
-      await editBill(bill._id, { status: newStatus });
+      await updateBill(bill._id, { status: newStatus }, userInfo.authToken);
     } catch (error: any) {
       console.error("Error message:", error);
     }
@@ -139,7 +143,7 @@ const BillDetail = () => {
               <Text style={styles.sectionTitle}>Options</Text>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={deleteBill}
+                onPress={handleDeleteBill}
               >
                 <Text style={styles.deleteText}>Delete Bill</Text>
               </TouchableOpacity>

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import HeaderItem from "./Header";
+// import HeaderItem from "./Header";
 
 type HeaderHomeScreenProps = {
   month: string;
@@ -63,7 +63,7 @@ const HeaderHomeScreen = ({
             {weekday}
           </Text>
         </View>
-        <HeaderItem page="Home" userStreak={userStreak} />
+        {/* <HeaderItem page="Home" userStreak={userStreak} /> */}
       </View>
       <Text
         style={{
