@@ -50,5 +50,6 @@ const styles = StyleSheet.create({
     height: 48,
     fontSize: 16,
     fontFamily: "Rebond-Grotesque-Regular",
+    lineHeight: 20,
   },
 });

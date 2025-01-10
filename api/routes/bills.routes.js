@@ -7,6 +7,7 @@ router
   .route("/")
   .get(authController.verifyToken, billsController.findBills)
   .post(authController.verifyToken, billsController.create);
+router.route('/currencies').get(billsController.findCurrencies);
 router
   .route("/:idB")
   .get(billsController.findBill)

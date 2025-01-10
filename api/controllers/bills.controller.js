@@ -1,6 +1,7 @@
 const db = require("../models/index.js");
 const mongoose = require("mongoose");
 const Bill = db.Bill;
+const Currency = db.Currency;
 
 const handleErrorResponse = (res, error) => {
   return res
@@ -38,13 +39,14 @@ exports.findBills = async (req, res) => {
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
+      .populate("IDcurrency", "-__v")
       .select("-__v")
       .exec();
 
     if (!bills || bills.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
-        error: "No bills found",
+        data: [],
       });
     }
 
@@ -80,24 +82,50 @@ exports.create = async (req, res) => {
       });
     }
 
-    let bill = new Bill({
-      name: req.body.name,
-      priority: req.body.priority,
-      amount: req.body.amount,
-      dueDate: new Date(req.body.dueDate),
-      periodicity: req.body.periodicity,
-      notification: req.body.notification,
-      notes: req.body.notes || "",
-      status: false,
-      IDuser: req.loggedUserId,
-    });
+    const billInstances = [];
+    const numberOfRepetitions = 5;
+    let currentDueDate = new Date(req.body.dueDate);
 
-    const newBill = await bill.save();
+    for (let i = 0; i < numberOfRepetitions; i++) {
+      billInstances.push({
+        name: req.body.name,
+        priority: req.body.priority,
+        amount: req.body.amount,
+        dueDate: new Date(currentDueDate),
+        periodicity: req.body.periodicity,
+        notification: req.body.notification,
+        notes: req.body.notes || "",
+        status: false,
+        IDuser: req.loggedUserId,
+      });
+
+      switch (req.body.periodicity) {
+        case "daily":
+          currentDueDate.setDate(currentDueDate.getDate() + 1);
+          break;
+        case "weekly":
+          currentDueDate.setDate(currentDueDate.getDate() + 7);
+          break;
+        case "monthly":
+          currentDueDate.setMonth(currentDueDate.getMonth() + 1);
+          break;
+        case "never":
+          i = numberOfRepetitions;
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            msg: "Invalid periodicity value.",
+          });
+      }
+    }
+
+    const newBills = await Bill.insertMany(billInstances);
 
     return res.status(201).json({
       success: true,
       msg: "Bill created successfully.",
-      data: newBill,
+      data: newBills,
     });
   } catch (error) {
     handleErrorResponse(res, error);
@@ -117,7 +145,8 @@ exports.findBill = async (req, res) => {
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated"
       )
-      .select("-_id -__v")
+      .populate("IDcurrency", "-__v")
+      .select("-__v")
       .exec();
 
     return res.status(200).json({
@@ -210,6 +239,26 @@ exports.delete = async (req, res) => {
     return res.status(200).json({
       success: true,
       msg: "Bill deleted successfully.",
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+exports.findCurrencies = async (req, res) => {
+  try {
+    const currencies = await Currency.find().exec();
+
+    if (!currencies || currencies.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "No currencies found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: currencies,
     });
   } catch (error) {
     handleErrorResponse(res, error);
