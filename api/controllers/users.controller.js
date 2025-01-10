@@ -40,7 +40,7 @@ exports.findUser = async (req, res) => {
 
     const user = await User.findById(req.params.idU)
       .populate("IDmascot", "-_id -cloudinary_id")
-      .select("-_id -__v")
+      .select("-__v")
       .exec();
 
     const userFavoriteTips = await FavoriteTip.find({ IDuser: req.params.idU })
@@ -58,7 +58,8 @@ exports.findUser = async (req, res) => {
     const userAchievements = await UserAchievements.find({
       IDuser: req.params.idU,
     })
-      .select("-_id -__v")
+      .select("-__v")
+      .populate("IDAchievements", "-_id -__v")
       .exec();
 
     return res.status(200).json({
@@ -114,7 +115,7 @@ exports.register = async (req, res) => {
       password: bcrypt.hashSync(req.body.password, 10),
       profilePicture: "https://example.com/profile.jpg",
       cloudinary_id: 0,
-      IDmascot: "6763080a51fd2aabdb86aab3",
+      IDmascot: "67696917a5e78f1378a63a6e",
     });
 
     const newUser = await user.save();
@@ -160,7 +161,7 @@ exports.login = async (req, res) => {
       });
 
     const token = jwt.sign({ id: user._id }, config.SECRET, {
-      expiresIn: "24h",
+      expiresIn: "48hr",
     });
 
     return res.status(200).json({
@@ -310,20 +311,42 @@ exports.edit = async (req, res) => {
         msg: "You need to provide the body with the request.",
       });
 
-    if (!req.body.name && !req.body.email && !req.body.password)
+    if (
+      !req.body.name &&
+      !req.body.email &&
+      !req.body.password &&
+      req.body.notifications == null &&
+      req.body.onboardingSeen == null &&
+      req.body.sound == null &&
+      req.body.vibration == null
+    )
       return res.status(400).json({
         success: false,
         error: "Fields missing",
-        msg: "You need to provide the name, email or password.",
+        msg: "You need to provide the name, email, password, notifications, on boarding, sounds or vibration.",
       });
 
     await User.findByIdAndUpdate(req.params.idU, {
-      name: req.body.name || user.name,
-      email: req.body.email || user.name,
-      password: req.body.password || user.name,
+      name: req.body.name ? req.body.name : user.name,
+      email: req.body.email ? req.body.email : user.email,
+      password: req.body.password
+        ? bcrypt.hashSync(req.body.password, 10)
+        : user.password,
+      notifications:
+        req.body.notifications != null
+          ? req.body.notifications
+          : user.notifications,
+      onboardingSeen:
+        req.body.onboardingSeen != null
+          ? req.body.onboardingSeen
+          : user.onboardingSeen,
+      sound: req.body.sound != null ? req.body.sound : user.sound,
+      vibration:
+        req.body.vibration != null ? req.body.vibration : user.vibration,
     });
 
     const updatedUser = await User.findById(req.params.idU);
+
     return res.status(200).json({
       success: true,
       data: updatedUser,
@@ -483,4 +506,4 @@ exports.assignMascotToUser = async (req, res) => {
   } catch (error) {
     handleErrorResponse(res, error);
   }
-}
+};
