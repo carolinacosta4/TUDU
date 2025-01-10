@@ -19,6 +19,15 @@ export function useBill() {
     }
   };
 
+  const handleGetBill = async (id: string) => {
+    try {
+      const response = await api.get(`bills/${id}`);
+      setBill(response.data.data);
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
   useEffect(() => {
     handleGetBillsCurrencies();
   }, []);
@@ -28,6 +37,8 @@ export function useBill() {
     bills,
     setBills,
     loading,
-    currencies
+    currencies,
+    handleGetBill,
+    bill
   };
 }
