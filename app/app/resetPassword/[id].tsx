@@ -94,6 +94,7 @@ export default function RecoverPasswordScreen() {
                     fontSize: 23.04,
                     color: "#291752",
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                     textAlign: "center",
                   }}
                 >
@@ -104,6 +105,7 @@ export default function RecoverPasswordScreen() {
                     fontSize: 19.2,
                     color: "#562CAF",
                     fontFamily: "Rebond-Grotesque-Regular",
+                    lineHeight: 20,
                     paddingHorizontal: 70,
                     textAlign: "center",
                   }}
@@ -151,6 +153,7 @@ export default function RecoverPasswordScreen() {
                       color: "#EEEADF",
                       fontSize: 19.2,
                       fontFamily: "Rebond-Grotesque-Bold",
+                      lineHeight: 20,
                     }}
                   >
                     Continue
@@ -162,6 +165,7 @@ export default function RecoverPasswordScreen() {
                       color: "red",
                       marginTop: 12,
                       fontFamily: "Rebond-Grotesque-Regular",
+                      lineHeight: 20,
                     }}
                   >
                     {error}
@@ -173,6 +177,7 @@ export default function RecoverPasswordScreen() {
                       color: "green",
                       marginTop: 12,
                       fontFamily: "Rebond-Grotesque-Regular",
+                      lineHeight: 20,
                     }}
                   >
                     {success}
