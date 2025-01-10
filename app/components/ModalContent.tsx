@@ -70,6 +70,7 @@ const ModalContent = ({
             fontFamily: "Rebond-Grotesque-Regular",
             color: "#474038",
             fontSize: 16,
+            lineHeight: 20
           }}
         >
           {text}
@@ -88,6 +89,7 @@ const ModalContent = ({
               color: "#A5A096",
               fontSize: 16,
               fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20
             }}
           >
             {selected.charAt(0).toUpperCase() + selected.slice(1)}
@@ -114,6 +116,7 @@ const ModalContent = ({
           fontSize: 19.2,
           marginLeft: 6,
           color: "#291752",
+          lineHeight: 20
         }}
       >
         My Stuff
@@ -176,6 +179,7 @@ const ModalContent = ({
             color: "#F7F6F0",
             fontSize: 19.02,
             textAlign: "center",
+            lineHeight: 20
           }}
         >
           Done
@@ -209,6 +213,7 @@ const ModalContent = ({
             fontFamily: "Rebond-Grotesque-Bold",
             fontSize: 19.2,
             color: "#291752",
+            lineHeight: 20
           }}
         >
           {title}
@@ -242,6 +247,7 @@ const ModalContent = ({
                     color: "#291752",
                     fontSize: 16,
                     marginLeft: 6,
+                    lineHeight: 20
                   }}
                 >
                   {parameter.name}
