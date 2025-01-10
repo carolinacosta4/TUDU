@@ -5,6 +5,7 @@ import {
 } from "react-native";
 import Task from "@/interfaces/Task";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Link } from "expo-router";
 
 type TaskItemProps = {
   task: Task;
@@ -53,20 +54,21 @@ const TaskCardItem = ({
   };
 
   return type === "cards" ? (
-    <View
-      style={{
-        flexDirection: "row",
-        padding: 10,
-        alignItems: "center",
-        backgroundColor: "#DDD8CE",
-        borderRadius: 16,
-      }}
-    >
+    <Link href={{ pathname: "/task/[id]", params: { id: task._id, task: JSON.stringify(task) } }}>
       <View
         style={{
-          width: "90%",
-        }}
+          flexDirection: "row",
+        padding: 10,
+        alignItems: "center",
+          backgroundColor: "#DDD8CE",
+            borderRadius: 16,
+          }}
       >
+        <View
+          style={{
+            width: "90%",
+          }}
+        >
         <View
           style={{
             alignSelf: "flex-start",
@@ -75,102 +77,104 @@ const TaskCardItem = ({
             ...getPriorityStyle(task.priority),
           }}
         >
+            <Text
+              style={{
+                fontSize: 13.33,
+                color: "#474038",
+                fontFamily: "Rebond-Grotesque-Medium",
+                padding: 4,
+                textAlign: "center",
+                lineHeight: 20,
+              }}
+            >
+              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            </Text>
+        </View>
           <Text
             style={{
-              fontSize: 13.33,
-              color: "#474038",
+              fontSize: 16,
+              color: "#291752",
               fontFamily: "Rebond-Grotesque-Medium",
-              padding: 4,
-              textAlign: "center",
-              lineHeight: 20,
+              marginTop: 6,
+            lineHeight: 20,
             }}
           >
-            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            {task.name}
           </Text>
+          {!allDay && (
+            <Text
+              style={{
+                fontSize: 13.3,
+                color: "#A5A096",
+                fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20,
+              }}
+            >
+              {duration}
+            </Text>
+          )}
         </View>
+        {task.status ? (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(task, "task");
+            }}
+          >
+            <Icon name="check-circle" size={20} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(task, "task");
+            }}
+          >
+            <Icon name="circle-outline" size={20} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        )}
+      </View>
+    </Link>
+  ) : (
+    <Link href={{ pathname: "/task/[id]", params: { id: task._id } }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          columnGap: 10,
+          rowGap: 16,
+        }}
+      >
+        {task.status ? (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(task, "task");
+            }}
+          >
+            <Icon name="check-circle" size={25} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(task, "task");
+            }}
+          >
+            <Icon name="circle-outline" size={25} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        )}
+
         <Text
           style={{
             fontSize: 16,
             color: "#291752",
             fontFamily: "Rebond-Grotesque-Medium",
             marginTop: 6,
-            lineHeight: 20,
+          lineHeight: 20,
           }}
         >
           {task.name}
         </Text>
-        {!allDay && (
-          <Text
-            style={{
-              fontSize: 13.3,
-              color: "#A5A096",
-              fontFamily: "Rebond-Grotesque-Regular",
-              lineHeight: 20,
-            }}
-          >
-            {duration}
-          </Text>
-        )}
-      </View>
-      {task.status ? (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(task, "task");
-          }}
+        <View
+          style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
         >
-          <Icon name="check-circle" size={20} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      ) : (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(task, "task");
-          }}
-        >
-          <Icon name="circle-outline" size={20} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      )}
-    </View>
-  ) : (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        columnGap: 10,
-        rowGap: 16,
-      }}
-    >
-      {task.status ? (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(task, "task");
-          }}
-        >
-          <Icon name="check-circle" size={25} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      ) : (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(task, "task");
-          }}
-        >
-          <Icon name="circle-outline" size={25} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      )}
-
-      <Text
-        style={{
-          fontSize: 16,
-          color: "#291752",
-          fontFamily: "Rebond-Grotesque-Medium",
-          marginTop: 6,
-          lineHeight: 20,
-        }}
-      >
-        {task.name}
-      </Text>
-      <View
-        style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
-      >
         <View
           style={{
             alignSelf: "flex-start",
@@ -179,21 +183,22 @@ const TaskCardItem = ({
             ...getPriorityStyle(task.priority),
           }}
         >
-          <Text
-            style={{
-              fontSize: 13.33,
-              color: "#474038",
-              fontFamily: "Rebond-Grotesque-Medium",
-              padding: 4,
-              textAlign: "center",
-              lineHeight: 20,
-            }}
-          >
-            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-          </Text>
+            <Text
+              style={{
+                fontSize: 13.33,
+                color: "#474038",
+                fontFamily: "Rebond-Grotesque-Medium",
+                padding: 4,
+                textAlign: "center",
+                lineHeight: 20,
+              }}
+            >
+              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            </Text>
+        </View>
         </View>
       </View>
-    </View>
+    </Link>
   );
 };
 

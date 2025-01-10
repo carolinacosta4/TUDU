@@ -1,6 +1,7 @@
 import Bill from "@/interfaces/Bill";
 import { Text, View, TouchableWithoutFeedback } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Link } from "expo-router";
 
 type BillItemProps = {
   bill: Bill;
@@ -11,113 +12,117 @@ type BillItemProps = {
 
 const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
   return type == "cards" ? (
-    <View
-      style={{
-        flexDirection: "row",
-        padding: 10,
-        alignItems: "center",
-        backgroundColor: "#DDD8CE",
-        borderRadius: 16,
-      }}
-    >
+    <Link href={{ pathname: "/bill/[id]", params: { id: bill._id } }}>
       <View
         style={{
-          width: "90%",
+          flexDirection: "row",
+            padding: 10,
+            alignItems: "center",
+          backgroundColor: "#DDD8CE",
+        borderRadius: 16,
+      }}
+      >
+        <View
+          style={{
+            width: "90%",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#291752",
+              fontFamily: "Rebond-Grotesque-Medium",
+              lineHeight: 20
+          }}
+          >
+            {bill.name}
+          </Text>
+          <Text
+            style={{
+              fontSize: 13.3,
+              color: "#A5A096",
+              fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20
+          }}
+          >
+            {bill.amount}
+          {/* {bill.IDcurrency.symbol} */}
+          </Text>
+        </View>
+        {bill.status ? (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(bill, "bill");
+            }}
+          >
+            <Icon name="check-circle" size={20} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(bill, "bill");
+            }}
+          >
+            <Icon name="circle-outline" size={20} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        )}
+      </View>
+    </Link>
+  ) : (
+    <Link href={{ pathname: "/bill/[id]", params: { id: bill._id } }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          rowGap: 16,
+          columnGap: 10,
         }}
       >
+        {bill.status ? (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(bill, "bill");
+            }}
+          >
+            <Icon name="check-circle" size={25} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              changeStatus(bill, "bill");
+            }}
+          >
+            <Icon name="circle-outline" size={25} color="#562CAF" />
+          </TouchableWithoutFeedback>
+        )}
+
         <Text
           style={{
             fontSize: 16,
             color: "#291752",
             fontFamily: "Rebond-Grotesque-Medium",
-            lineHeight: 20,
-          }}
+            lineHeight: 20
+        }}
         >
           {bill.name}
         </Text>
-        <Text
-          style={{
-            fontSize: 13.3,
-            color: "#A5A096",
-            fontFamily: "Rebond-Grotesque-Regular",
-            lineHeight: 20,
-          }}
+        <View
+          style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
         >
-          {bill.amount}
-          {/* {bill.IDcurrency.symbol} */}
-        </Text>
-      </View>
-      {bill.status ? (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(bill, "bill");
-          }}
-        >
-          <Icon name="check-circle" size={20} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      ) : (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(bill, "bill");
-          }}
-        >
-          <Icon name="circle-outline" size={20} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      )}
-    </View>
-  ) : (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        rowGap: 16,
-        columnGap: 10,
-      }}
-    >
-      {bill.status ? (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(bill, "bill");
-          }}
-        >
-          <Icon name="check-circle" size={25} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      ) : (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            changeStatus(bill, "bill");
-          }}
-        >
-          <Icon name="circle-outline" size={25} color="#562CAF" />
-        </TouchableWithoutFeedback>
-      )}
-
-      <Text
-        style={{
-          fontSize: 16,
-          color: "#291752",
-          fontFamily: "Rebond-Grotesque-Medium",
-          lineHeight: 20,
-        }}
-      >
-        {bill.name}
-      </Text>
-      <View
-        style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
-      >
-        <Text
-          style={{
-            fontSize: 19.2,
-            color: "#A5A096",
-            fontFamily: "Rebond-Grotesque-Regular",
-            lineHeight: 20,
+          <Text
+            style={{
+              fontSize: 19.2,
+              color: "#A5A096",
+              fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20,
             textAlign: "right",
-          }}
-        >
-          {bill.amount}€
-        </Text>
+            }}
+          >
+            {bill.amount}€
+          </Text>
+        </View>
       </View>
-    </View>
+    </Link>
   );
 };
 

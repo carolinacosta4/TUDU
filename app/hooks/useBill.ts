@@ -3,9 +3,11 @@ import api from "@/api/api";
 import { useUserInfo } from "./useUserInfo";
 import Bill from "@/interfaces/Bill";
 
+
 export function useBill() {
   const { loading } = useUserInfo();
   const [bills, setBills] = useState<Bill[]>([]);
+  const [bill, setBill] = useState<Bill>();  
   const [currencies, setCurrencies] = useState<{ _id: string; name: string; symbol: string }[]>([]);
 
   const handleGetBillsCurrencies = async () => {

@@ -145,6 +145,7 @@ export default function TabLayout() {
             color: "#562CAF",
             fontSize: 19.2,
             fontFamily: "Rebond-Grotesque-Bold",
+            lineHeight: 20
           }}
         >
           + Add
@@ -210,6 +211,7 @@ export default function TabLayout() {
                         fontFamily: "Rebond-Grotesque-Medium",
                         paddingHorizontal: 16,
                         paddingVertical: 8,
+                        lineHeight: 20
                       }}
                     >
                       Task
@@ -230,6 +232,7 @@ export default function TabLayout() {
                         fontFamily: "Rebond-Grotesque-Medium",
                         paddingHorizontal: 16,
                         paddingVertical: 8,
+                        lineHeight: 20
                       }}
                     >
                       Bill

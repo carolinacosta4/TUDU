@@ -44,7 +44,7 @@ const CardsHome = ({
                   fontSize: 20,
                   color: "#A5A096",
                   fontFamily: "Rebond-Grotesque-Medium",
-                  lineHeight: 20,
+                  lineHeight: 20
                 }}
               >
                 All-day

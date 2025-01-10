@@ -1,5 +1,6 @@
 import Task from "@/interfaces/Task";
 import Bill from "@/interfaces/Bill";
+import { format } from 'date-fns';
 
 export const getCompletedThingsCount = (
   tasks: Task[],
@@ -130,4 +131,9 @@ export const applyFilters = (
   }
 
   return { filteredTasks, filteredBills };
+};
+
+export const formatDate = (d: Date | string): string => {
+  const date = new Date(d);
+  return format(date, 'MMM dd, yyyy');
 };
