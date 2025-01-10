@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   View,
   StyleSheet,
-  Modal,
   Text,
   TouchableOpacity,
   Dimensions,
@@ -10,24 +9,14 @@ import {
 import { Tabs } from "expo-router";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useFonts from "@/hooks/useFonts";
-import { useTask } from "@/hooks/useTask";
-import { ScrollView } from "react-native";
-import CreateTaskModal from "@/components/CreateTaskModal";
-import CreateBillModal from "@/components/CreateBillModal";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import ModalCreateStuff from "@/components/ModalCreateStuff";
 
 const { width, height } = Dimensions.get("window");
 
 export default function TabLayout() {
+  const { userInfo } = useUserInfo();
   const [modalVisible, setModalVisible] = useState(false);
-  const [addTask, setAddTask] = useState(true);
-  const { categories } = useTask();
-
-  const dataRepeat = [
-    { label: "Never", value: "never" },
-    { label: "Daily", value: "daily" },
-    { label: "Weekly", value: "weekly" },
-    { label: "Monthly", value: "monthly" },
-  ];
   const fontsLoaded = useFonts();
 
   if (!fontsLoaded) {
@@ -109,7 +98,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="profile"
+          name="[id]/profile"
           options={{
             headerShown: false,
             tabBarIcon: ({ focused, color, size }) => (
@@ -123,6 +112,12 @@ export default function TabLayout() {
               </View>
             ),
           }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              navigation.navigate("[id]/profile", { id: userInfo?.userID });
+            },
+          })}
         />
       </Tabs>
 
@@ -145,108 +140,14 @@ export default function TabLayout() {
             color: "#562CAF",
             fontSize: 19.2,
             fontFamily: "Rebond-Grotesque-Bold",
+            lineHeight: 20,
           }}
         >
           + Add
         </Text>
       </TouchableOpacity>
 
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={toggleModal}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            justifyContent: "flex-end",
-          }}
-        >
-          <View
-            style={{
-              width: "100%",
-              height: height * 0.8,
-              padding: height * 0.025,
-              backgroundColor: "#F7F6F0",
-              borderTopRightRadius: 24,
-              borderTopLeftRadius: 24,
-            }}
-          >
-            <ScrollView
-              contentContainerStyle={{
-                flexGrow: 1,
-                justifyContent: "flex-end",
-              }}
-            >
-              <View style={{ rowGap: 24 }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    columnGap: 16,
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => setAddTask(true)}
-                    style={
-                      addTask && {
-                        backgroundColor: "#DDD8CE",
-                        borderRadius: 50,
-                      }
-                    }
-                  >
-                    <Text
-                      style={{
-                        fontSize: 19.2,
-                        fontFamily: "Rebond-Grotesque-Medium",
-                        paddingHorizontal: 16,
-                        paddingVertical: 8,
-                      }}
-                    >
-                      Task
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => setAddTask(false)}
-                    style={
-                      !addTask && {
-                        backgroundColor: "#DDD8CE",
-                        borderRadius: 50,
-                      }
-                    }
-                  >
-                    <Text
-                      style={{
-                        fontSize: 19.2,
-                        fontFamily: "Rebond-Grotesque-Medium",
-                        paddingHorizontal: 16,
-                        paddingVertical: 8,
-                      }}
-                    >
-                      Bill
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                {addTask ? (
-                  <CreateTaskModal
-                    categories={categories}
-                    dataRepeat={dataRepeat}
-                    toggleModal={toggleModal}
-                  />
-                ) : (
-                  <CreateBillModal
-                    dataRepeat={dataRepeat}
-                    toggleModal={toggleModal}
-                  />
-                )}
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+      <ModalCreateStuff toggleModal={toggleModal} modalVisible={modalVisible} />
     </>
   );
 }
@@ -255,7 +156,6 @@ const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: "center",
     alignItems: "center",
-    // marginBottom: (height * 0.09) / 2,
   },
 
   activeIconBackground: {
