@@ -5,10 +5,10 @@ import Task from "@/interfaces/Task";
 import Category from "@/interfaces/Category";
 
 export function useTask() {
-  const { userInfo, loading } = useUserInfo();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { loading } = useUserInfo();
+  const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState<Task>();
-  const [categories, setCategories] = useState<{ _id: string; name: string; backgroundColor: string; color: string }[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const handleGetTask = async (id: string) => {
     try {
@@ -32,13 +32,5 @@ export function useTask() {
     handleGetTasksCategories();
   }, []);
 
-
-  return {
-    tasks,
-    setTasks,
-    loading,
-    categories,
-    handleGetTask,
-    task
-  };
+  return { tasks, setTasks, loading, categories, handleGetTask, task };
 }

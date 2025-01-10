@@ -1,11 +1,6 @@
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { configureReanimatedLogger } from "react-native-reanimated";
-
-configureReanimatedLogger({
-  strict: false,
-});
 
 export default function RootLayout() {
   return (

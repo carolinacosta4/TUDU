@@ -1,29 +1,19 @@
-import { Text, TouchableOpacity } from "react-native";
-import Reanimated, {
-  SharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import React, { PropsWithChildren } from 'react';
+import { Animated, Text, TouchableOpacity } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 
-type RightActionProps = {
-  ID: string;
-  name: string;
-  handleDelete: (id: string, type: string) => void;
-};
+interface SwipeDeleteProps {
+  handleDelete: () => void;
+}
 
-const RightAction = (
-  prog: SharedValue<number>,
-  drag: SharedValue<number>,
-  { handleDelete, ID, name }: RightActionProps
-) => {
-  const styleAnimation = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: drag.value + 60 }],
-    };
-  });
+const SwipeDelete: React.FC<PropsWithChildren<SwipeDeleteProps>> = ({ children, handleDelete }) => {
+  let swipeableRow: Swipeable | null = null;
 
-  return (
-    <Reanimated.View style={styleAnimation}>
-      <TouchableOpacity
+  const renderRightActions = (
+    progress: Animated.AnimatedInterpolation<number>,
+    _dragAnimatedValue: Animated.AnimatedInterpolation<number>
+  ) => (
+    <TouchableOpacity
         style={{
           backgroundColor: "#EF4444",
           justifyContent: "center",
@@ -33,11 +23,11 @@ const RightAction = (
           borderTopRightRadius: 16,
           borderBottomRightRadius: 16,
         }}
-        onPress={() => handleDelete(ID, name)}
+        onPress={handleDelete}
       >
         <Text
           style={{
-            width: 50,
+            width: 60,
             color: "#F7F6F0",
             textAlign: "center",
             fontFamily: "Rebond-Grotesque-Medium",
@@ -47,8 +37,24 @@ const RightAction = (
           Delete
         </Text>
       </TouchableOpacity>
-    </Reanimated.View>
+  );
+
+  const updateRef = (ref: Swipeable) => {
+    swipeableRow = ref;
+  };
+
+  return (
+    <Swipeable
+      ref={updateRef}
+      friction={2}
+      enableTrackpadTwoFingerGesture
+      leftThreshold={30}
+      rightThreshold={40}
+      renderRightActions={renderRightActions}
+    >
+      {children}
+    </Swipeable>
   );
 };
 
-export default RightAction;
+export default SwipeDelete;

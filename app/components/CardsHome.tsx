@@ -5,8 +5,7 @@ import BillItem from "@/components/BillItem";
 import TaskItem from "@/components/TaskItem";
 import Task from "@/interfaces/Task";
 import Bill from "@/interfaces/Bill";
-import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import RightAction from "./RightAction";
+import SwipeDelete from "./RightAction";
 
 type CardsHomeProps = {
   allDayTasks: Task[];
@@ -44,7 +43,7 @@ const CardsHome = ({
                   fontSize: 20,
                   color: "#A5A096",
                   fontFamily: "Rebond-Grotesque-Medium",
-                  lineHeight: 20
+                  lineHeight: 20,
                 }}
               >
                 All-day
@@ -52,75 +51,30 @@ const CardsHome = ({
               <View style={{ flex: 1, rowGap: 8 }}>
                 {allDayTasks.map((task) => (
                   <Fragment key={task._id}>
-                    {Platform.OS == "ios" ? (
-                      <ReanimatedSwipeable
-                        containerStyle={{
-                          backgroundColor: "#DDD8CE",
-                          borderRadius: 16,
-                        }}
-                        friction={2}
-                        enableTrackpadTwoFingerGesture
-                        rightThreshold={40}
-                        renderRightActions={(progress, dragX) =>
-                          RightAction(progress, dragX, {
-                            ID: task._id,
-                            name: "task",
-                            handleDelete,
-                          })
-                        }
-                      >
-                        <TaskItem
-                          changeStatus={changeStatus}
-                          task={task}
-                          allDay={true}
-                          type="cards"
-                        />
-                      </ReanimatedSwipeable>
-                    ) : (
+                    <SwipeDelete
+                      handleDelete={() => handleDelete(task._id, "task")}
+                    >
                       <TaskItem
                         changeStatus={changeStatus}
                         task={task}
                         allDay={true}
                         type="cards"
                       />
-                    )}
+                    </SwipeDelete>
                   </Fragment>
                 ))}
                 {user.userBills &&
                   filteredBills.map((bill) => (
                     <Fragment key={bill._id}>
-                      {Platform.OS == "ios" ? (
-                        <ReanimatedSwipeable
-                          containerStyle={{
-                            backgroundColor: "#DDD8CE",
-                            borderRadius: 16,
-                          }}
-                          friction={2}
-                          enableTrackpadTwoFingerGesture
-                          rightThreshold={40}
-                          renderRightActions={(progress, dragX) =>
-                            RightAction(progress, dragX, {
-                              ID: bill._id,
-                              name: "bill",
-                              handleDelete,
-                            })
-                          }
-                        >
-                          <BillItem
-                            bill={bill}
-                            changeStatus={changeStatus}
-                            type="cards"
-                            handleDelete={handleDelete}
-                          />
-                        </ReanimatedSwipeable>
-                      ) : (
+                      <SwipeDelete
+                        handleDelete={() => handleDelete(bill._id, "bill")}
+                      >
                         <BillItem
                           bill={bill}
                           changeStatus={changeStatus}
                           type="cards"
-                          handleDelete={handleDelete}
                         />
-                      )}
+                      </SwipeDelete>
                     </Fragment>
                   ))}
               </View>
@@ -165,38 +119,16 @@ const CardsHome = ({
               >
                 {group.tasks.map((task) => (
                   <Fragment key={task._id}>
-                    {Platform.OS == "ios" ? (
-                      <ReanimatedSwipeable
-                        containerStyle={{
-                          backgroundColor: "#DDD8CE",
-                          borderRadius: 16,
-                        }}
-                        friction={2}
-                        enableTrackpadTwoFingerGesture
-                        rightThreshold={40}
-                        renderRightActions={(progress, dragX) =>
-                          RightAction(progress, dragX, {
-                            ID: task._id,
-                            name: "task",
-                            handleDelete,
-                          })
-                        }
-                      >
-                        <TaskItem
-                          changeStatus={changeStatus}
-                          task={task}
-                          allDay={false}
-                          type="cards"
-                        />
-                      </ReanimatedSwipeable>
-                    ) : (
+                    <SwipeDelete
+                      handleDelete={() => handleDelete(task._id, "task")}
+                    >
                       <TaskItem
                         changeStatus={changeStatus}
                         task={task}
                         allDay={false}
                         type="cards"
                       />
-                    )}
+                    </SwipeDelete>
                   </Fragment>
                 ))}
               </View>

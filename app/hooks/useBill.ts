@@ -3,7 +3,6 @@ import api from "@/api/api";
 import { useUserInfo } from "./useUserInfo";
 import Bill from "@/interfaces/Bill";
 
-
 export function useBill() {
   const { loading } = useUserInfo();
   const [bills, setBills] = useState<Bill[]>([]);

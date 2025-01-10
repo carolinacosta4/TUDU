@@ -7,21 +7,20 @@ type BillItemProps = {
   bill: Bill;
   changeStatus: (data: Bill, name: "bill") => void;
   type: string;
-  handleDelete?: (id: string, type: string) => void;
 };
 
 const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
   return type == "cards" ? (
-    <Link href={{ pathname: "/bill/[id]", params: { id: bill._id } }}>
-      <View
-        style={{
-          flexDirection: "row",
-            padding: 10,
-            alignItems: "center",
-          backgroundColor: "#DDD8CE",
+    <View
+      style={{
+        flexDirection: "row",
+        padding: 10,
+        alignItems: "center",
+        backgroundColor: "#DDD8CE",
         borderRadius: 16,
       }}
-      >
+    >
+      <Link href={{ pathname: "/bill/[id]", params: { id: bill._id } }}>
         <View
           style={{
             width: "90%",
@@ -32,8 +31,8 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
               fontSize: 16,
               color: "#291752",
               fontFamily: "Rebond-Grotesque-Medium",
-              lineHeight: 20
-          }}
+              lineHeight: 20,
+            }}
           >
             {bill.name}
           </Text>
@@ -42,32 +41,32 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
               fontSize: 13.3,
               color: "#A5A096",
               fontFamily: "Rebond-Grotesque-Regular",
-              lineHeight: 20
-          }}
+              lineHeight: 20,
+            }}
           >
             {bill.amount}
-          {/* {bill.IDcurrency.symbol} */}
+            {bill.IDcurrency.symbol}
           </Text>
         </View>
-        {bill.status ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              changeStatus(bill, "bill");
-            }}
-          >
-            <Icon name="check-circle" size={20} color="#562CAF" />
-          </TouchableWithoutFeedback>
-        ) : (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              changeStatus(bill, "bill");
-            }}
-          >
-            <Icon name="circle-outline" size={20} color="#562CAF" />
-          </TouchableWithoutFeedback>
-        )}
-      </View>
-    </Link>
+      </Link>
+      {bill.status ? (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            changeStatus(bill, "bill");
+          }}
+        >
+          <Icon name="check-circle" size={24} color="#562CAF" />
+        </TouchableWithoutFeedback>
+      ) : (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            changeStatus(bill, "bill");
+          }}
+        >
+          <Icon name="circle-outline" size={24} color="#562CAF" />
+        </TouchableWithoutFeedback>
+      )}
+    </View>
   ) : (
     <Link href={{ pathname: "/bill/[id]", params: { id: bill._id } }}>
       <View
@@ -101,8 +100,8 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
             fontSize: 16,
             color: "#291752",
             fontFamily: "Rebond-Grotesque-Medium",
-            lineHeight: 20
-        }}
+            lineHeight: 20,
+          }}
         >
           {bill.name}
         </Text>
@@ -115,7 +114,7 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
               color: "#A5A096",
               fontFamily: "Rebond-Grotesque-Regular",
               lineHeight: 20,
-            textAlign: "right",
+              textAlign: "right",
             }}
           >
             {bill.amount}€
