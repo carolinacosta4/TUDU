@@ -109,7 +109,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="profile"
+          name="profile/[id]"
           options={{
             headerShown: false,
             tabBarIcon: ({ focused, color, size }) => (
