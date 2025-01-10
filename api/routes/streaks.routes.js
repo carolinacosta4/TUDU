@@ -7,7 +7,7 @@ router.route("/:idU")
   .get(authController.verifyToken, streaksController.getStreaksByUserId)
 
   router.route("/")
-  .post(authController.verifyToken, streaksController.updateStreak)
+  .patch(authController.verifyToken, streaksController.updateStreak)
 
 router.all("*", function (req, res) {
   res.status(404).json({ message: "No route found" });
