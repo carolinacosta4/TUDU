@@ -31,7 +31,8 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
               fontSize: 16,
               color: "#291752",
               fontFamily: "Rebond-Grotesque-Medium",
-            }}
+              lineHeight: 20
+          }}
           >
             {bill.name}
           </Text>
@@ -40,7 +41,8 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
               fontSize: 13.3,
               color: "#A5A096",
               fontFamily: "Rebond-Grotesque-Regular",
-            }}
+              lineHeight: 20
+          }}
           >
             {bill.amount}€
           </Text>
@@ -97,7 +99,8 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
             fontSize: 16,
             color: "#291752",
             fontFamily: "Rebond-Grotesque-Medium",
-          }}
+            lineHeight: 20
+        }}
         >
           {bill.name}
         </Text>
