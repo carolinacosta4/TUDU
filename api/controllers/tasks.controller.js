@@ -158,7 +158,7 @@ exports.findTask = async (req, res) => {
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
       .populate("IDcategory", "-_id -__v")
-      .select("-_id -__v")
+      .select("-__v")
       .exec();
 
     if (!task) {
@@ -239,6 +239,7 @@ exports.edit = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
+    
     if (!mongoose.isValidObjectId(req.params.idT))
       return res.status(400).json({
         success: false,
@@ -266,6 +267,8 @@ exports.delete = async (req, res) => {
       msg: "Task deleted successfully.",
     });
   } catch (error) {
+    console.log(error);
+    
     handleErrorResponse(res, error);
   }
 };
