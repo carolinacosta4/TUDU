@@ -5,8 +5,6 @@ const authController = require("../controllers/auth.controller");
 
 router.route("/:idU")
   .get(authController.verifyToken, streaksController.getStreaksByUserId)
-
-  router.route("/")
   .patch(authController.verifyToken, streaksController.updateStreak)
 
 router.all("*", function (req, res) {
