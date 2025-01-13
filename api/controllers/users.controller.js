@@ -325,13 +325,23 @@ exports.edit = async (req, res) => {
       req.body.notifications == null &&
       req.body.onboardingSeen == null &&
       req.body.sound == null &&
+      req.body.isDeactivated == null &&
       req.body.vibration == null
     )
       return res.status(400).json({
         success: false,
         error: "Fields missing",
-        msg: "You need to provide the name, email, password, notifications, on boarding, sounds or vibration.",
+        msg: "You need to provide the name, email, password, notifications, on boarding, sounds, is deactivated or vibration.",
       });
+
+    if (req.body.password && req.body.oldPassword) {      
+      const isMatch = bcrypt.compareSync(req.body.oldPassword, user.password);      
+      if (!isMatch)       
+        return res.status(404).json({
+          success: false,
+          msg: "Old password is wrong.",
+        });
+    }
 
     await User.findByIdAndUpdate(req.params.idU, {
       name: req.body.name ? req.body.name : user.name,
@@ -348,6 +358,7 @@ exports.edit = async (req, res) => {
           ? req.body.onboardingSeen
           : user.onboardingSeen,
       sound: req.body.sound != null ? req.body.sound : user.sound,
+      isDeactivated: req.body.isDeactivated != null ? req.body.isDeactivated : user.isDeactivated,
       vibration:
         req.body.vibration != null ? req.body.vibration : user.vibration,
     });
@@ -388,7 +399,9 @@ exports.changeProfilePicture = async (req, res) => {
         }
         const b64 = Buffer.from(req.file.buffer).toString("base64");
         let dataURI = `data:${req.file.mimetype};base64,${b64}`;
-        let result = await cloudinary.uploader.upload(dataURI, { resource_type: "auto" });
+        let result = await cloudinary.uploader.upload(dataURI, {
+          resource_type: "auto",
+        });
         user_image = result;
       }
 
