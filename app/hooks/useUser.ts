@@ -22,5 +22,5 @@ export function useUser() {
     }
   }, [userInfo, loading]);
 
-  return { user, setUser, loading };
+  return { user, setUser, loading, handleGetUser };
 }
