@@ -5,7 +5,7 @@ const authController = require("../controllers/auth.controller");
 
 const multer = require('multer')
 let storage = multer.memoryStorage();
-const multerUploads = multer({ storage }).single('inputProfilePicture');
+const multerUploads = multer({ storage }).single('profilePicture');
 
 router.route("/").get(usersController.findAll).post(usersController.register);
 router.route("/login").post(usersController.login);
@@ -21,7 +21,7 @@ router
   .patch(authController.verifyToken, usersController.editOnboarding);
 router.route("/:idU/achievements/:idA").post(authController.verifyToken, usersController.unlockAchievement)
 router.route("/:idU/mascots/:idM").patch(authController.verifyToken, usersController.assignMascotToUser)
-// router.route("/:idU/change-profile-picture").patch(authController.verifyToken, multerUploads, usersController.changeProfilePicture)
+router.route("/:idU/change-profile-picture").patch(authController.verifyToken, multerUploads, usersController.changeProfilePicture)
 
 router.all("*", function (req, res) {
   res.status(404).json({ message: "users: what???" });
