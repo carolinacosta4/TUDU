@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import { Calendar, CalendarList } from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTask } from "@/hooks/useTask";
 import ListHome from "@/components/ListHome";
@@ -19,6 +19,7 @@ import { groupTasksByTime, categorizeTasks } from "@/utils/taskUtils";
 import Task from "@/interfaces/Task";
 import Bill from "@/interfaces/Bill";
 import { useUser } from "@/hooks/useUser";
+import { useBill } from "@/hooks/useBill";
 
 const CalendarScreen = () => {
   const { user } = useUser();
@@ -27,16 +28,105 @@ const CalendarScreen = () => {
   const [showStat, setShowStat] = useState(true);
   const [day, setDay] = useState();
   const { getTasks, tasks, editTask, categories } = useTask();
+  const { getBills, bills, editBill } = useBill();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const categorizedTasks = categorizeTasks(tasks);
   const { allDayTasks, timedTasks } = categorizedTasks;
   const groupedTasks = groupTasksByTime(timedTasks);
+  const [markedDates, setMarkedDates] = useState<{ [key: string]: any }>({});
+  const [currentMonth, setCurrentMonth] = useState<number | null>(null);
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+  const [colorDotDays, setColorDotDays] = useState<{ [key: string]: any }>({});
+
+  const getDaysColorDots = (month: number, year: number) => {
+    if (!user) {
+      console.log("user not found");
+      return { green: [], orange: [], purple: [] };
+    } else if (!user.userTasks || month === null || year === null) {
+      console.log("not working");
+      return { green: [], orange: [], purple: [] };
+    } else {
+      let userTasks = user.userTasks;
+
+      let tasksOfTheMonth = userTasks.filter((t) => {
+        let taskDate = new Date(t.startDate);
+        let taskMonth = taskDate.getMonth();
+        let taskYear = taskDate.getFullYear();
+        return taskMonth === month && taskYear === year;
+      });
+
+      const groupedByDay = tasksOfTheMonth.reduce((acc: any, task) => {
+        let date = new Date(task.startDate).toISOString().split("T")[0]; // Formato: YYYY-MM-DD
+        if (!acc[date]){
+           acc[date] = [];
+          }
+        acc[date].push(task);
+        return acc;
+      }, {});
+
+      const categorizedDays = Object.entries(groupedByDay).reduce(
+        (acc, [date, tasks]: [string, Task[]]) => {
+          const totalTasks = tasks.length;
+          const completedTasks = tasks.filter((t) => t.status).length;
+          const completionRate = (completedTasks / totalTasks) * 100;
+
+          if (completionRate === 100) {
+            acc.green.push(date);
+          } else if (completionRate >= 50) {
+            acc.orange.push(date);
+          } else {
+            acc.purple.push(date);
+          }
+
+          return acc;
+        },
+        { green: [], orange: [], purple: [] }
+      );
+
+      console.log("Categorized Days:", categorizedDays);
+      return categorizedDays;
+    }
+  };
 
   useEffect(() => {
-    if (logged === false) {
-      router.push("/register");
+    if (!user){
+
     }
-  }, [logged]);
+  })
+
+  useEffect(() => {
+    let today = new Date();
+    let thisMonth = today.getMonth();
+    let thisYear = today.getFullYear();
+    setCurrentMonth(thisMonth);
+    setCurrentYear(thisYear);
+  
+    if (currentMonth && currentYear) {
+      const categorizedDays = getDaysColorDots(currentMonth, currentYear);
+  
+      const colorDotDays = {};
+      categorizedDays.green.forEach((date) => {
+        colorDotDays[date] = {
+          marked: true, selectedColor: 'green'
+        };
+      });
+      categorizedDays.orange.forEach((date) => {
+        colorDotDays[date] = {
+          marked: true, selectedColor: 'orange'
+        };
+      });
+      categorizedDays.purple.forEach((date) => {
+        colorDotDays[date] = {
+          marked: true, selectedColor: 'purple'
+        };
+      });
+  
+      setColorDotDays(colorDotDays);
+      console.log(colorDotDays);
+      
+    }
+  }, [currentMonth, currentYear]);
+  
 
   const stats = [
     { label: "Perfect Days", value: "15 days" },
@@ -54,17 +144,26 @@ const CalendarScreen = () => {
   );
 
   const handleDayPress = (day: any) => {
-    const selectedDate = day.dateString;
+    const newSelectedDate = day.dateString;
 
-    if (selectedDay === selectedDate) {
+    if (selectedDay === newSelectedDate) {
       setShowStat(!showStat);
+      const newMarkedDates = { ...markedDates };
+      delete newMarkedDates[selectedDay as string];
+      setMarkedDates(newMarkedDates);
+      setSelectedDay(null);
     } else {
-      setSelectedDay(selectedDate);
+      setSelectedDay(newSelectedDate);
       setShowStat(false);
-      getTasks(new Date(selectedDate));
+      getTasks(new Date(newSelectedDate));
+      getBills(new Date(newSelectedDate));
+
+      setMarkedDates({
+        [newSelectedDate]: { selected: true, selectedColor: "#EEEADF" },
+      });
     }
 
-    setDay(selectedDate);
+    setDay(newSelectedDate);
   };
 
   if (!fontsLoaded) return <Text>Loading...</Text>;
@@ -72,12 +171,14 @@ const CalendarScreen = () => {
   const changeStatus = async (data: Task | Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
-      if (name === "task" && selectedDay) {
-        await editTask(data._id, { status: updatedStatus });
-        getTasks(new Date(selectedDay));
-      } else {
-        // await editBill(data._id, { status: updatedStatus });
-        // getBills(today);
+      if (selectedDay) {
+        if (name === "task") {
+          await editTask(data._id, { status: updatedStatus });
+          getTasks(new Date(selectedDay));
+        } else {
+          await editBill(data._id, { status: updatedStatus });
+          getBills(new Date(selectedDay));
+        }
       }
     } catch (error) {
       console.error(error);
@@ -86,23 +187,24 @@ const CalendarScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-
       <Calendar
         style={styles.calendar}
-        markedDates={{
-          "2024-11-01": { marked: true, dotColor: "#FFC107" },
-          "2024-11-05": { marked: true, dotColor: "#03A9F4" },
-          "2024-11-17": { marked: true, dotColor: "#4CAF50" },
-        }}
+        markedDates={{markedDates, colorDotDays}}
         theme={{
           backgroundColor: "#F7F6F0",
           calendarBackground: "#ffffff",
-          todayTextColor: "#6A60F0",
-          dayTextColor: "#474038",
+          todayTextColor: "#aa8bd3",
+          dayTextColor: "#635C54",
           textDisabledColor: "#D9E1E8",
           monthTextColor: "#291752",
+          selectedDayBackgroundColor: "#EEEADF",
+          selectedDayTextColor: "#635C54",
         }}
         onDayPress={handleDayPress}
+        onMonthChange={(month: any) => {
+          setCurrentMonth(month.month);
+          setCurrentYear(month.year);
+        }}
       />
 
       {showStat ? (
@@ -116,12 +218,13 @@ const CalendarScreen = () => {
         <View style={styles.statsList}>
           {tasks.length > 0 ? (
             <ListHome
-            allDayTasks={allDayTasks}
-            groupedTasks={groupedTasks}
-            filteredBills={[]}
-            changeStatus={changeStatus}
-            user={user}
-          />) : (
+              allDayTasks={allDayTasks}
+              groupedTasks={groupedTasks}
+              filteredBills={bills}
+              changeStatus={changeStatus}
+              user={user}
+            />
+          ) : (
             <NoTasksView />
           )}
         </View>
