@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getTips } from '@/api/tips';
-import  Tip  from '@/interfaces/Tip'; 
+import { get } from '@/api/api'; 
+import Tip from '@/interfaces/Tip';
 
 export const useTips = () => {
   const [tips, setTips] = useState<Tip[]>([]);
@@ -10,8 +10,7 @@ export const useTips = () => {
   useEffect(() => {
     const fetchTips = async () => {
       try {
-        const response = await getTips();
-        //console.log('response get tips:', response);
+        const response = await get("http://192.168.137.1:3000", "tips", "");
         setTips(response.data);
       } catch (err) {
         setError('Error fetching tips');

@@ -3,7 +3,6 @@ const config = require("../config/db.config.js");
 
 exports.verifyToken = (req, res, next) => {
   const header = req.headers["x-access-token"] || req.headers.authorization;
-  console.log('Header:', header);  
   if (typeof header == "undefined")
     return res
       .status(401)

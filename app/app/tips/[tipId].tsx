@@ -1,27 +1,24 @@
 import { useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useLayoutEffect, useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTip } from '@/hooks/useTip';
+import { removeFromFavorite } from '@/hooks/removeFromFavorites';
+import { markAsFavorite } from '@/hooks/markAsFavorite'
 import { formatDistanceToNow } from 'date-fns';
 import { Asset } from 'expo-asset';
 import SvgUri from 'react-native-svg-uri';
-import { removeFromFavorite, markAsFavorite } from '@/api/tips';
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useUser } from '@/hooks/useUser';
 const TipDetail = () => {
   const { userInfo } = useUserInfo();
   const {user} = useUser();
   const { tipId } = useLocalSearchParams();
-  console.log('tipId:', tipId);
   const navigation = useNavigation(); 
   const { tip, loading, error } = useTip(tipId as string);
-  
   const [isLiked, setIsLiked] = useState(false); 
 
-  //console.log('tip:', tip);
   const formatRelativeTime = (date: string | Date | null) => {
     if (!date) return 'Unknown time';
     try {
@@ -54,9 +51,9 @@ const TipDetail = () => {
       const id = String(tipId);
       if (isLiked) {
         console.log('inside the remove from favorite')
-        await removeFromFavorite(id, userInfo.authToken);
+        await removeFromFavorite(id);
       } else {
-        await markAsFavorite(id, userInfo.authToken);
+        await markAsFavorite(id);
       }
     } catch (error) {
       console.error("Error with favorite action", error);

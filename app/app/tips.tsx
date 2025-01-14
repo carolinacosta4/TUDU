@@ -4,7 +4,6 @@ import { useNavigation } from 'expo-router';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'; 
 import { RootStackParamList } from '@/types/navigation'; 
 import SearchAndCategories from '@/components/SearchAndCategories';
-import { useTips } from '@/hooks/useTips';
 import { formatDistanceToNow } from 'date-fns';
 import TipItemList from '@/components/TipItemList';
 import { getCategoryById } from '@/api/tipsCategory';
@@ -12,10 +11,10 @@ import RecentTips from '@/components/RecentTips';
 import useFonts from "@/hooks/useFonts";
 import SvgUri from 'react-native-svg-uri';
 import { useRouter } from 'expo-router';
-
+import { useTips } from '@/hooks/useTips';
 const TipsPage = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { tips, loading, error } = useTips();
+  const { tips, loading, error } = useTips()
   const [categoryNames, setCategoryNames] = useState<{ [key: string]: string }>({});
   const [selectedCategory, setSelectedCategory] = useState<string>('All'); 
   const [searchText, setSearchText] = useState<string>('');
@@ -23,6 +22,8 @@ const TipsPage = () => {
   const router = useRouter();
 
   useEffect(() => {
+
+
     const fetchCategoryNames = async () => {
       const categoryNameMap: { [key: string]: string } = {}; 
       for (let tip of tips) {
