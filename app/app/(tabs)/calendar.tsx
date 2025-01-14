@@ -20,6 +20,7 @@ import Task from "@/interfaces/Task";
 import Bill from "@/interfaces/Bill";
 import { useUser } from "@/hooks/useUser";
 import { useBill } from "@/hooks/useBill";
+import { calculateStatistics } from "@/utils/statisticsUtils";
 
 const CalendarScreen = () => {
   const { user } = useUser();
@@ -32,11 +33,22 @@ const CalendarScreen = () => {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const categorizedTasks = categorizeTasks(tasks);
   const { allDayTasks, timedTasks } = categorizedTasks;
-  const groupedTasks = groupTasksByTime(timedTasks);
+  const groupedStuff = groupTasksByTime(timedTasks);
   const [markedDates, setMarkedDates] = useState<{ [key: string]: any }>({});
-  const [currentMonth, setCurrentMonth] = useState<number | null>(null);
-  const [currentYear, setCurrentYear] = useState<number | null>(null);
+  const today = new Date();
+  const [currentMonth, setCurrentMonth] = useState<number>(
+    today.getMonth() + 1
+  );
+  const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
   const [colorDotDays, setColorDotDays] = useState<{ [key: string]: any }>({});
+  const [tasksCompleted, setTasksCompleted] = useState<number>(0);
+  const [perfectDaysCount, setPerfectDaysCount] = useState<number>(0);
+  const [highestStreak, setHighestStreak] = useState<number>(0);
+  const [monthlyRate, setMonthlyRate] = useState<number>(0);
+  const [overallRate, setOverallRate] = useState<number>(0);
+  const [monthTasks, setMonthTasks] = useState<number>(0);
+  const [monthBills, setMonthBills] = useState<number>(0);
+  const [billsCompleted, setBillsCompleted] = useState<number>(0);
 
   const getDaysColorDots = (month: number, year: number) => {
     if (!user) {
@@ -89,12 +101,6 @@ const CalendarScreen = () => {
   };
 
   useEffect(() => {
-    if (!user){
-
-    }
-  })
-
-  useEffect(() => {
     let today = new Date();
     let thisMonth = today.getMonth();
     let thisYear = today.getFullYear();
@@ -126,14 +132,46 @@ const CalendarScreen = () => {
       
     }
   }, [currentMonth, currentYear]);
-  
+
+  // ESTATÍSTICAS :)
+  useEffect(() => {
+    if (!user) return;
+
+    const {
+      perfectDaysCount,
+      tasksCompleted,
+      billsCompleted,
+      monthlyRate,
+      highestStreak,
+      overallRate,
+      monthTasksCount,
+      monthBillsCount,
+    } = calculateStatistics(
+      user.userTasks,
+      user.userBills,
+      currentMonth,
+      currentYear
+    );
+
+    setPerfectDaysCount(perfectDaysCount);
+    setTasksCompleted(tasksCompleted);
+    setBillsCompleted(billsCompleted);
+    setMonthlyRate(monthlyRate);
+    setOverallRate(overallRate);
+    setHighestStreak(highestStreak);
+    setMonthTasks(monthTasksCount);
+    setMonthBills(monthBillsCount);
+  }, [currentMonth, currentYear, user, tasks, bills]);
 
   const stats = [
-    { label: "Perfect Days", value: "15 days" },
-    { label: "Highest streak", value: "24" },
-    { label: "Tasks completed this month", value: "12" },
-    { label: "Monthly rate", value: "70%" },
-    { label: "Overall rate", value: "30%" },
+    { label: "Total Tasks", value: monthTasks },
+    { label: "Total Bills", value: monthBills },
+    { label: "Perfect Days", value: perfectDaysCount },
+    { label: "Highest Streak", value: highestStreak },
+    { label: "Tasks Completed this Month", value: tasksCompleted },
+    { label: "Bills Completed this Month", value: billsCompleted },
+    { label: "Monthly Rate", value: `${monthlyRate}%` },
+    { label: "Overall Rate", value: `${overallRate}%` },
   ];
 
   const renderStatItem = ({ item }: any) => (
@@ -189,7 +227,7 @@ const CalendarScreen = () => {
     <SafeAreaView style={styles.container}>
       <Calendar
         style={styles.calendar}
-        markedDates={{markedDates, colorDotDays}}
+        markedDates={{ markedDates, colorDotDays }}
         theme={{
           backgroundColor: "#F7F6F0",
           calendarBackground: "#ffffff",
@@ -219,7 +257,7 @@ const CalendarScreen = () => {
           {tasks.length > 0 ? (
             <ListHome
               allDayTasks={allDayTasks}
-              groupedTasks={groupedTasks}
+              groupedTasks={groupedStuff}
               filteredBills={bills}
               changeStatus={changeStatus}
               user={user}
