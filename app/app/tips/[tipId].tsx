@@ -1,6 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useLayoutEffect, useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,20 +7,20 @@ import { useTip } from '@/hooks/useTip';
 import { formatDistanceToNow } from 'date-fns';
 import { Asset } from 'expo-asset';
 import SvgUri from 'react-native-svg-uri';
-import { removeFromFavorite, markAsFavorite } from '@/api/tips';
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useUser } from '@/hooks/useUser';
 const TipDetail = () => {
   const { userInfo } = useUserInfo();
   const {user} = useUser();
   const { tipId } = useLocalSearchParams();
-  console.log('tipId:', tipId);
   const navigation = useNavigation(); 
-  const { tip, loading, error } = useTip(tipId as string);
-  
+  const { tip, loading, error, removeFromFavorite, markAsFavorite, fetchTip } = useTip();
   const [isLiked, setIsLiked] = useState(false); 
 
-  //console.log('tip:', tip);
+  useEffect(() => {
+    fetchTip(tipId)
+  }, [tipId])
+
   const formatRelativeTime = (date: string | Date | null) => {
     if (!date) return 'Unknown time';
     try {
@@ -32,15 +31,15 @@ const TipDetail = () => {
     }
   };
 
-  useEffect(() => {
-    if (!userInfo?.authToken || !tipId || !user) return;
+  // useEffect(() => {
+  //   if (!userInfo?.authToken || !tipId || !user) return;
     
-    const idToCheck = Array.isArray(tipId) ? tipId[0] : tipId;
-    const favoriteTipIds = user.FavoriteTip.map(fav => fav.IDtip);
+  //   const idToCheck = Array.isArray(tipId) ? tipId[0] : tipId;
+  //   const favoriteTipIds = user.FavoriteTip.map(fav => fav.IDtip);
 
-    setIsLiked(favoriteTipIds.includes(idToCheck));
-  }, [user, tipId, userInfo?.authToken]);
-
+  //   setIsLiked(favoriteTipIds.includes(idToCheck));
+  // }, [user, tipId, userInfo?.authToken]);
+/*
   const handleHeartClick = async () => {
     if (!userInfo?.authToken) {
       console.error("User is not logged in or token is not available.");
@@ -54,34 +53,34 @@ const TipDetail = () => {
       const id = String(tipId);
       if (isLiked) {
         console.log('inside the remove from favorite')
-        await removeFromFavorite(id, userInfo.authToken);
+        await removeFromFavorite(id, userInfo?.authToken);
       } else {
-        await markAsFavorite(id, userInfo.authToken);
+        await markAsFavorite(id, userInfo?.authToken);
       }
     } catch (error) {
       console.error("Error with favorite action", error);
       setIsLiked(isLiked); 
     }
   };
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,}
-);
+*/
+//   useLayoutEffect(() => {
+//     navigation.setOptions({
+//       headerShown: false,}
+// );
     
-  }, [navigation, tip]);
+//   }, [navigation, tip]);
 
   if (loading) {
     return <Text>Loading...</Text>;
   }
 
-  if (error) {
-    return <Text>Error: {error}</Text>;
-  }
+  // if (error) {
+  //   return <Text>Error: {error}</Text>;
+  // }
 
-  if (!tip) {
-    return <Text>No tip found</Text>;
-  }
+  // if (!tip) {
+  //   return <Text>No tip found</Text>;
+  // }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -107,7 +106,7 @@ const TipDetail = () => {
               <Text style={styles.subtitle}>{formatRelativeTime(new Date(tip.createdAt))} • {tip.author}</Text>
             </View>
             <View style={styles.iconContainer}>
-            <TouchableOpacity onPress={handleHeartClick}>
+            <TouchableOpacity >
             <SvgUri
                 width="32"
                 height="32"

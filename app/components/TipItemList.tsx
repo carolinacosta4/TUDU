@@ -30,7 +30,7 @@ const TipItemList: React.FC<TipItemListProps> = ({
               <View style={styles.footerContainer}>
                 <View style={styles.footerItem}>
                   <Text style={styles.footerTitle}>
-                    {categoryNames[tip._id] || 'Loading...'}
+                   {tip.IDcategory.name}
                   </Text>
                   <View style={styles.footerContent}>
                     <Text style={styles.footerText}>{tip.title}</Text>

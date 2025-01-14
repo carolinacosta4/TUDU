@@ -1,37 +1,51 @@
 import { useState, useEffect } from 'react';
-import { getTip } from '@/api/tips';
-import  Tip  from '@/interfaces/Tip'; 
+import users, { get, post } from '@/api/users';
+import Tip from '@/interfaces/Tip';
+import { useUserInfo } from "./useUserInfo";
 
-export const useTip = (tipId: string | undefined) => {
-  const [tip, setTip] = useState<Tip | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+export const useTip = () => {
+  const { loading } = useUserInfo();
+  const [tip, setTip] = useState<Tip[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchTip = async (tipId: string) => {
+    try {
+      const response = await users.get(`tips/${tipId}`);
+      setTip(response.data);
+      console.log(response.data);
+    } catch (err) {
+      setError('Error fetching tips');
+    }
+  };
 
-  useEffect(() => {
-    console.log('useEffect triggered with tipId:', tipId);
-
-    const fetchTips = async () => {
-      if (!tipId) {
-        setError('Tip ID is missing');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await getTip(tipId);
-        //console.log('API response:', response);
-        setTip(response.data); 
-      } catch (err) {
-        console.error('Error fetching tips:', err);
-        setError('Error fetching tips');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTips();
-  }, [tipId]);
-
-  return { tip, loading, error };
+const removeFromFavorite = async (tipId: string, authToken: string) => {
+  try {
+    const response = await users.delete(`tips/${tipId}/favorite`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+    console.log('response:', response);
+  } catch (error) {
+    console.warn(error);
+  }
 };
+
+const markAsFavorite = async (tipId: string, authToken: string) => {
+  try {
+    console.log('inside mark as favorite hook');
+    const response = await users.post(`tips/${tipId}/favorite`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    console.log('response:', response);
+    return response;
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+  return { tip, loading, error, markAsFavorite, removeFromFavorite, fetchTip };
+}; 

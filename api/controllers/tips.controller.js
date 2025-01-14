@@ -23,7 +23,7 @@ cloudinary.config({
 
 exports.findAll = async (req, res) => {
     try {
-        const tips = await Tip.find().exec();
+        const tips = await Tip.find().populate('IDcategory', '-_v').exec();
 
         if (!tips) {
             return res.status(200).json({
