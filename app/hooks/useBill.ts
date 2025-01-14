@@ -6,8 +6,11 @@ import Bill from "@/interfaces/Bill";
 export function useBill() {
   const { loading } = useUserInfo();
   const [bills, setBills] = useState<Bill[]>([]);
-  const [bill, setBill] = useState<Bill>();  
-  const [currencies, setCurrencies] = useState<{ _id: string; name: string; symbol: string }[]>([]);
+  const [bill, setBill] = useState<Bill>();
+  const [currencies, setCurrencies] = useState<
+    { _id: string; name: string; symbol: string }[]
+  >([]);
+  const { userInfo } = useUserInfo();
 
   const handleGetBillsCurrencies = async () => {
     try {
@@ -15,6 +18,33 @@ export function useBill() {
       setCurrencies(response.data.data);
     } catch (error) {
       console.warn(error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetBillsCurrencies();
+  }, []);
+
+  const handleGetBillsForMonth = async (
+    month: number,
+    year: number,
+    authToken: string
+  ) => {
+    try {
+      const response = await api.get(`bills?month=${month}&year=${year}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      setBills(response.data.data);
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
+  const getBillsForMonth = async (month: number, year: number) => {
+    if (userInfo && userInfo.authToken && !loading) {
+      handleGetBillsForMonth(month, year, userInfo.authToken);
     }
   };
 
@@ -27,17 +57,13 @@ export function useBill() {
     }
   };
 
-  useEffect(() => {
-    handleGetBillsCurrencies();
-  }, []);
-
-
   return {
     bills,
     setBills,
-    loading,
-    currencies,
     handleGetBill,
-    bill
+    loading,
+    getBillsForMonth,
+    bill,
+    currencies,
   };
 }

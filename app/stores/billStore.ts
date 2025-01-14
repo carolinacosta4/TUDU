@@ -5,6 +5,11 @@ import Bill from "../interfaces/Bill";
 interface BillState {
   bills: Bill[];
   fetchBills: (date: Date, authToken: string) => Promise<void>;
+  fetchMonthBills: (
+    month: number,
+    year: number,
+    authToken: string
+  ) => Promise<void>;
   addBills: (bill: any, authToken: string) => Promise<void>;
   updateBill: (
     id: string,
@@ -19,6 +24,18 @@ export const useBillStore = create<BillState>((set) => ({
   fetchBills: async (date, authToken) => {
     try {
       const response = await api.get(`bills?date=${date.toISOString()}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      set({ bills: response.data.data });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  fetchMonthBills: async (month, year, authToken) => {
+    try {
+      const response = await api.get(`bills?month=${month}&year=${year}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
