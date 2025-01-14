@@ -1,4 +1,5 @@
-import { useTask } from "@/hooks/useTask";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { useTaskStore } from "@/stores/taskStore";
 import React, { Fragment, useState } from "react";
 import {
   View,
@@ -29,7 +30,8 @@ export default function CreateTaskModal({
   dataRepeat,
   toggleModal,
 }: CreateTaskModalProps) {
-  const { getTasks, createTask } = useTask();
+  const { addTask } = useTaskStore();
+  const { userInfo } = useUserInfo();
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -74,7 +76,7 @@ export default function CreateTaskModal({
     } else if (newTask.startDate == newTask.endDate) {
       alert("Please different times for start and end");
     } else {
-      createTask(newTask);
+      if(userInfo) addTask(newTask, userInfo.authToken);
       toggleModal();
     }
   };

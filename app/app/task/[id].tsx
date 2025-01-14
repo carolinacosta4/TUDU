@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  Vibration
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -14,6 +16,7 @@ import { useTask } from "@/hooks/useTask";
 import { formatDate } from "@/utils/taskUtils";
 import { useTaskStore } from "@/stores/taskStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
+import { useUser } from "@/hooks/useUser";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
@@ -21,6 +24,7 @@ const TaskDetail = () => {
   const { handleGetTask, task } = useTask();
   const { updateTask, deleteTask } = useTaskStore()
   const { userInfo } = useUserInfo();
+  const { user } = useUser();
 
   useEffect(() => {
     if (typeof id === "string") {
@@ -99,11 +103,21 @@ const TaskDetail = () => {
     router.push("/");
   };
 
+  const ONE_SECOND_IN_MS = 1000;
+  const PATTERN = [1 * ONE_SECOND_IN_MS];
+
   const handleMarkAsDone = async (task: Task) => {
     try {
       let newStatus = !task.status;      
       await updateTask(task._id, { status: newStatus }, userInfo.authToken );
-    } catch (error: any) {
+    
+      if (user?.data.vibration && newStatus === true) {
+        Platform.OS === "android"
+          ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+          : Vibration.vibrate(PATTERN);
+      }
+    }
+     catch (error: any) {
       console.error("Error message:", error);
     }
   };

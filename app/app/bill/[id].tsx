@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  Vibration,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -14,6 +16,7 @@ import { useBill } from "@/hooks/useBill";
 import { formatDate } from "@/utils/taskUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
+import { useUser } from "@/hooks/useUser";
 
 const BillDetail = () => {
   const fontsLoaded = useFonts();
@@ -21,6 +24,7 @@ const BillDetail = () => {
   const { handleGetBill, bill } = useBill();
   const {updateBill, deleteBill} = useBillStore();
   const {userInfo} = useUserInfo()
+  const { user } = useUser();
 
   useEffect(() => {
     if (typeof id === "string") {
@@ -61,16 +65,24 @@ const BillDetail = () => {
     }
   };
 
-
   const handleDeleteBill = () => {
     deleteBill(bill._id, userInfo.authToken);
     router.push("/");
   };
 
+  const ONE_SECOND_IN_MS = 1000;
+  const PATTERN = [1 * ONE_SECOND_IN_MS];
+
   const handleMarkAsDone = async (bill: Bill) => {
     try {
       let newStatus = !bill.status;
       await updateBill(bill._id, { status: newStatus }, userInfo.authToken);
+    
+      if (user?.data.vibration && newStatus === true) {
+        Platform.OS === "android"
+        ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+        : Vibration.vibrate(PATTERN);
+      }
     } catch (error: any) {
       console.error("Error message:", error);
     }

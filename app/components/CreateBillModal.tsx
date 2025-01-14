@@ -1,4 +1,6 @@
 import { useBill } from "@/hooks/useBill";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { useBillStore } from "@/stores/billStore";
 import React, { useState } from "react";
 import {
   View,
@@ -22,7 +24,9 @@ export default function CreateBillModal({
   dataRepeat,
   toggleModal,
 }: CreateBillModalProps) {
-  const { createBill, currencies } = useBill();
+  const { currencies } = useBill();
+  const { addBills } = useBillStore();
+  const { userInfo } = useUserInfo();
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -60,7 +64,7 @@ export default function CreateBillModal({
     } else if (newTask.priority === "") {
       alert("Please select a priority for the task");
     } else {
-      createBill(newTask);
+      if (userInfo) addBills(newTask, userInfo.authToken);
       toggleModal();
     }
   };
