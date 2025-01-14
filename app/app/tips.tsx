@@ -6,12 +6,13 @@ import { RootStackParamList } from '@/types/navigation';
 import SearchAndCategories from '@/components/SearchAndCategories';
 import { formatDistanceToNow } from 'date-fns';
 import TipItemList from '@/components/TipItemList';
-import { getCategoryById } from '@/api/tipsCategory';
+import { useCategories } from '@/hooks/useCategoryTipsV2';
 import RecentTips from '@/components/RecentTips';
 import useFonts from "@/hooks/useFonts";
 import SvgUri from 'react-native-svg-uri';
 import { useRouter } from 'expo-router';
 import { useTips } from '@/hooks/useTips';
+import Tip from '@/interfaces/Tip';
 const TipsPage = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { tips, loading, error } = useTips()
@@ -19,29 +20,10 @@ const TipsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All'); 
   const [searchText, setSearchText] = useState<string>('');
   const fontsLoaded = useFonts();
+  const {category, handleGetCategory} = useCategories()
+  const [filteredTips, setFilteredTips] = useState<Tip[]>([])
+  const [recentTips, setRecentTips] = useState<Tip[]>([])
   const router = useRouter();
-
-  useEffect(() => {
-
-
-    const fetchCategoryNames = async () => {
-      const categoryNameMap: { [key: string]: string } = {}; 
-      for (let tip of tips) {
-        try {
-          const category = await getCategoryById({ _id: tip.IDcategory });
-          //console.log('category:', category);
-          categoryNameMap[tip._id] = category.data; 
-        } catch (error) {
-          console.error(`Error fetching category for tip ${tip._id}:`, error);
-        }
-      }
-      setCategoryNames(categoryNameMap);
-    };
-
-    if (tips.length > 0) {
-      fetchCategoryNames();
-    }
-  }, [tips]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -76,21 +58,33 @@ const TipsPage = () => {
       ),
     });
   }, [navigation]);
+
+  useEffect(() => {
+    if(!tips){
+      return
+    }else{      
+      const filteredTipsFilter = tips.filter(tip => {
+        const categoryMatch =
+          selectedCategory === 'All' || tip.IDcategory === selectedCategory; 
+        const titleMatch = tip.title.toLowerCase().includes(searchText.toLowerCase());
+        return categoryMatch && titleMatch;
+      });
+      setFilteredTips(filteredTipsFilter)
+
+      const recentTipsSort = tips
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
+
+        setRecentTips(recentTipsSort)
+        }
+  })
   
   const handleNavigateToTip = (tipId: string) => {
       router.push(`/tips/${tipId}`);
   };
-  
-  
 
-  const filteredTips = tips.filter(tip => {
-    const categoryMatch =
-      selectedCategory === 'All' || tip.IDcategory === selectedCategory; 
-    const titleMatch = tip.title.toLowerCase().includes(searchText.toLowerCase());
-    return categoryMatch && titleMatch;
-  });
   
-
+  
   const formatRelativeTime = (date: Date) => {
     let relativeTime = formatDistanceToNow(date, { addSuffix: true });
     return relativeTime.replace(/^about\s/, '');
@@ -114,10 +108,6 @@ const TipsPage = () => {
   if (!fontsLoaded) {
     return <Text>Loading tips...</Text>;
   }
-
-  const recentTips = filteredTips
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 5);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
