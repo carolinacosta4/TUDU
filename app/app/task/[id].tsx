@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,11 +12,13 @@ import useFonts from "@/hooks/useFonts";
 import Task from "@/interfaces/Task";
 import { useTask } from "@/hooks/useTask";
 import { formatDate } from "@/utils/taskUtils";
+import EditTask from "@/components/EditTask";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
   const { editTask, handleGetTask, task, handleDeleteTask } = useTask();
+  const [edit, setEdit] = useState<Boolean>(false);
 
   useEffect(() => {
     if (typeof id === "string") {
@@ -104,50 +106,75 @@ const TaskDetail = () => {
     }
   };
 
+  const handleEdit = () => {
+    console.log("pressed");
+
+    let newEdit = !edit;
+    setEdit(newEdit);
+  };
+
   return (
     task && (
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F6F0" }}>
-          <ScrollView style={styles.container}>
-            <View style={styles.taskHeader}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
+          {edit ? (
+            <ScrollView style={styles.container}>
+              <Text>Edit view</Text>
+              <TouchableOpacity onPress={handleEdit}>
                 <Text
                   style={{
-                    fontSize: 13.33,
-                    color: "#474038",
                     fontFamily: "Rebond-Grotesque-Medium",
-                    padding: 4,
-                    textAlign: "center",
-                    lineHeight: 24,
-                    ...getPriorityStyle(task.priority),
+                    fontSize: 16,
+                    color: "#562CAF",
+                    textAlign: "right",
                   }}
                 >
-                  {task.priority.charAt(0).toUpperCase() +
-                    task.priority.slice(1)}
+                  Done
                 </Text>
-                <TouchableOpacity>
+              </TouchableOpacity>
+              <EditTask task={task}></EditTask>
+            </ScrollView>
+          ) : (
+            <ScrollView style={styles.container}>
+              <View style={styles.taskHeader}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
                   <Text
                     style={{
+                      fontSize: 13.33,
+                      color: "#474038",
                       fontFamily: "Rebond-Grotesque-Medium",
-                      fontSize: 16,
-                      color: "#562CAF",
-                      textAlign: "right",
+                      padding: 4,
+                      textAlign: "center",
+                      lineHeight: 24,
+                      ...getPriorityStyle(task.priority),
                     }}
                   >
-                    Edit
+                    {task.priority.charAt(0).toUpperCase() +
+                      task.priority.slice(1)}
                   </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity onPress={handleEdit}>
+                    <Text
+                      style={{
+                        fontFamily: "Rebond-Grotesque-Medium",
+                        fontSize: 16,
+                        color: "#562CAF",
+                        textAlign: "right",
+                      }}
+                    >
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.taskTitle}>{task.name}</Text>
               </View>
-              <Text style={styles.taskTitle}>{task.name}</Text>
-            </View>
-            <Text
+              <Text
                 style={{
                   fontSize: 13.33,
                   fontFamily: "Rebond-Grotesque-Medium",
@@ -163,55 +190,61 @@ const TaskDetail = () => {
                 {task.IDcategory.name}
               </Text>
 
-            <View style={styles.startInfo}>
-              <Text style={styles.countdown}>Starts in</Text>
-              <Text style={styles.timeRemaining}>
-                {getCountdown(task.startDate)}
-              </Text>
-              <Text style={styles.startDate}>{formatDate(task.startDate)}</Text>
-            </View>
+              <View style={styles.startInfo}>
+                <Text style={styles.countdown}>Starts in</Text>
+                <Text style={styles.timeRemaining}>
+                  {getCountdown(task.startDate)}
+                </Text>
+                <Text style={styles.startDate}>
+                  {formatDate(task.startDate)}
+                </Text>
+              </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Schedule</Text>
-              <Text style={styles.schedule}>
-                {task.periodicity.charAt(0).toUpperCase() +
-                  task.periodicity.slice(1)}{" "}
-                - {formatTime(task.startDate)}
-              </Text>
-            </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Schedule</Text>
+                <Text style={styles.schedule}>
+                  {task.periodicity.charAt(0).toUpperCase() +
+                    task.periodicity.slice(1)}{" "}
+                  - {formatTime(task.startDate)}
+                </Text>
+              </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Notes</Text>
-              {task.notes && <Text style={styles.notes}>{task.notes}</Text>}
-              {!task.notes && <Text style={styles.notes}>No notes yet!</Text>}
-            </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Notes</Text>
+                {task.notes != "" ? (
+                  <Text style={styles.notes}>{task.notes}</Text>
+                ) : (
+                  <Text style={styles.notes}>No notes yet!</Text>
+                )}
+              </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Options</Text>
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={deleteTask}
-              >
-                <Text style={styles.deleteText}>Delete Task</Text>
-              </TouchableOpacity>
-            </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Options</Text>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={deleteTask}
+                >
+                  <Text style={styles.deleteText}>Delete Task</Text>
+                </TouchableOpacity>
+              </View>
 
-            {!task.status ? (
-              <TouchableOpacity
-                style={{ ...styles.checkButton, backgroundColor: "#6A60F0" }}
-                onPress={() => handleMarkAsDone(task)}
-              >
-                <Text style={styles.checkText}>Check as done</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={{ ...styles.checkButton, backgroundColor: "#837D74" }}
-                onPress={() => handleMarkAsDone(task)}
-              >
-                <Text style={styles.checkText}>Uncheck as done</Text>
-              </TouchableOpacity>
-            )}
-          </ScrollView>
+              {!task.status ? (
+                <TouchableOpacity
+                  style={{ ...styles.checkButton, backgroundColor: "#6A60F0" }}
+                  onPress={() => handleMarkAsDone(task)}
+                >
+                  <Text style={styles.checkText}>Check as done</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={{ ...styles.checkButton, backgroundColor: "#837D74" }}
+                  onPress={() => handleMarkAsDone(task)}
+                >
+                  <Text style={styles.checkText}>Uncheck as done</Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+          )}
         </SafeAreaView>
       </SafeAreaProvider>
     )
@@ -318,7 +351,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#D32F2F",
     fontFamily: "Rebond-Grotesque-Medium",
-    lineHeight: 24
+    lineHeight: 24,
   },
   checkButton: {
     padding: 15,
