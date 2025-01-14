@@ -66,7 +66,7 @@ exports.findUser = async (req, res) => {
       IDuser: req.params.idU,
     })
       .select("-__v")
-      .populate("IDAchievements", "-_id -__v")
+      .populate("IDAchievements", "-__v")
       .exec();
 
     return res.status(200).json({
