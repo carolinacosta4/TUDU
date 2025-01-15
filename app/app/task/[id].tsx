@@ -107,7 +107,7 @@ const TaskDetail = () => {
   };
 
   const handleEdit = () => {
-    console.log("pressed");
+    console.log(task);
 
     let newEdit = !edit;
     setEdit(newEdit);
@@ -120,7 +120,7 @@ const TaskDetail = () => {
           {edit ? (
             <ScrollView style={styles.container}>
               <Text>Edit view</Text>
-              <TouchableOpacity onPress={handleEdit}>
+              {/* <TouchableOpacity onPress={handleEdit} style={{paddingBottom: 10}}>
                 <Text
                   style={{
                     fontFamily: "Rebond-Grotesque-Medium",
@@ -131,7 +131,7 @@ const TaskDetail = () => {
                 >
                   Done
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <EditTask task={task}></EditTask>
             </ScrollView>
           ) : (

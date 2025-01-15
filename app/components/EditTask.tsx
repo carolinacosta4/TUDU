@@ -13,22 +13,28 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Task from "@/interfaces/Task";
 const { width, height } = Dimensions.get("window");
 
-
-export default function EditTask(task: Task) {
+export default function EditTask({ task }: { task: Task }) {
+  // console.log(task);
   const { editTask, categories } = useTask();
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(
+    task.IDcategory.name || ""
+  );
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [name, setName] = useState("");
-  const [priority, setPriority] = useState("");
-  const [IDcategory, setIDcategory] = useState("");
-  const [periodicity, setPeriodicity] = useState("never");
-  const [notification, setNotification] = useState(false);
-  const [notes, setNotes] = useState("");
+  const [startDate, setStartDate] = useState(
+    task.startDate ? new Date(task.startDate) : new Date()
+  );
+  const [endDate, setEndDate] = useState(
+    task.endDate ? new Date(task.endDate) : new Date()
+  );
+  const [name, setName] = useState(task.name || "");
+  const [priority, setPriority] = useState(task.priority || "");
+  const [IDcategory, setIDcategory] = useState(task.IDcategory || "");
+  const [periodicity, setPeriodicity] = useState(task.periodicity || "never");
+  const [notification, setNotification] = useState(task.notification || false);
+  const [notes, setNotes] = useState(task.notes || "Type here...");
   const editTaskItem = {
     name: name,
     priority: priority,
@@ -50,7 +56,7 @@ export default function EditTask(task: Task) {
     setShowEndDatePicker(false);
   };
 
-  const handleCreateTask = () => {
+  const handleEditTask = () => {
     if (editTaskItem.name === "") {
       alert("Please enter a name for the task");
     } else if (editTaskItem.priority === "") {
@@ -59,79 +65,109 @@ export default function EditTask(task: Task) {
       alert("Please select a category for the task");
     } else if (editTaskItem.startDate == editTaskItem.endDate) {
       alert("Please different times for start and end");
+    } else {
+      console.log("edit tbd");
     }
   };
 
   return (
     <>
       <View style={{ rowGap: 24 }}>
-        <TextInput
-          placeholder="Task Name"
-          style={{
-            borderColor: "#C4BFB5",
-            borderWidth: 1,
-            padding: 10,
-            borderRadius: 8,
-            fontFamily: "Rebond-Grotesque-Medium",
-            color: "#474038",
-          }}
-          placeholderTextColor={"#C4BFB5"}
-          onChangeText={setName}
-        />
-
-        <Dropdown
-          style={[
-            {
-              height: 40,
+        <View style={{ rowGap: 8 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#A5A096",
+              fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20,
+            }}
+          >
+            Task Name
+          </Text>
+          <TextInput
+            value={name}
+            style={{
               borderColor: "#C4BFB5",
               borderWidth: 1,
+              padding: 10,
               borderRadius: 8,
-              paddingHorizontal: 8,
+              fontFamily: "Rebond-Grotesque-Medium",
+              color: "#474038",
+              lineHeight: 20,
+            }}
+            placeholderTextColor={"#C4BFB5"}
+            onChangeText={setName}
+          />
+        </View>
+
+        <View style={{ rowGap: 8 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#A5A096",
+              fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20,
+            }}
+          >
+            Priority
+          </Text>
+          <Dropdown
+            style={[
+              {
+                height: 40,
+                borderColor: "#C4BFB5",
+                borderWidth: 1,
+                borderRadius: 8,
+                paddingHorizontal: 8,
+                backgroundColor: "#F7F6F0",
+              },
+              isFocus && { borderColor: "#562CAF" },
+            ]}
+            containerStyle={{
               backgroundColor: "#F7F6F0",
-            },
-            isFocus && { borderColor: "#562CAF" },
-          ]}
-          containerStyle={{
-            backgroundColor: "#F7F6F0",
-            borderBottomRightRadius: 8,
-            borderBottomLeftRadius: 8,
-          }}
-          placeholderStyle={{
-            fontSize: 13.33,
-            fontFamily: "Rebond-Grotesque-Medium",
-            color: "#C4BFB5",
-          }}
-          selectedTextStyle={{
-            fontSize: 13.33,
-            fontFamily: "Rebond-Grotesque-Medium",
-            color: "#474038",
-          }}
-          iconStyle={{
-            width: 24,
-            height: 24,
-          }}
-          itemTextStyle={{
-            fontSize: 13.33,
-            color: "#A5A096",
-            fontFamily: "Rebond-Grotesque-Regular",
-          }}
-          data={[
-            { label: "High", value: "high" },
-            { label: "Medium", value: "medium" },
-            { label: "Low", value: "low" },
-          ]}
-          labelField="label"
-          valueField="value"
-          placeholder="Priority"
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={(item) => {
-            setPriority(item.value);
-            setValue(item.value);
-            setIsFocus(false);
-          }}
-        />
+              borderBottomRightRadius: 8,
+              borderBottomLeftRadius: 8,
+            }}
+            placeholderStyle={{
+              fontSize: 13.33,
+              fontFamily: "Rebond-Grotesque-Medium",
+              lineHeight: 20,
+              color: "#C4BFB5",
+            }}
+            selectedTextStyle={{
+              fontSize: 13.33,
+              fontFamily: "Rebond-Grotesque-Medium",
+              lineHeight: 20,
+              color: "#474038",
+            }}
+            iconStyle={{
+              width: 24,
+              height: 24,
+            }}
+            itemTextStyle={{
+              fontSize: 13.33,
+              color: "#A5A096",
+              fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20,
+            }}
+            data={[
+              { label: "High", value: "high" },
+              { label: "Medium", value: "medium" },
+              { label: "Low", value: "low" },
+            ]}
+            labelField="label"
+            valueField="value"
+            placeholder="Priority"
+            value={priority}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setPriority(item.value);
+              setValue(item.value);
+              setIsFocus(false);
+            }}
+          />
+        </View>
 
         <View style={{ rowGap: 16 }}>
           <View style={{ rowGap: 8 }}>
@@ -140,6 +176,7 @@ export default function EditTask(task: Task) {
                 fontFamily: "Rebond-Grotesque-Regular",
                 fontSize: 16,
                 color: "#A5A096",
+                lineHeight: 20,
               }}
             >
               Category
@@ -181,6 +218,7 @@ export default function EditTask(task: Task) {
                     <Text
                       style={{
                         fontFamily: "Rebond-Grotesque-Medium",
+                        lineHeight: 20,
                         fontSize: 13.3,
                         color: category.color,
                       }}
@@ -204,9 +242,10 @@ export default function EditTask(task: Task) {
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
-              Starts
+              Start
             </Text>
             <TouchableOpacity
               style={{
@@ -219,6 +258,7 @@ export default function EditTask(task: Task) {
               <Text
                 style={{
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 {startDate.toLocaleString("en-GB", {
@@ -244,6 +284,7 @@ export default function EditTask(task: Task) {
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               End
@@ -259,6 +300,7 @@ export default function EditTask(task: Task) {
               <Text
                 style={{
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 {endDate.toLocaleString("en-GB", {
@@ -284,11 +326,25 @@ export default function EditTask(task: Task) {
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Repeat
             </Text>
             <Dropdown
+              data={[
+                { label: "Never", value: "never" },
+                { label: "Daily", value: "daily" },
+                { label: "Weekly", value: "weekly" },
+                { label: "Monthly", value: "monthly" },
+              ]}
+              labelField="label"
+              valueField="value"
+              value={periodicity} // Valor selecionado
+              placeholder="Select repeat frequency"
+              onChange={(item) => {
+                setPeriodicity(item.value); // Atualiza o estado quando o usuário seleciona uma opção
+              }}
               style={[
                 {
                   height: 20,
@@ -304,12 +360,14 @@ export default function EditTask(task: Task) {
               placeholderStyle={{
                 fontSize: 13.33,
                 fontFamily: "Rebond-Grotesque-Medium",
+                lineHeight: 20,
                 color: "#474038",
                 textAlign: "right",
               }}
               selectedTextStyle={{
                 fontSize: 13.33,
                 fontFamily: "Rebond-Grotesque-Medium",
+                lineHeight: 20,
                 color: "#474038",
                 textAlign: "right",
               }}
@@ -317,17 +375,8 @@ export default function EditTask(task: Task) {
                 fontSize: 13.33,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
-            //   data={dataRepeat}
-            //   placeholder={dataRepeat[0].label}
-            //   labelField="label"
-            //   valueField="value"
-            //   value={value}
-            //   onChange={(item) => {
-            //     setValue(item.value);
-            //     setPeriodicity(item.value);
-            //   }}
-              renderRightIcon={() => null}
             />
           </View>
         </View>
@@ -345,6 +394,7 @@ export default function EditTask(task: Task) {
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Allow notifications
@@ -369,20 +419,22 @@ export default function EditTask(task: Task) {
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Add Notes
             </Text>
             <TextInput
-              placeholder="Type here..."
               style={{
                 padding: 10,
                 paddingBottom: 100,
                 borderRadius: 8,
                 backgroundColor: "#EEEADF60",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
                 color: "#474038",
               }}
+              value={notes}
               placeholderTextColor={"#C4BFB5"}
               onChangeText={setNotes}
             />
@@ -402,29 +454,29 @@ export default function EditTask(task: Task) {
             />
           </View>
         </View>
+        <TouchableOpacity
+                style={{
+                  backgroundColor: "#6B47DC",
+                  padding: height * 0.012,
+                  borderRadius: 16,
+                  height: 48,
+                  justifyContent: "center",
+                }}
+                onPress={handleEditTask}
+              >
+                <Text
+                  style={{
+                    color: "#F7F6F0",
+                    textAlign: "center",
+                    fontFamily: "Rebond-Grotesque-Bold",
+                    borderRadius: 5,
+                    fontSize: 19.02,
+                  }}
+                >
+                  Done
+                </Text>
+              </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#6B47DC",
-          padding: height * 0.012,
-          borderRadius: 16,
-          height: 48,
-          justifyContent: "center",
-        }}
-        onPress={handleCreateTask}
-      >
-        <Text
-          style={{
-            color: "#F7F6F0",
-            textAlign: "center",
-            fontFamily: "Rebond-Grotesque-Bold",
-            borderRadius: 5,
-            fontSize: 19.02,
-          }}
-        >
-          Done
-        </Text>
-      </TouchableOpacity>
     </>
   );
 }
