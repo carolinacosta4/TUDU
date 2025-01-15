@@ -37,7 +37,6 @@ exports.findAll = async (req, res) => {
     }
 }
 
-
 exports.findOne = async (req, res) => {
     let idM = req.params.idM
     try {

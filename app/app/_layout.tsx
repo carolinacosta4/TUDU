@@ -15,6 +15,7 @@ export default function RootLayout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="+not-found" />
+      <Stack.Screen name="task/[id]" />
     </Stack>
   );
 }

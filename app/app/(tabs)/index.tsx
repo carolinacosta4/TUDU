@@ -1,118 +1,219 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Button, Text, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import { useUser } from "@/hooks/useUser";
 import { useUserInfo } from "@/hooks/useUserInfo";
-import { Link, router } from "expo-router";
-import { useEffect } from "react";
 import useFonts from "@/hooks/useFonts";
-import { useRouter } from "expo-router";
-import { NavigationContainer } from "@react-navigation/native";
+import { useTask } from "@/hooks/useTask";
+import { useBill } from "@/hooks/useBill";
+import Filter from "@/components/Filter";
+import HeaderHomeScreen from "@/components/HeaderHomeScreen";
+import CardsHome from "@/components/CardsHome";
+import ListHome from "@/components/ListHome";
+import { groupTasksByTime, categorizeTasks } from "@/utils/taskUtils";
+import Task from "@/interfaces/Task";
+import Bill from "@/interfaces/Bill";
+import NoTasksView from "@/components/NoTasksView";
+import StuffHeader from "@/components/StuffHeader";
+
 export default function HomeScreen() {
   const today = new Date();
   const { user, loading } = useUser();
   const { logged } = useUserInfo();
-  const month = today.toLocaleDateString("en-US", { month: "short" });
-  const day = today.getDate();
-  const weekday = today.toLocaleDateString("en-US", { weekday: "short" });
   const fontsLoaded = useFonts();
-  const router = useRouter();
+  const [showFilter, setShowFilter] = useState(false);
+  const [filterSelection, setFilterSelection] = useState({
+    category: "all",
+    filter: "all",
+    group: "all",
+    layout: "cards",
+    sortBy: "ascending",
+  });
+  const { getTasks, tasks, editTask, categories } = useTask();
+  const { getBills, bills, editBill } = useBill();
+  const [loadingTasks, setLoadingTasks] = useState(true);
+  const [loaded, setLoaded] = useState(false);
+  const [showList, setShowList] = useState(false);
+
   useEffect(() => {
     if (logged === false) {
       router.push("/register");
     }
   }, [logged]);
 
-  if (loading && !fontsLoaded) {
+  useEffect(() => {
+    if (loading === false && logged === true) {
+      getTasks(today);
+      getBills(today);
+      setLoadingTasks(false);
+    }
+  }, [logged, loading]);
+
+  useEffect(() => {
+    if (!loadingTasks) {
+      setLoaded(true);
+    }
+  }, [loadingTasks]);
+
+  useEffect(() => {
+    setShowList(filterSelection.layout === "list");
+  }, [filterSelection.layout]);
+
+  if (loading || !fontsLoaded || loadingTasks || !loaded)
     return <Text>Loading...</Text>;
-  }
+
+  const changeStatus = async (data: Task | Bill, name: string) => {
+    try {
+      const updatedStatus = !data.status;
+      if (name === "task") {
+        const updatedStatus = !data.status;
+        await editTask(data._id, { status: updatedStatus });
+        getTasks(today);
+      } else {
+        await editBill(data._id, { status: updatedStatus });
+        getBills(today);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleFilterChange = (selection: {
+    category: string;
+    filter: string;
+    group: string;
+    layout: string;
+    sortBy: string;
+  }) => {
+    setFilterSelection(selection);
+  };
+
+  const applyFilters = (tasks: Task[], bills: Bill[]) => {
+    let filteredTasks = [...tasks];
+    let filteredBills = [...bills];
+
+    if (filterSelection.category != "all") {
+      filteredTasks = filteredTasks.filter(
+        (task) => task.IDcategory === filterSelection.category
+      );
+      filteredBills = [];
+    }
+
+    if (filterSelection.group != "all") {
+      if (filterSelection.group == "tasks") {
+        filteredBills = [];
+      } else if (filterSelection.group == "bills") {
+        filteredTasks = [];
+      }
+    }
+
+    if (filterSelection.filter != "all") {
+      filteredTasks = filteredTasks.filter(
+        (task) => task.priority == filterSelection.filter
+      );
+      filteredBills = filteredBills.filter(
+        (bill) => bill.priority == filterSelection.filter
+      );
+    }
+
+    if (filterSelection.sortBy == "ascending") {
+      filteredTasks.sort(
+        (a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
+      filteredBills.sort(
+        (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+      );
+    } else {
+      filteredTasks.sort(
+        (a, b) =>
+          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
+      filteredBills.sort(
+        (a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime()
+      );
+    }
+
+    return { filteredTasks, filteredBills };
+  };
+
+  const { filteredTasks, filteredBills } = applyFilters(
+    tasks ?? [],
+    bills ?? []
+  );
+  const categorizedTasks = categorizeTasks(filteredTasks);
+  const { allDayTasks, timedTasks } = categorizedTasks;
+  const groupedTasks = groupTasksByTime(timedTasks);
 
   return (
     user && (
-      <View style={{ backgroundColor: "#F7F6F0", flex: 1 }}>
-        <View style={{ flexDirection: "row", columnGap: 4 }}>
-          <Text style={{ ...styles.textGrey, fontSize: 23 }}>
-            {month}'{day}
-          </Text>
-          <Text style={{ color: "#635C54", fontSize: 23 }}>{weekday}</Text>
-        </View>
-        <Text
-          style={{
-            ...styles.textPurple,
-            fontSize: 27.65,
-            fontFamily: "Rebond-Grotesque-Bold",
-          }}
-        >
-          Hello, {user.data.name}!
-
-        </Text>
-      <View>
-      <TouchableOpacity onPress={() => router.push("/tips")}>
-          <Text>
-            Go to tasks
-          </Text>
-        </TouchableOpacity>
-      </View>
-        <View style={{ flexDirection: "row", columnGap: 4 }}>
-          <Text
+      <SafeAreaProvider>
+        <SafeAreaView style={{ backgroundColor: "#F7F6F0", flex: 1 }}>
+          <View style={{ paddingLeft: 20, paddingTop: 10 }}>
+            <HeaderHomeScreen
+              month={today.toLocaleDateString("en-US", { month: "short" })}
+              day={today.getDate()}
+              weekday={today.toLocaleDateString("en-US", { weekday: "short" })}
+              username={user.data.name}
+              tasksToday={tasks?.length}
+              billsToday={bills?.length}
+            />
+            <Button onPress={() => AsyncStorage.clear()} title="Logout" />
+          </View>
+          <View
             style={{
-              ...styles.textGrey,
-              fontSize: 19.2,
-              fontFamily: "Rebond-Grotesque-Medium",
+              marginTop: "50%",
+              backgroundColor: "#EEEADF",
+              minHeight: "100%",
+              padding: 24,
+              borderTopLeftRadius: 32,
+              borderTopRightRadius: 32,
             }}
           >
-            You have
-          </Text>
-          <Text
-            style={{
-              ...styles.textPurple,
-              fontSize: 19.2,
-              fontFamily: "Rebond-Grotesque-Medium",
-            }}
-          >
-            {user.userTasks.length}{" "}
-            {user.userTasks.length === 1 ? "task" : "tasks"}
-          </Text>
-          <Text
-            style={{
-              ...styles.textPurple,
-              fontSize: 19.2,
-              fontFamily: "Rebond-Grotesque-Medium",
-            }}
-          >
-            and {user.userBills.length}{" "}
-            {user.userBills.length === 1 ? "bill" : "bills"}
-          </Text>
-
-          <Text
-            style={{
-              ...styles.textGrey,
-              fontSize: 19.2,
-              fontFamily: "Rebond-Grotesque-Medium",
-            }}
-          >
-            due today.
-          </Text>
-        </View>
-        <View
-          style={{
-            marginTop: "50%",
-            backgroundColor: "#EEEADF",
-            flex: 1,
-            padding: 16,
-            borderTopLeftRadius: 32,
-            borderTopRightRadius: 32,
-          }}
-        ></View>
-      </View>
+            <StuffHeader
+              filterSelection={filterSelection}
+              tasksToday={tasks}
+              billsDueToday={bills}
+              onFilterToggle={() => setShowFilter(true)}
+            />
+            <>
+              {allDayTasks.length > 0 ||
+              filteredBills.length > 0 ||
+              groupedTasks.length > 0 ? (
+                showList == true ? (
+                  <ListHome
+                    allDayTasks={allDayTasks}
+                    groupedTasks={groupedTasks}
+                    filteredBills={filteredBills}
+                    changeStatus={changeStatus}
+                    user={user}
+                  />
+                ) : (
+                  <CardsHome
+                    allDayTasks={allDayTasks}
+                    groupedTasks={groupedTasks}
+                    filteredBills={filteredBills}
+                    changeStatus={changeStatus}
+                    user={user}
+                  />
+                )
+              ) : (
+                <NoTasksView />
+              )}
+            </>
+          </View>
+          {showFilter && (
+            <Filter
+              onClose={() => setShowFilter(false)}
+              visible={true}
+              onFilterChange={handleFilterChange}
+              categories={categories}
+            />
+          )}
+        </SafeAreaView>
+      </SafeAreaProvider>
     )
   );
 }
-
-const styles = StyleSheet.create({
-  textGrey: {
-    color: "#C4BFB5",
-  },
-
-  textPurple: {
-    color: "#562CAF",
-  },
-});

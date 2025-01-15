@@ -1,12 +1,63 @@
 const db = require("../models/index.js");
 const mongoose = require("mongoose");
 const Bill = db.Bill;
+const Currency = db.Currency;
 
 const handleErrorResponse = (res, error) => {
   return res
     .status(500)
     .json({ success: false, msg: error.message || "Some error occurred." });
 };
+
+exports.findBillsForMonth = async (req, res) => {
+  try {
+    if (!req.query.month || !req.query.year) {
+      return res.status(400).json({
+        success: false,
+        error: "Query parameters missing",
+        msg: "You need to provide query parameters for month and year.",
+      });
+    }
+
+    const month = parseInt(req.query.month);
+    const year = parseInt(req.query.year);
+
+    if (isNaN(month) || isNaN(year)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid month or year format",
+        msg: "The provided month or year is not valid. Use valid month (1-12) and year.",
+      });
+    }
+
+    const startDate = new Date(year, month - 1, 1); 
+    const endDate = new Date(year, month, 0); 
+
+    const bills = await Bill.find({
+      IDuser: req.loggedUserId,
+      dueDate: { $gte: startDate, $lte: endDate },
+    })
+      .populate("IDuser", "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot")
+      .populate("IDcurrency", "-__v")
+      .select("-__v")
+      .exec();
+
+    if (!bills || bills.length === 0) {
+      return res.status(200).json({
+        success: false,
+        data: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: bills,
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
 
 exports.findBills = async (req, res) => {
   try {
@@ -27,20 +78,25 @@ exports.findBills = async (req, res) => {
       });
     }
 
+    const startOfDay = new Date(dateQuery.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(dateQuery.setHours(23, 59, 59, 999));
+
     const bills = await Bill.find({
-      $and: [{ IDuser: req.loggedUserId }, { dueDate: dateQuery }],
+      IDuser: req.loggedUserId,
+      dueDate: { $gte: startOfDay, $lte: endOfDay },
     })
       .populate(
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
-      .select("-_id -__v")
+      .populate("IDcurrency", "-__v")
+      .select("-__v")
       .exec();
 
     if (!bills || bills.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
-        error: "No bills found",
+        data: [],
       });
     }
 
@@ -76,24 +132,50 @@ exports.create = async (req, res) => {
       });
     }
 
-    let bill = new Bill({
-      name: req.body.name,
-      priority: req.body.priority,
-      amount: req.body.amount,
-      dueDate: new Date(req.body.dueDate),
-      periodicity: req.body.periodicity,
-      notification: req.body.notification,
-      notes: req.body.notes || "",
-      status: false,
-      IDuser: req.loggedUserId,
-    });
+    const billInstances = [];
+    const numberOfRepetitions = 5;
+    let currentDueDate = new Date(req.body.dueDate);
 
-    const newBill = await bill.save();
+    for (let i = 0; i < numberOfRepetitions; i++) {
+      billInstances.push({
+        name: req.body.name,
+        priority: req.body.priority,
+        amount: req.body.amount,
+        dueDate: new Date(currentDueDate),
+        periodicity: req.body.periodicity,
+        notification: req.body.notification,
+        notes: req.body.notes || "",
+        status: false,
+        IDuser: req.loggedUserId,
+      });
+
+      switch (req.body.periodicity) {
+        case "daily":
+          currentDueDate.setDate(currentDueDate.getDate() + 1);
+          break;
+        case "weekly":
+          currentDueDate.setDate(currentDueDate.getDate() + 7);
+          break;
+        case "monthly":
+          currentDueDate.setMonth(currentDueDate.getMonth() + 1);
+          break;
+        case "never":
+          i = numberOfRepetitions;
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            msg: "Invalid periodicity value.",
+          });
+      }
+    }
+
+    const newBills = await Bill.insertMany(billInstances);
 
     return res.status(201).json({
       success: true,
       msg: "Bill created successfully.",
-      data: newBill,
+      data: newBills,
     });
   } catch (error) {
     handleErrorResponse(res, error);
@@ -113,7 +195,8 @@ exports.findBill = async (req, res) => {
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated"
       )
-      .select("-_id -__v")
+      .populate("IDcurrency", "-__v")
+      .select("-__v")
       .exec();
 
     return res.status(200).json({
@@ -154,7 +237,7 @@ exports.edit = async (req, res) => {
         msg: "You need to provide the body with the request.",
       });
 
-    if (!req.body.periodicity && !req.body.dueDate)
+    if (!req.body.periodicity && !req.body.dueDate && req.body.status == null)
       return res.status(400).json({
         success: false,
         error: "Fields missing",
@@ -162,14 +245,17 @@ exports.edit = async (req, res) => {
       });
 
     await Bill.findByIdAndUpdate(req.params.idB, {
-      periodicity: req.body.periodicity || bill.periodicity,
-      dueDate: req.body.dueDate || bill.dueDate,
+      periodicity: req.body.periodicity
+        ? req.body.periodicity
+        : bill.periodicity,
+      dueDate: req.body.dueDate ? req.body.dueDate : bill.dueDate,
+      status: req.body.status != null ? req.body.status : bill.status,
     });
 
-    const updatedTask = await Bill.findById(req.params.idB);
+    const updatedBill = await Bill.findById(req.params.idB);
     return res.status(200).json({
       success: true,
-      data: updatedTask,
+      data: updatedBill,
     });
   } catch (error) {
     handleErrorResponse(res, error);
@@ -203,6 +289,26 @@ exports.delete = async (req, res) => {
     return res.status(200).json({
       success: true,
       msg: "Bill deleted successfully.",
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+exports.findCurrencies = async (req, res) => {
+  try {
+    const currencies = await Currency.find().exec();
+
+    if (!currencies || currencies.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "No currencies found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: currencies,
     });
   } catch (error) {
     handleErrorResponse(res, error);

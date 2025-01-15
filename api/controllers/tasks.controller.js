@@ -1,6 +1,7 @@
 const db = require("../models/index.js");
 const mongoose = require("mongoose");
 const Task = db.Task;
+const Category = db.CategoryTask;
 
 const handleErrorResponse = (res, error) => {
   return res
@@ -27,23 +28,24 @@ exports.findTasks = async (req, res) => {
       });
     }
 
+    const startOfDay = new Date(dateQuery.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(dateQuery.setHours(23, 59, 59, 999));
+
     const tasks = await Task.find({
-      $and: [
-        { IDuser: req.loggedUserId },
-        { $or: [{ startDate: dateQuery }, { endDate: dateQuery }] },
-      ],
+      IDuser: req.loggedUserId,
+      $or: [{ startDate: { $lte: endOfDay }, endDate: { $gte: startOfDay } }],
     })
       .populate(
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
-      .select("-_id -__v")
+      .select("-__v")
       .exec();
 
     if (!tasks || tasks.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
-        error: "No tasks found",
+        data: [],
       });
     }
 
@@ -87,25 +89,55 @@ exports.create = async (req, res) => {
       });
     }
 
-    let task = new Task({
-      name: req.body.name,
-      priority: req.body.priority,
-      IDcategory: req.body.IDcategory,
-      startDate: new Date(req.body.startDate),
-      endDate: new Date(req.body.endDate),
-      periodicity: req.body.periodicity,
-      notification: req.body.notification,
-      notes: req.body.notes || "",
-      status: false,
-      IDuser: req.loggedUserId,
-    });
+    const taskInstances = [];
+    const numberOfRepetitions = 5;
+    let currentStartDate = new Date(req.body.startDate);
+    let currentEndDate = new Date(req.body.endDate);
 
-    const newTask = await task.save();
+    for (let i = 0; i < numberOfRepetitions; i++) {
+      taskInstances.push({
+        name: req.body.name,
+        priority: req.body.priority,
+        IDcategory: req.body.IDcategory,
+        startDate: new Date(currentStartDate),
+        endDate: new Date(currentEndDate),
+        periodicity: req.body.periodicity,
+        notification: req.body.notification,
+        notes: req.body.notes || "",
+        status: false,
+        IDuser: req.loggedUserId,
+      });
+
+      switch (req.body.periodicity) {
+        case "daily":
+          currentStartDate.setDate(currentStartDate.getDate() + 1);
+          currentEndDate.setDate(currentEndDate.getDate() + 1);
+          break;
+        case "weekly":
+          currentStartDate.setDate(currentStartDate.getDate() + 7);
+          currentEndDate.setDate(currentEndDate.getDate() + 7);
+          break;
+        case "monthly":
+          currentStartDate.setMonth(currentStartDate.getMonth() + 1);
+          currentEndDate.setMonth(currentEndDate.getMonth() + 1);
+          break;
+        case "never":
+          i = numberOfRepetitions;
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            msg: "Invalid periodicity value.",
+          });
+      }
+    }
+
+    const newTasks = await Task.insertMany(taskInstances);
 
     return res.status(201).json({
       success: true,
       msg: "Task created successfully.",
-      data: newTask,
+      data: newTasks,
     });
   } catch (error) {
     handleErrorResponse(res, error);
@@ -125,7 +157,8 @@ exports.findTask = async (req, res) => {
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
-      .select("-_id -__v")
+      .populate("IDcategory", "-_id -__v")
+      .select("-__v")
       .exec();
 
     if (!task) {
@@ -173,7 +206,12 @@ exports.edit = async (req, res) => {
         msg: "You need to provide the body with the request.",
       });
 
-    if (!req.body.periodicity && !req.body.startDate && !req.body.endDate)
+    if (
+      !req.body.periodicity &&
+      !req.body.startDate &&
+      !req.body.endDate &&
+      req.body.status == null
+    )
       return res.status(400).json({
         success: false,
         error: "Fields missing",
@@ -181,9 +219,12 @@ exports.edit = async (req, res) => {
       });
 
     await Task.findByIdAndUpdate(req.params.idT, {
-      periodicity: req.body.periodicity || task.periodicity,
-      startDate: req.body.startDate || task.startDate,
-      endDate: req.body.endDate || task.endDate,
+      periodicity: req.body.periodicity
+        ? req.body.periodicity
+        : task.periodicity,
+      startDate: req.body.startDate ? req.body.startDate : task.startDate,
+      endDate: !req.body.endDate ? req.body.endDate : task.endDate,
+      status: req.body.status != null ? req.body.status : task.status,
     });
 
     const updatedTask = await Task.findById(req.params.idT);
@@ -198,6 +239,7 @@ exports.edit = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
+    
     if (!mongoose.isValidObjectId(req.params.idT))
       return res.status(400).json({
         success: false,
@@ -223,6 +265,28 @@ exports.delete = async (req, res) => {
     return res.status(200).json({
       success: true,
       msg: "Task deleted successfully.",
+    });
+  } catch (error) {
+    console.log(error);
+    
+    handleErrorResponse(res, error);
+  }
+};
+
+exports.findCategories = async (req, res) => {
+  try {
+    const categories = await Category.find().exec();
+
+    if (!categories || categories.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "No categories found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: categories,
     });
   } catch (error) {
     handleErrorResponse(res, error);

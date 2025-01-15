@@ -1,4 +1,4 @@
-import users from "@/api/users";
+import api from "@/api/api";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -33,14 +33,14 @@ export default function RegisterScreen() {
     if (name && email && password && confirmPassword) {
       setShowError(false);
       try {
-        await users.post("users", {
+        await api.post("users", {
           name: name,
           email: email,
           password: password,
           confirmPassword: confirmPassword,
         });
 
-        const response = await users.post("users/login", {
+        const response = await api.post("users/login", {
           email: email,
           password: password,
         });
@@ -115,6 +115,7 @@ export default function RegisterScreen() {
                   fontSize: 16,
                   color: "#562CAF",
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 Say goodbye to chaos!
@@ -168,6 +169,7 @@ export default function RegisterScreen() {
                     color: "#EEEADF",
                     fontSize: 19.2,
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                   }}
                 >
                   Create account
@@ -184,6 +186,7 @@ export default function RegisterScreen() {
                   paddingRight: 90,
                   textAlign: "center",
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 When you register, you're agreeing to our terms and privacy
@@ -196,6 +199,7 @@ export default function RegisterScreen() {
                     color: "#291752",
                     textAlign: "center",
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                   }}
                 >
                   Already have an account?
