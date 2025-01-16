@@ -129,7 +129,7 @@ export default function TabLayout() {
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
-              navigation.navigate("[id]/profile", { id: userInfo?.userID });
+              navigation.navigate("profile/[id]", { id: userInfo?.userID });
             },
           })}
         />
