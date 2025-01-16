@@ -13,11 +13,11 @@ router.route("/:idT")
   .delete(tipsController.deleteTip)
   .get(tipsController.findOne)
 
+
   router.route("/:idT/favorite")
     .post(authController.verifyToken, tipsController.markAsFavorite)
-    .delete(authController.verifyToken, tipsController.removeFromFavorite)
-
-
+    .delete(authController.verifyToken, tipsController.removeFromFavorite);
+  
 router.all("*", function (req, res) {
   res.status(404).json({ message: "No route found" });
 });
