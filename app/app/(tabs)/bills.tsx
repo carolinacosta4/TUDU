@@ -13,7 +13,7 @@ export default function BillsScreen() {
   const width = Dimensions.get("window").width;
   const thismonth = new Date();
   const { userInfo, logged } = useUserInfo();
-  const { bills, updateBill, fetchMonthBills } = useBillStore()
+  const { monthlyBills, updateBill, fetchMonthBills } = useBillStore()
   const { loading, handleGetUser, user } = useUser();
   const [loadingBills, setloadingBills] = useState(true);
   const [upcomingBills, setUpcomingBills] = useState<Bill[]>([]);
@@ -27,7 +27,6 @@ export default function BillsScreen() {
           if(userInfo) await fetchMonthBills(month, year, userInfo.authToken);
           // if(userInfo) handleGetUser(userInfo.userID);
           // console.log(user?.userBills);
-          
           setloadingBills(false);
         }
       } catch (error) {
@@ -59,7 +58,7 @@ export default function BillsScreen() {
   };
 
   const pendingBill = () => {
-    const currentBills = bills.filter((bill) => {
+    const currentBills = monthlyBills.filter((bill) => {
       const billDate = new Date(bill.dueDate);
       const isPastUnpaidBill = billDate < thismonth && !bill.status; 
       const isFutureUnpaidBill = billDate >= thismonth && !bill.status; 
@@ -69,23 +68,21 @@ export default function BillsScreen() {
   };
 
   const nextPayment = () => {
-    const upcomingUnpaidBills = bills.filter((bill) => {
-      const billDate = new Date(bill.dueDate);
-      return billDate > thismonth && !bill.status; 
+    const upcomingUnpaidBills = monthlyBills.filter((bill) => {
+      const billDate = new Date(bill.dueDate);      
+      return billDate.getDate() > thismonth.getDate() && !bill.status; 
     });
-
-    const sortedUpcomingBills = upcomingUnpaidBills.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
-
+    const sortedUpcomingBills = upcomingUnpaidBills.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());    
     return sortedUpcomingBills.length > 0 ? sortedUpcomingBills[0] : null;
   };
 
   const activeBillsCount = () => {
-    const currentBills = bills.filter((bill) => !bill.status);
+    const currentBills = monthlyBills.filter((bill) => !bill.status);
     return currentBills.length;
   }
 
   const getUpcomingBills = () => {
-    return bills.filter(bill => {
+    return monthlyBills.filter(bill => {
       const billDate = new Date(bill.dueDate);
       const isCurrentMonth = 
         billDate.getMonth() === thismonth.getMonth() &&
@@ -96,7 +93,7 @@ export default function BillsScreen() {
   };
 
   const getCurrentMonthBills = () => {
-    return bills.filter(bill => {
+    return monthlyBills.filter(bill => {
       const billDate = new Date(bill.dueDate);
       return (
         billDate.getMonth() === thismonth.getMonth() &&
@@ -121,7 +118,7 @@ export default function BillsScreen() {
               <View style={styles.header}>
                 <Text style={styles.headerTitle}>My bills</Text>
               </View>
-              {bills.length === 0 ? (
+              {monthlyBills.length === 0 ? (
                 <NoTasksView />
               ) : (
                   <ScrollView>

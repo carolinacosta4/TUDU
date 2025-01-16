@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
         fontFamily: 'ES Rebond Grotesque TRIAL',
         fontWeight: '400',
         lineHeight: 16,
-        wordWrap: 'break-word'
+        flexWrap: 'wrap',
       },
       totalAmount: {
         right: 16,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
         fontSize: 33.18,
         fontFamily: 'SF Pro Display',
         fontWeight: '700',
-        wordWrap: 'break-word'
+        flexWrap: 'wrap',
       },
 })
 

@@ -4,6 +4,7 @@ import Bill from "../interfaces/Bill";
 
 interface BillState {
   bills: Bill[];
+  monthlyBills: Bill[];
   fetchBills: (date: Date, authToken: string) => Promise<void>;
   fetchMonthBills: (
     month: number,
@@ -21,6 +22,7 @@ interface BillState {
 
 export const useBillStore = create<BillState>((set) => ({
   bills: [],
+  monthlyBills: [],
   fetchBills: async (date, authToken) => {
     try {
       const response = await api.get(`bills?date=${date.toISOString()}`, {
@@ -40,7 +42,7 @@ export const useBillStore = create<BillState>((set) => ({
           Authorization: `Bearer ${authToken}`,
         },
       });
-      set({ bills: response.data.data });
+      set({ monthlyBills: response.data.data });
     } catch (error) {
       console.error(error);
     }
@@ -63,6 +65,17 @@ export const useBillStore = create<BillState>((set) => ({
       set((state) => ({
         bills: [...state.bills, ...billsForToday],
       }));
+
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      const billsForMonth = response.data.data.filter((createdBill: Bill) => {
+        const billDate = new Date(createdBill.dueDate);
+        return billDate.getMonth() == currentMonth && billDate.getFullYear() == currentYear;
+      });
+
+      set((state) => ({
+        monthlyBills: [...state.monthlyBills, ...billsForMonth],
+      }));
     } catch (error) {
       console.error(error);
     }
@@ -76,6 +89,11 @@ export const useBillStore = create<BillState>((set) => ({
       });
       set((state) => ({
         bills: state.bills.map((bill) =>
+          bill._id == id ? { ...bill, ...updatedBills } : bill
+        ),
+      }));
+      set((state) => ({
+        monthlyBills: state.monthlyBills.map((bill) =>
           bill._id == id ? { ...bill, ...updatedBills } : bill
         ),
       }));
