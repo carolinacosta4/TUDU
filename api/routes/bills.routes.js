@@ -5,7 +5,13 @@ const authController = require("../controllers/auth.controller");
 
 router
   .route("/")
-  .get(authController.verifyToken, billsController.findBills)
+  .get(authController.verifyToken, (req, res) => {
+    if (req.query.month && req.query.year) {
+      billsController.findBillsForMonth(req, res);
+    } else {
+      billsController.findBills(req, res);
+    }
+  })
   .post(authController.verifyToken, billsController.create);
 router.route('/currencies').get(billsController.findCurrencies);
 router

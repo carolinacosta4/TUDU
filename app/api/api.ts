@@ -8,8 +8,11 @@ export interface UserDetails {
 }
 
 export default axios.create({
+  // baseURL: "http://192.168.1.100:3000",
+  baseURL: "http://172.23.116.118:3000",
   // baseURL: "http://192.168.1.233:3000", //casa
-  baseURL: "http://192.168.137.1:3000", //uni
+  //baseURL: "http://192.168.137.1:3000", //uni
+  // baseURL: "http://192.168.0.14:3000", //casa victoria
   headers: {
     "Content-type": "application/json",
   },

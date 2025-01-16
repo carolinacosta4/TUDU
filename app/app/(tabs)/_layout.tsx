@@ -98,7 +98,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="[id]/profile"
+          name="profile/[id]"
           options={{
             headerShown: false,
             tabBarIcon: ({ focused, color, size }) => (
@@ -151,7 +151,6 @@ export default function TabLayout() {
     </>
   );
 }
-
 const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: "center",

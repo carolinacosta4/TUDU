@@ -11,6 +11,13 @@ const UserAchievements = db.UserAchievements;
 const Streaks = db.Streaks;
 const nodemailer = require("nodemailer");
 
+const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: config.C_CLOUD_NAME,
+  api_key: config.C_API_KEY,
+  api_secret: config.C_API_SECRET
+});
+
 const handleErrorResponse = (res, error) => {
   return res
     .status(500)
@@ -45,6 +52,11 @@ exports.findUser = async (req, res) => {
 
     const userFavoriteTips = await FavoriteTip.find({ IDuser: req.params.idU })
       .select("-_id -__v")
+      .populate({
+        path: "IDtip",
+        select: "-__v",
+        populate: { path: "IDcategory", select: "-__v" },
+      })
       .exec();
 
     const userTasks = await Task.find({ IDuser: req.params.idU })
@@ -113,9 +125,9 @@ exports.register = async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10),
-      profilePicture: "https://example.com/profile.jpg",
+      profilePicture: "https://res.cloudinary.com/ditdnslga/image/upload/v1735949597/ipmihkt7ebpogdtnlw4b.png",
       cloudinary_id: 0,
-      IDmascot: "67696917a5e78f1378a63a6e",
+      IDmascot: "676969dfa5e78f1378a63a71",
     });
 
     const newUser = await user.save();
@@ -318,13 +330,23 @@ exports.edit = async (req, res) => {
       req.body.notifications == null &&
       req.body.onboardingSeen == null &&
       req.body.sound == null &&
+      req.body.isDeactivated == null &&
       req.body.vibration == null
     )
       return res.status(400).json({
         success: false,
         error: "Fields missing",
-        msg: "You need to provide the name, email, password, notifications, on boarding, sounds or vibration.",
+        msg: "You need to provide the name, email, password, notifications, on boarding, sounds, is deactivated or vibration.",
       });
+
+    if (req.body.password && req.body.oldPassword) {      
+      const isMatch = bcrypt.compareSync(req.body.oldPassword, user.password);      
+      if (!isMatch)       
+        return res.status(404).json({
+          success: false,
+          msg: "Old password is wrong.",
+        });
+    }
 
     await User.findByIdAndUpdate(req.params.idU, {
       name: req.body.name ? req.body.name : user.name,
@@ -341,6 +363,7 @@ exports.edit = async (req, res) => {
           ? req.body.onboardingSeen
           : user.onboardingSeen,
       sound: req.body.sound != null ? req.body.sound : user.sound,
+      isDeactivated: req.body.isDeactivated != null ? req.body.isDeactivated : user.isDeactivated,
       vibration:
         req.body.vibration != null ? req.body.vibration : user.vibration,
     });
@@ -353,6 +376,58 @@ exports.edit = async (req, res) => {
     });
   } catch (error) {
     handleErrorResponse(res, error);
+  }
+};
+
+exports.changeProfilePicture = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.idU)) {
+      return res.status(400).json({
+        success: false,
+        msg: "Invalid ID.",
+      });
+    }
+
+    let user = await User.findById(req.params.idU);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        msg: `Cannot find any user with ID ${req.params.idU}`,
+      });
+    }
+
+    if (req.loggedUserId == req.params.idU) {
+      let user_image = null;
+      if (req.file) {
+        if (user.cloudinary_id) {
+          await cloudinary.uploader.destroy(user.cloudinary_id);
+        }
+        const b64 = Buffer.from(req.file.buffer).toString("base64");
+        let dataURI = `data:${req.file.mimetype};base64,${b64}`;
+        let result = await cloudinary.uploader.upload(dataURI, {
+          resource_type: "auto",
+        });
+        user_image = result;
+      }
+
+      user.profilePicture = user_image ? user_image.url : null;
+      user.cloudinary_id = user_image ? user_image.public_id : null;
+      await user.save();
+
+      return res.status(201).json({
+        success: true,
+        profilePicture: user_image ? user_image.url : null,
+        cloudinary_id: user_image ? user_image.public_id : null,
+        msg: "Profile picture updated successfully!",
+      });
+    }
+
+    return res.status(403).json({
+      success: false,
+      msg: "You are not authorized to edit other users.",
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, msg: 'An error occurred while updating profile picture.' });
   }
 };
 
