@@ -20,7 +20,6 @@ import Task from "@/interfaces/Task";
 import Bill from "@/interfaces/Bill";
 import { useUser } from "@/hooks/useUser";
 import { useBill } from "@/hooks/useBill";
-import { calculateStatistics } from "@/utils/statisticsUtils";
 
 const CalendarScreen = () => {
   const { user } = useUser();
@@ -33,72 +32,11 @@ const CalendarScreen = () => {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const categorizedTasks = categorizeTasks(tasks);
   const { allDayTasks, timedTasks } = categorizedTasks;
-  const groupedStuff = groupTasksByTime(timedTasks);
+  const groupedTasks = groupTasksByTime(timedTasks);
   const [markedDates, setMarkedDates] = useState<{ [key: string]: any }>({});
-  const today = new Date();
-  const [currentMonth, setCurrentMonth] = useState<number>(
-    today.getMonth() + 1
-  );
-  const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
-  const [colorDotDays, setColorDotDays] = useState<{ [key: string]: any }>({});
-  const [tasksCompleted, setTasksCompleted] = useState<number>(0);
-  const [perfectDaysCount, setPerfectDaysCount] = useState<number>(0);
-  const [highestStreak, setHighestStreak] = useState<number>(0);
-  const [monthlyRate, setMonthlyRate] = useState<number>(0);
-  const [overallRate, setOverallRate] = useState<number>(0);
-  const [monthTasks, setMonthTasks] = useState<number>(0);
-  const [monthBills, setMonthBills] = useState<number>(0);
-  const [billsCompleted, setBillsCompleted] = useState<number>(0);
-
-  const getDaysColorDots = (month: number, year: number) => {
-    if (!user) {
-      console.log("user not found");
-      return { green: [], orange: [], purple: [] };
-    } else if (!user.userTasks || month === null || year === null) {
-      console.log("not working");
-      return { green: [], orange: [], purple: [] };
-    } else {
-      let userTasks = user.userTasks;
-
-      let tasksOfTheMonth = userTasks.filter((t) => {
-        let taskDate = new Date(t.startDate);
-        let taskMonth = taskDate.getMonth();
-        let taskYear = taskDate.getFullYear();
-        return taskMonth === month && taskYear === year;
-      });
-
-      const groupedByDay = tasksOfTheMonth.reduce((acc: any, task) => {
-        let date = new Date(task.startDate).toISOString().split("T")[0]; // Formato: YYYY-MM-DD
-        if (!acc[date]){
-           acc[date] = [];
-          }
-        acc[date].push(task);
-        return acc;
-      }, {});
-
-      const categorizedDays = Object.entries(groupedByDay).reduce(
-        (acc, [date, tasks]: [string, Task[]]) => {
-          const totalTasks = tasks.length;
-          const completedTasks = tasks.filter((t) => t.status).length;
-          const completionRate = (completedTasks / totalTasks) * 100;
-
-          if (completionRate === 100) {
-            acc.green.push(date);
-          } else if (completionRate >= 50) {
-            acc.orange.push(date);
-          } else {
-            acc.purple.push(date);
-          }
-
-          return acc;
-        },
-        { green: [], orange: [], purple: [] }
-      );
-
-      console.log("Categorized Days:", categorizedDays);
-      return categorizedDays;
-    }
-  };
+  const [currentMonth, setCurrentMonth] = useState<number | null>(null);
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+  
 
   useEffect(() => {
     let today = new Date();
@@ -106,72 +44,15 @@ const CalendarScreen = () => {
     let thisYear = today.getFullYear();
     setCurrentMonth(thisMonth);
     setCurrentYear(thisYear);
-  
-    if (currentMonth && currentYear) {
-      const categorizedDays = getDaysColorDots(currentMonth, currentYear);
-  
-      const colorDotDays = {};
-      categorizedDays.green.forEach((date) => {
-        colorDotDays[date] = {
-          marked: true, selectedColor: 'green'
-        };
-      });
-      categorizedDays.orange.forEach((date) => {
-        colorDotDays[date] = {
-          marked: true, selectedColor: 'orange'
-        };
-      });
-      categorizedDays.purple.forEach((date) => {
-        colorDotDays[date] = {
-          marked: true, selectedColor: 'purple'
-        };
-      });
-  
-      setColorDotDays(colorDotDays);
-      console.log(colorDotDays);
-      
-    }
   }, [currentMonth, currentYear]);
-
-  // ESTATÍSTICAS :)
-  useEffect(() => {
-    if (!user) return;
-
-    const {
-      perfectDaysCount,
-      tasksCompleted,
-      billsCompleted,
-      monthlyRate,
-      highestStreak,
-      overallRate,
-      monthTasksCount,
-      monthBillsCount,
-    } = calculateStatistics(
-      user.userTasks,
-      user.userBills,
-      currentMonth,
-      currentYear
-    );
-
-    setPerfectDaysCount(perfectDaysCount);
-    setTasksCompleted(tasksCompleted);
-    setBillsCompleted(billsCompleted);
-    setMonthlyRate(monthlyRate);
-    setOverallRate(overallRate);
-    setHighestStreak(highestStreak);
-    setMonthTasks(monthTasksCount);
-    setMonthBills(monthBillsCount);
-  }, [currentMonth, currentYear, user, tasks, bills]);
+  
 
   const stats = [
-    { label: "Total Tasks", value: monthTasks },
-    { label: "Total Bills", value: monthBills },
-    { label: "Perfect Days", value: perfectDaysCount },
-    { label: "Highest Streak", value: highestStreak },
-    { label: "Tasks Completed this Month", value: tasksCompleted },
-    { label: "Bills Completed this Month", value: billsCompleted },
-    { label: "Monthly Rate", value: `${monthlyRate}%` },
-    { label: "Overall Rate", value: `${overallRate}%` },
+    { label: "Perfect Days", value: "15 days" },
+    { label: "Highest streak", value: "24" },
+    { label: "Tasks completed this month", value: "12" },
+    { label: "Monthly rate", value: "70%" },
+    { label: "Overall rate", value: "30%" },
   ];
 
   const renderStatItem = ({ item }: any) => (
@@ -227,7 +108,7 @@ const CalendarScreen = () => {
     <SafeAreaView style={styles.container}>
       <Calendar
         style={styles.calendar}
-        markedDates={{ markedDates, colorDotDays }}
+        markedDates={markedDates}
         theme={{
           backgroundColor: "#F7F6F0",
           calendarBackground: "#ffffff",
@@ -257,7 +138,7 @@ const CalendarScreen = () => {
           {tasks.length > 0 ? (
             <ListHome
               allDayTasks={allDayTasks}
-              groupedTasks={groupedStuff}
+              groupedTasks={groupedTasks}
               filteredBills={bills}
               changeStatus={changeStatus}
               user={user}
