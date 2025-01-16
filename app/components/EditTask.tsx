@@ -13,7 +13,12 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Task from "@/interfaces/Task";
 const { width, height } = Dimensions.get("window");
 
-export default function EditTask({ task }: { task: Task }) {
+type EditTaskProps = {
+  task: Task,
+  handleEdit: () => void
+}
+
+export default function EditTask({ task, handleEdit }: EditTaskProps) {
   // console.log(task);
   const { editTask, categories } = useTask();
   const [isFocus, setIsFocus] = useState(false);
@@ -57,17 +62,19 @@ export default function EditTask({ task }: { task: Task }) {
   };
 
   const handleEditTask = () => {
-    if (editTaskItem.name === "") {
-      alert("Please enter a name for the task");
-    } else if (editTaskItem.priority === "") {
-      alert("Please select a priority for the task");
-    } else if (editTaskItem.IDcategory === "") {
-      alert("Please select a category for the task");
-    } else if (editTaskItem.startDate == editTaskItem.endDate) {
-      alert("Please different times for start and end");
-    } else {
-      console.log("edit tbd");
-    }
+    // if (editTaskItem.name === "") {
+    //   alert("Please enter a name for the task");
+    // } else if (editTaskItem.priority === "") {
+    //   alert("Please select a priority for the task");
+    // } else if (editTaskItem.IDcategory === "") {
+    //   alert("Please select a category for the task");
+    // } else if (editTaskItem.startDate == editTaskItem.endDate) {
+    //   alert("Please different times for start and end");
+    // } else {
+    //   console.log("edit tbd");
+    // }
+    console.log(editTaskItem);
+    handleEdit()
   };
 
   return (

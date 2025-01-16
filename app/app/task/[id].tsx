@@ -107,7 +107,6 @@ const TaskDetail = () => {
   };
 
   const handleEdit = () => {
-    console.log(task);
 
     let newEdit = !edit;
     setEdit(newEdit);
@@ -132,7 +131,7 @@ const TaskDetail = () => {
                   Done
                 </Text>
               </TouchableOpacity> */}
-              <EditTask task={task}></EditTask>
+              <EditTask task={task} handleEdit={handleEdit} />
             </ScrollView>
           ) : (
             <ScrollView style={styles.container}>
