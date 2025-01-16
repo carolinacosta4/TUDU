@@ -1,10 +1,11 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Dimensions, ScrollView, Text, View, Platform } from "react-native";
 import { Fragment } from "react";
 import BillItem from "@/components/BillItem";
 import TaskItem from "@/components/TaskItem";
 import Task from "@/interfaces/Task";
 import Bill from "@/interfaces/Bill";
+import SwipeDelete from "./RightAction";
 
 type CardsHomeProps = {
   allDayTasks: Task[];
@@ -12,6 +13,7 @@ type CardsHomeProps = {
   filteredBills: Bill[];
   changeStatus: (data: Task | Bill, name: string) => void;
   user: any;
+  handleDelete: (id: string, type: string) => void;
 };
 
 const CardsHome = ({
@@ -20,10 +22,13 @@ const CardsHome = ({
   filteredBills,
   changeStatus,
   user,
+  handleDelete,
 }: CardsHomeProps) => {
+  const width = Dimensions.get("window").width;
+
   return (
     <ScrollView>
-      <View style={{ marginBottom: 450 }}>
+      <View style={{ marginBottom: width / 0.8 }}>
         {(filteredBills.length > 0 || allDayTasks.length > 0) && (
           <>
             <View
@@ -38,7 +43,7 @@ const CardsHome = ({
                   fontSize: 20,
                   color: "#A5A096",
                   fontFamily: "Rebond-Grotesque-Medium",
-                  lineHeight: 20
+                  lineHeight: 20,
                 }}
               >
                 All-day
@@ -46,22 +51,30 @@ const CardsHome = ({
               <View style={{ flex: 1, rowGap: 8 }}>
                 {allDayTasks.map((task) => (
                   <Fragment key={task._id}>
-                    <TaskItem
-                      changeStatus={changeStatus}
-                      task={task}
-                      allDay={true}
-                      type="cards"
-                    />
+                    <SwipeDelete
+                      handleDelete={() => handleDelete(task._id, "task")}
+                    >
+                      <TaskItem
+                        changeStatus={changeStatus}
+                        task={task}
+                        allDay={true}
+                        type="cards"
+                      />
+                    </SwipeDelete>
                   </Fragment>
                 ))}
                 {user.userBills &&
                   filteredBills.map((bill) => (
                     <Fragment key={bill._id}>
-                      <BillItem
-                        bill={bill}
-                        changeStatus={changeStatus}
-                        type="cards"
-                      />
+                      <SwipeDelete
+                        handleDelete={() => handleDelete(bill._id, "bill")}
+                      >
+                        <BillItem
+                          bill={bill}
+                          changeStatus={changeStatus}
+                          type="cards"
+                        />
+                      </SwipeDelete>
                     </Fragment>
                   ))}
               </View>
@@ -88,6 +101,10 @@ const CardsHome = ({
                   fontSize: 18,
                   color: "#A5A096",
                   fontFamily: "Rebond-Grotesque-Medium",
+                  lineHeight: 20,
+                  ...(group.time.split(":")[0].length != 1 && {
+                    marginRight: "-2%",
+                  }),
                 }}
               >
                 {group.time}
@@ -102,12 +119,16 @@ const CardsHome = ({
               >
                 {group.tasks.map((task) => (
                   <Fragment key={task._id}>
-                    <TaskItem
-                      changeStatus={changeStatus}
-                      task={task}
-                      allDay={false}
-                      type="cards"
-                    />
+                    <SwipeDelete
+                      handleDelete={() => handleDelete(task._id, "task")}
+                    >
+                      <TaskItem
+                        changeStatus={changeStatus}
+                        task={task}
+                        allDay={false}
+                        type="cards"
+                      />
+                    </SwipeDelete>
                   </Fragment>
                 ))}
               </View>

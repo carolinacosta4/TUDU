@@ -1,4 +1,5 @@
-import { useTask } from "@/hooks/useTask";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { useTaskStore } from "@/stores/taskStore";
 import React, { Fragment, useState } from "react";
 import {
   View,
@@ -29,9 +30,11 @@ export default function CreateTaskModal({
   dataRepeat,
   toggleModal,
 }: CreateTaskModalProps) {
-  const { getTasks, createTask } = useTask();
+  const { userInfo } = useUserInfo();
+  const { addTask } = useTaskStore();
   const [isFocus, setIsFocus] = useState(false);
-  const [value, setValue] = useState("");
+  const [valuePeriodicity, setValuePeriodicity] = useState("");
+  const [valuePriority, setValuePriority] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
@@ -43,6 +46,8 @@ export default function CreateTaskModal({
   const [periodicity, setPeriodicity] = useState("never");
   const [notification, setNotification] = useState(false);
   const [notes, setNotes] = useState("");
+  const [showError, setShowError] = useState(false);
+  const [error, setError] = useState("");
   const newTask = {
     name: name,
     priority: priority,
@@ -64,18 +69,47 @@ export default function CreateTaskModal({
     setShowEndDatePicker(false);
   };
 
-  const handleCreateTask = () => {
+  const handleCreateTask = async () => {
     if (newTask.name === "") {
-      alert("Please enter a name for the task");
+      setShowError(true);
+      setError("Please enter a name for the task");
     } else if (newTask.priority === "") {
-      alert("Please select a priority for the task");
+      setShowError(true);
+      setError("Please select a priority for the task");
     } else if (newTask.IDcategory === "") {
-      alert("Please select a category for the task");
+      setShowError(true);
+      setError("Please select a category for the task");
     } else if (newTask.startDate == newTask.endDate) {
-      alert("Please different times for start and end");
+      setShowError(true);
+      setError("Please select a valid time for the task");
+    } else if (
+      new Date(newTask.startDate).getDay() !=
+        new Date(newTask.endDate).getDay() &&
+      newTask.periodicity != "never"
+    ) {
+      setShowError(true);
+      setError(
+        "If you select a periodicity you can't set different days for the date."
+      );
     } else {
-      createTask(newTask);
-      toggleModal();
+      const startDateWithoutSeconds = new Date(startDate);
+      startDateWithoutSeconds.setSeconds(0, 0);
+      const endDateWithoutSeconds = new Date(endDate);
+      endDateWithoutSeconds.setSeconds(0, 0);
+      if (startDateWithoutSeconds >= endDateWithoutSeconds) {
+        setShowError(true);
+        setError("Please select a valid time for the task");
+      } else {
+        setShowError(false);
+        setError("");
+        if (userInfo) {
+          await addTask(newTask, userInfo.authToken);
+        } else {
+          setShowError(true);
+          setError("User information is missing");
+        }
+        toggleModal();
+      }
     }
   };
 
@@ -90,6 +124,7 @@ export default function CreateTaskModal({
             padding: 10,
             borderRadius: 8,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#474038",
           }}
           placeholderTextColor={"#C4BFB5"}
@@ -116,11 +151,13 @@ export default function CreateTaskModal({
           placeholderStyle={{
             fontSize: 13.33,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#C4BFB5",
           }}
           selectedTextStyle={{
             fontSize: 13.33,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#474038",
           }}
           iconStyle={{
@@ -131,6 +168,7 @@ export default function CreateTaskModal({
             fontSize: 13.33,
             color: "#A5A096",
             fontFamily: "Rebond-Grotesque-Regular",
+            lineHeight: 20,
           }}
           data={[
             { label: "High", value: "high" },
@@ -140,12 +178,12 @@ export default function CreateTaskModal({
           labelField="label"
           valueField="value"
           placeholder="Priority"
-          value={value}
+          value={valuePriority}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={(item) => {
             setPriority(item.value);
-            setValue(item.value);
+            setValuePriority(item.value);
             setIsFocus(false);
           }}
         />
@@ -155,6 +193,7 @@ export default function CreateTaskModal({
             <Text
               style={{
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
                 fontSize: 16,
                 color: "#A5A096",
               }}
@@ -200,6 +239,7 @@ export default function CreateTaskModal({
                         fontFamily: "Rebond-Grotesque-Medium",
                         fontSize: 13.3,
                         color: category.color,
+                        lineHeight: 20,
                       }}
                     >
                       {category.name}
@@ -221,6 +261,7 @@ export default function CreateTaskModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Starts
@@ -236,6 +277,7 @@ export default function CreateTaskModal({
               <Text
                 style={{
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 {startDate.toLocaleString("en-GB", {
@@ -261,6 +303,7 @@ export default function CreateTaskModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               End
@@ -276,6 +319,7 @@ export default function CreateTaskModal({
               <Text
                 style={{
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 {endDate.toLocaleString("en-GB", {
@@ -301,6 +345,7 @@ export default function CreateTaskModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Repeat
@@ -321,12 +366,14 @@ export default function CreateTaskModal({
               placeholderStyle={{
                 fontSize: 13.33,
                 fontFamily: "Rebond-Grotesque-Medium",
+                lineHeight: 20,
                 color: "#474038",
                 textAlign: "right",
               }}
               selectedTextStyle={{
                 fontSize: 13.33,
                 fontFamily: "Rebond-Grotesque-Medium",
+                lineHeight: 20,
                 color: "#474038",
                 textAlign: "right",
               }}
@@ -334,14 +381,15 @@ export default function CreateTaskModal({
                 fontSize: 13.33,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
               data={dataRepeat}
               placeholder={dataRepeat[0].label}
               labelField="label"
               valueField="value"
-              value={value}
+              value={valuePeriodicity}
               onChange={(item) => {
-                setValue(item.value);
+                setValuePeriodicity(item.value);
                 setPeriodicity(item.value);
               }}
               renderRightIcon={() => null}
@@ -362,6 +410,7 @@ export default function CreateTaskModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Allow notifications
@@ -386,6 +435,7 @@ export default function CreateTaskModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Add Notes
@@ -398,6 +448,7 @@ export default function CreateTaskModal({
                 borderRadius: 8,
                 backgroundColor: "#EEEADF60",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
                 color: "#474038",
               }}
               placeholderTextColor={"#C4BFB5"}
@@ -420,6 +471,7 @@ export default function CreateTaskModal({
           </View>
         </View>
       </View>
+      {showError && <Text style={{ color: "red" }}>{error}</Text>}
       <TouchableOpacity
         style={{
           backgroundColor: "#6B47DC",
@@ -435,6 +487,7 @@ export default function CreateTaskModal({
             color: "#F7F6F0",
             textAlign: "center",
             fontFamily: "Rebond-Grotesque-Bold",
+            lineHeight: 20,
             borderRadius: 5,
             fontSize: 19.02,
           }}

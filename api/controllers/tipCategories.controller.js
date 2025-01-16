@@ -24,6 +24,24 @@ exports.findAll  = async (req, res) => {
       }
 }
 
+exports.findById = async (req, res) => {
+    try {
+        const category = await TipCategory.findById(id).exec(); 
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                msg: "Category not found",
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            data: category.name,
+        });
+    } catch (error) {
+        handleErrorResponse(res, error);
+    }
+}
+
 exports.addNewTipCategory = async (req, res) => {
     try {
         if (!req.body.name) {

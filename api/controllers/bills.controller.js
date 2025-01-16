@@ -9,6 +9,56 @@ const handleErrorResponse = (res, error) => {
     .json({ success: false, msg: error.message || "Some error occurred." });
 };
 
+exports.findBillsForMonth = async (req, res) => {
+  try {
+    if (!req.query.month || !req.query.year) {
+      return res.status(400).json({
+        success: false,
+        error: "Query parameters missing",
+        msg: "You need to provide query parameters for month and year.",
+      });
+    }
+
+    const month = parseInt(req.query.month);
+    const year = parseInt(req.query.year);
+
+    if (isNaN(month) || isNaN(year)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid month or year format",
+        msg: "The provided month or year is not valid. Use valid month (1-12) and year.",
+      });
+    }
+
+    const startDate = new Date(year, month - 1, 1); 
+    const endDate = new Date(year, month, 0); 
+
+    const bills = await Bill.find({
+      IDuser: req.loggedUserId,
+      dueDate: { $gte: startDate, $lte: endDate },
+    })
+      .populate("IDuser", "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot")
+      .populate("IDcurrency", "-__v")
+      .select("-__v")
+      .exec();
+
+    if (!bills || bills.length === 0) {
+      return res.status(200).json({
+        success: false,
+        data: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: bills,
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+
 exports.findBills = async (req, res) => {
   try {
     if (!req.query.date) {
@@ -72,13 +122,14 @@ exports.create = async (req, res) => {
       !req.body.priority ||
       !req.body.amount ||
       !req.body.dueDate ||
+      !req.body.IDcurrency ||
       !req.body.periodicity ||
       req.body.notification == null
     ) {
       return res.status(400).json({
         success: false,
         error: "Fields missing",
-        msg: "You need to provide the name, priority, amount, dueDate, periodicity and notification.",
+        msg: "You need to provide the name, priority, amount, dueDate, IDcurrency, periodicity and notification.",
       });
     }
 
@@ -94,6 +145,7 @@ exports.create = async (req, res) => {
         dueDate: new Date(currentDueDate),
         periodicity: req.body.periodicity,
         notification: req.body.notification,
+        IDcurrency: req.body.IDcurrency,
         notes: req.body.notes || "",
         status: false,
         IDuser: req.loggedUserId,

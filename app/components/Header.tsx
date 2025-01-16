@@ -1,6 +1,7 @@
 import { Text, View, TouchableHighlight } from "react-native";
 import StreaksItem from "./StreaksItem";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Link } from "expo-router";
 
 type HeaderItemProps = {
   page: string;
@@ -26,7 +27,9 @@ const HeaderItem = ({ page, userStreak }: HeaderItemProps) => {
             marginLeft: 10,
           }}
         >
-          <Icon name="lightbulb-outline" size={28} color="#562CAF" />
+          <Link href={{ pathname: "/tips" }}>
+            <Icon name="lightbulb-outline" size={28} color="#562CAF" />
+          </Link>
         </View>
       </View>
     )
