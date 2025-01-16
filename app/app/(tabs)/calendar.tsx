@@ -21,15 +21,18 @@ import Bill from "@/interfaces/Bill";
 import { useUser } from "@/hooks/useUser";
 import { useBill } from "@/hooks/useBill";
 import { calculateStatistics } from "@/utils/statisticsUtils";
+import { useBillStore } from "@/stores/billStore";
+import { useTaskStore } from "@/stores/taskStore";
 
 const CalendarScreen = () => {
   const { user } = useUser();
   const fontsLoaded = useFonts();
-  const { logged } = useUserInfo();
+  const { userInfo } = useUserInfo();
   const [showStat, setShowStat] = useState(true);
   const [day, setDay] = useState();
-  const { getTasks, tasks, editTask, categories } = useTask();
-  const { getBills, bills, editBill } = useBill();
+  const { categories } = useTask();
+  const { fetchTasks, tasks, updateTask } = useTaskStore();
+  const { fetchBills, updateBill, bills } = useBillStore();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const categorizedTasks = categorizeTasks(tasks);
   const { allDayTasks, timedTasks } = categorizedTasks;
@@ -49,7 +52,7 @@ const CalendarScreen = () => {
   const [monthBills, setMonthBills] = useState<number>(0);
   const [billsCompleted, setBillsCompleted] = useState<number>(0);
 
-  useEffect(() => {  
+  useEffect(() => {
     if (!user) return;
 
     const {
@@ -108,8 +111,10 @@ const CalendarScreen = () => {
     } else {
       setSelectedDay(newSelectedDate);
       setShowStat(false);
-      getTasks(new Date(newSelectedDate));
-      getBills(new Date(newSelectedDate));
+      if (userInfo) {
+        fetchTasks(new Date(newSelectedDate), userInfo.authToken);
+        fetchBills(new Date(newSelectedDate), userInfo.authToken);
+      }
 
       setMarkedDates({
         [newSelectedDate]: { selected: true, selectedColor: "#EEEADF" },
@@ -124,13 +129,13 @@ const CalendarScreen = () => {
   const changeStatus = async (data: Task | Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
-      if (selectedDay) {
+      if (selectedDay && userInfo) {
         if (name === "task") {
-          await editTask(data._id, { status: updatedStatus });
-          getTasks(new Date(selectedDay));
+          await updateTask(data._id, { status: updatedStatus }, userInfo.authToken);
+          fetchTasks(new Date(selectedDay), userInfo.authToken);
         } else {
-          await editBill(data._id, { status: updatedStatus });
-          getBills(new Date(selectedDay));
+          await updateBill(data._id, { status: updatedStatus }, userInfo.authToken);
+          fetchBills(new Date(selectedDay), userInfo.authToken);
         }
       }
     } catch (error) {
