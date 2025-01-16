@@ -25,10 +25,13 @@ export default function CreateBillModal({
   toggleModal,
 }: CreateBillModalProps) {
   const { currencies } = useBill();
-  const { addBills } = useBillStore();
   const { userInfo } = useUserInfo();
-  const [isFocus, setIsFocus] = useState(false);
-  const [value, setValue] = useState("");
+  const { addBills } = useBillStore();
+  const [isFocusIDcurrency, setIsFocusIDcurrency] = useState(false);
+  const [isFocusPriority, setIsFocusPriority] = useState(false);
+  const [valuePeriodicity, setValuePeriodicity] = useState("");
+  const [valuePriority, setValuePriority] = useState("");
+  const [valueIDcurrency, setValueIDcurrency] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dueDate, setDueDate] = useState(new Date());
   const [name, setName] = useState("");
@@ -38,6 +41,8 @@ export default function CreateBillModal({
   const [periodicity, setPeriodicity] = useState("never");
   const [notification, setNotification] = useState(false);
   const [notes, setNotes] = useState("");
+  const [showError, setShowError] = useState(false);
+  const [error, setError] = useState("");
   const newTask = {
     name: name,
     priority: priority,
@@ -54,17 +59,28 @@ export default function CreateBillModal({
     setShowDatePicker(false);
   };
 
-  const handleCreateBill = () => {
+  const handleCreateBill = async () => {
     if (newTask.name === "") {
-      alert("Please enter a name for the task");
+      setShowError(true);
+      setError("Please enter a name for the bill");
     } else if (newTask.IDcurrency === "") {
-      alert("Please select a currency for the task");
+      setShowError(true);
+      setError("Please select a currency for the bill");
     } else if (newTask.amount === 0) {
-      alert("Please enter an amount for the task");
+      setShowError(true);
+      setError("Please enter an amount for the bill");
     } else if (newTask.priority === "") {
-      alert("Please select a priority for the task");
+      setShowError(true);
+      setError("Please select a priority for the bill");
     } else {
-      if (userInfo) addBills(newTask, userInfo.authToken);
+      setShowError(false);
+      setError("");
+      if (userInfo) {
+        await addBills(newTask, userInfo.authToken);
+      } else {
+        setShowError(true);
+        setError("User information is missing");
+      }
       toggleModal();
     }
   };
@@ -80,6 +96,7 @@ export default function CreateBillModal({
             padding: 10,
             borderRadius: 8,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#474038",
           }}
           placeholderTextColor={"#C4BFB5"}
@@ -96,7 +113,7 @@ export default function CreateBillModal({
               paddingHorizontal: 8,
               backgroundColor: "#F7F6F0",
             },
-            isFocus && { borderColor: "#562CAF" },
+            isFocusIDcurrency && { borderColor: "#562CAF" },
           ]}
           containerStyle={{
             backgroundColor: "#F7F6F0",
@@ -106,11 +123,13 @@ export default function CreateBillModal({
           placeholderStyle={{
             fontSize: 13.33,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#C4BFB5",
           }}
           selectedTextStyle={{
             fontSize: 13.33,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#474038",
           }}
           iconStyle={{
@@ -121,6 +140,7 @@ export default function CreateBillModal({
             fontSize: 13.33,
             color: "#A5A096",
             fontFamily: "Rebond-Grotesque-Regular",
+            lineHeight: 20,
           }}
           data={currencies.map((currency) => ({
             label: currency.name,
@@ -129,13 +149,13 @@ export default function CreateBillModal({
           labelField="label"
           valueField="value"
           placeholder="Currency"
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
+          value={valueIDcurrency}
+          onFocus={() => setIsFocusIDcurrency(true)}
+          onBlur={() => setIsFocusIDcurrency(false)}
           onChange={(item) => {
             setIDcurrency(item.value);
-            setValue(item.value);
-            setIsFocus(false);
+            setValueIDcurrency(item.value);
+            setIsFocusIDcurrency(false);
           }}
         />
 
@@ -147,6 +167,7 @@ export default function CreateBillModal({
             padding: 10,
             borderRadius: 8,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#474038",
           }}
           placeholderTextColor={"#C4BFB5"}
@@ -163,7 +184,7 @@ export default function CreateBillModal({
               paddingHorizontal: 8,
               backgroundColor: "#F7F6F0",
             },
-            isFocus && { borderColor: "#562CAF" },
+            isFocusPriority && { borderColor: "#562CAF" },
           ]}
           containerStyle={{
             backgroundColor: "#F7F6F0",
@@ -173,11 +194,13 @@ export default function CreateBillModal({
           placeholderStyle={{
             fontSize: 13.33,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#C4BFB5",
           }}
           selectedTextStyle={{
             fontSize: 13.33,
             fontFamily: "Rebond-Grotesque-Medium",
+            lineHeight: 20,
             color: "#474038",
           }}
           iconStyle={{
@@ -188,6 +211,7 @@ export default function CreateBillModal({
             fontSize: 13.33,
             color: "#A5A096",
             fontFamily: "Rebond-Grotesque-Regular",
+            lineHeight: 20,
           }}
           data={[
             { label: "High", value: "high" },
@@ -197,13 +221,13 @@ export default function CreateBillModal({
           labelField="label"
           valueField="value"
           placeholder="Priority"
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
+          value={valuePriority}
+          onFocus={() => setIsFocusPriority(true)}
+          onBlur={() => setIsFocusPriority(false)}
           onChange={(item) => {
             setPriority(item.value);
-            setValue(item.value);
-            setIsFocus(false);
+            setValuePriority(item.value);
+            setIsFocusPriority(false);
           }}
         />
 
@@ -220,6 +244,7 @@ export default function CreateBillModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Due date
@@ -235,6 +260,7 @@ export default function CreateBillModal({
               <Text
                 style={{
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 {dueDate.toLocaleString("en-GB", {
@@ -258,6 +284,7 @@ export default function CreateBillModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Repeat
@@ -278,12 +305,14 @@ export default function CreateBillModal({
               placeholderStyle={{
                 fontSize: 13.33,
                 fontFamily: "Rebond-Grotesque-Medium",
+                lineHeight: 20,
                 color: "#474038",
                 textAlign: "right",
               }}
               selectedTextStyle={{
                 fontSize: 13.33,
                 fontFamily: "Rebond-Grotesque-Medium",
+                lineHeight: 20,
                 color: "#474038",
                 textAlign: "right",
               }}
@@ -291,15 +320,16 @@ export default function CreateBillModal({
                 fontSize: 13.33,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
               data={dataRepeat}
               placeholder={dataRepeat[0].label}
               labelField="label"
               valueField="value"
-              value={value}
+              value={valuePeriodicity}
               onChange={(item) => {
                 setPeriodicity(item.value);
-                setValue(item.value);
+                setValuePeriodicity(item.value);
               }}
               renderRightIcon={() => null}
             />
@@ -319,6 +349,7 @@ export default function CreateBillModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Allow notifications
@@ -345,6 +376,7 @@ export default function CreateBillModal({
                 fontSize: 16,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               Add Notes
@@ -357,6 +389,7 @@ export default function CreateBillModal({
                 borderRadius: 8,
                 backgroundColor: "#EEEADF60",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
                 color: "#474038",
               }}
               placeholderTextColor={"#C4BFB5"}
@@ -372,6 +405,8 @@ export default function CreateBillModal({
           </View>
         </View>
       </View>
+      {showError && <Text style={{ color: "red" }}>{error}</Text>}
+
       <TouchableOpacity
         style={{
           backgroundColor: "#6B47DC",
@@ -387,6 +422,7 @@ export default function CreateBillModal({
             color: "#F7F6F0",
             textAlign: "center",
             fontFamily: "Rebond-Grotesque-Bold",
+            lineHeight: 20,
             borderRadius: 5,
             fontSize: 19.02,
           }}
