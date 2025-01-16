@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Text, View } from "react-native";
+import { Button, Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -152,6 +152,9 @@ export default function HomeScreen() {
       <SafeAreaProvider>
         <SafeAreaView style={{ backgroundColor: "#F7F6F0", flex: 1 }}>
           <View style={{ paddingLeft: 20, paddingTop: 10 }}>
+            <TouchableOpacity onPress={() => router.push("/tips")}>
+              <Text>Tips</Text>
+            </TouchableOpacity>
             <HeaderHomeScreen
               month={today.toLocaleDateString("en-US", { month: "short" })}
               day={today.getDate()}
