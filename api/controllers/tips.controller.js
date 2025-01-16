@@ -23,7 +23,7 @@ cloudinary.config({
 
 exports.findAll = async (req, res) => {
     try {
-        const tips = await Tip.find().exec();
+        const tips = await Tip.find().populate('IDcategory', '-_v').exec();
 
         if (!tips) {
             return res.status(200).json({
@@ -64,7 +64,7 @@ exports.findOne = async (req, res) => {
 
 exports.addTip = async (req, res) => {
     try {
-        if (!req.body.title || !req.body.info || !req.body.IDcategory || !req.body.image) {
+        if (!req.body.title || !req.body.info || !req.body.IDcategory || !req.body.image || !req.body.description || !req.body.author) {
             return res.status(400).json({
                 success: false,
                 msg: "Missing some required information"
@@ -86,7 +86,7 @@ exports.addTip = async (req, res) => {
         if (!uploadResult) {
             return res.status(400).json({
                 success: false,
-                msg: "Could not upload imagem"
+                msg: "Could not upload image"
             });
         }
 
@@ -96,7 +96,9 @@ exports.addTip = async (req, res) => {
             IDcategory: req.body.IDcategory,
             image: uploadResult.secure_url,
             cloudinary_id: uploadResult.public_id,
-            created_at: createdAt
+            created_at: createdAt,
+            description: req.body.description,
+            author: req.body.author
         });
 
         return res.status(201).json({
@@ -136,9 +138,7 @@ exports.deleteTip = async (req, res) => {
 exports.markAsFavorite = async (req, res) => {
     try {
         const idT = req.params.idT
-
         const tip = await Tip.findOne({ _id: idT }).exec();
-
         if (!tip) {
             return res.status(404).json({
                 success: false,

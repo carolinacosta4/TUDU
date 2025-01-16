@@ -1,16 +1,37 @@
-import { useState } from "react";
-import users from "@/api/api";
+import { useEffect, useState } from "react";
+import api from "@/api/api";
 import { useUserInfo } from "./useUserInfo";
 import Bill from "@/interfaces/Bill";
 
-
 export function useBill() {
-  const { userInfo, loading } = useUserInfo();
-  const [bills, setBills] = useState([]);
+  const { loading } = useUserInfo();
+  const [bills, setBills] = useState<Bill[]>([]);
   const [bill, setBill] = useState<Bill>();
-  const handleGetBills = async (date: Date, authToken: string) => {
+  const [currencies, setCurrencies] = useState<
+    { _id: string; name: string; symbol: string }[]
+  >([]);
+  const { userInfo } = useUserInfo();
+
+  const handleGetBillsCurrencies = async () => {
     try {
-      const response = await users.get(`bills?date=${date.toISOString()}`, {
+      const response = await api.get(`bills/currencies`);
+      setCurrencies(response.data.data);
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetBillsCurrencies();
+  }, []);
+
+  const handleGetBillsForMonth = async (
+    month: number,
+    year: number,
+    authToken: string
+  ) => {
+    try {
+      const response = await api.get(`bills?month=${month}&year=${year}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -21,44 +42,28 @@ export function useBill() {
     }
   };
 
-  const getBills = async (date: Date) => {
+  const getBillsForMonth = async (month: number, year: number) => {
     if (userInfo && userInfo.authToken && !loading) {
-      handleGetBills(date, userInfo.authToken);
+      handleGetBillsForMonth(month, year, userInfo.authToken);
     }
   };
 
-  const editBill = async (id: string, data: any) => {
+  const handleGetBill = async (id: string) => {
     try {
-      await users.patch(`bills/${id}`, data, {
-        headers: {
-          Authorization: `Bearer ${userInfo?.authToken}`,
-        },
-      });
+      const response = await api.get(`bills/${id}`);
+      setBill(response.data.data);
     } catch (error) {
-      console.error(error);
+      console.warn(error);
     }
   };
 
-  const handleDeleteBill = async (id: string) => {
-      try {
-        const response = await users.delete(`bills/${id}`, {
-          headers: {
-            Authorization: `Bearer ${userInfo?.authToken}`,
-          },
-        });
-      } catch (error: any) {
-        console.error("Error message:", error);
-      }
-    }
-
-    const handleGetBill = async (id: string) => {
-        try {
-          const response = await users.get(`bills/${id}`);
-          setBill(response.data.data);
-        } catch (error) {
-          console.warn(error);
-        }
-      };
-
-  return { bills, setBills, loading, getBills, editBill, handleDeleteBill, handleGetBill, bill };
+  return {
+    bills,
+    setBills,
+    handleGetBill,
+    loading,
+    getBillsForMonth,
+    bill,
+    currencies,
+  };
 }
