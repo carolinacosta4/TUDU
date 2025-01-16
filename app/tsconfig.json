@@ -1,11 +1,6 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "typeRoots": ["./node_modules/@types", "./types"],
-    "allowJs": true,
-    "moduleResolution": "node",
-    "jsx": "react-native",
-    "skipLibCheck": true,
     "strict": true,
     "paths": {
       "@/*": [
@@ -18,7 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "utils/formatRelativeTime.js"  ],
-
-  
+  ]
 }

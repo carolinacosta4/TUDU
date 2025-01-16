@@ -1,60 +1,48 @@
-import React, { useState } from 'react';
+import TipCategory from '@/interfaces/TipCategory';
+import React, { Fragment } from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity } from 'react-native';
-import { useTipCategories } from '@/hooks/useCategoryTip';
-//import { SearchAndCategoriesProps } from '@/types/searchAndCategoriesProps';
-import SvgUri from 'react-native-svg-uri';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface SearchAndCategoriesProps {
   selectedCategory: string; 
   onCategoryClick: (categoryId: string) => void;  
   onSearchChange: (text: string) => void;  
+  tipCategories: TipCategory[]
 }
 
-
-const SearchAndCategories: React.FC<SearchAndCategoriesProps> = ({ selectedCategory, onCategoryClick, onSearchChange }) => {
+const SearchAndCategories = ({ selectedCategory, onCategoryClick, onSearchChange, tipCategories }: SearchAndCategoriesProps) => {
 
   const handleSearchChange = (text: string) => {
     onSearchChange(text);
   }
 
- // console.log('selectedCategory:', selectedCategory);
-
- const {tipCategories, loading, error} = useTipCategories();
- //console.log('tipCategories:', tipCategories);
   return (
     <View style={styles.container}>
       <View>
         <View style={styles.searchBox}>
           <View style={styles.searchContent}>
-            <View  />
-                    <SvgUri
-                    width="16"
-                    height="16"
-                    source={require('@/assets/icons/search_icon.svg')}
-                        />
-                      <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search"
-                        onChangeText={handleSearchChange}
-                      />
+            <Icon name="magnify" size={20} color='#C4BFB5' />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search..."
+              placeholderTextColor={'#C4BFB5'}
+              onChangeText={handleSearchChange}
+              />
           </View>
         </View>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       <View style={styles.categoriesContainer}>
       {tipCategories.map((category, index) => (
-        <View
-          key={index}
-          style={[
+        <Fragment key={index}>
+          <TouchableOpacity onPress={() => onCategoryClick(category._id)} style={[
             styles.categoryBox,
             {
               backgroundColor: selectedCategory === category._id
                 ? '#291752'
                 : '#EEEADF',
             },
-          ]}
-        >
-          <TouchableOpacity onPress={() => onCategoryClick(category._id)}>
+          ]}>
             <Text
               style={[
                 styles.categoryText,
@@ -68,7 +56,7 @@ const SearchAndCategories: React.FC<SearchAndCategoriesProps> = ({ selectedCateg
               {category.name}
             </Text>
           </TouchableOpacity>
-        </View>
+        </Fragment>
       ))}
       </View>   
       </ScrollView>
@@ -84,7 +72,7 @@ const styles = StyleSheet.create({
   },
   searchBox: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
     backgroundColor: '#F7F6F0',
     borderRadius: 12,
     borderWidth: 1,

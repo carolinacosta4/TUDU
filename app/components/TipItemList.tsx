@@ -1,24 +1,19 @@
-import React from 'react';
-import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
+import React, { Fragment } from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import  Tip  from '@/interfaces/Tip';
+import { Link } from 'expo-router';
 
 interface TipItemListProps {
   filteredTips: Tip[];
-  categoryNames: { [key: string]: string };
   formatRelativeTime: (date: Date) => string;
-  handleNavigateToTip: (tipId: string) => void;
 }
 
-const TipItemList: React.FC<TipItemListProps> = ({
+const TipItemList = ({
   filteredTips,
-  categoryNames,
   formatRelativeTime,
-  handleNavigateToTip,
-}) => {
-//console.log('category names',categoryNames);
+}: TipItemListProps) => {
   return (
-    <>
-      {filteredTips.length > 0 ? (
+      filteredTips.length > 0 ? (
         filteredTips
           .sort((a, b) => {
             const titleA = a.title || ''; 
@@ -26,7 +21,8 @@ const TipItemList: React.FC<TipItemListProps> = ({
             return titleA.localeCompare(titleB);
           })
           .map((tip) => (
-            <TouchableOpacity key={tip._id} onPress={() => handleNavigateToTip(tip._id)}>
+            <Fragment key={tip._id}>
+            <Link href={{pathname: '/tips/[tipId]', params: {tipId: tip._id}}} >
               <View style={styles.footerContainer}>
                 <View style={styles.footerItem}>
                   <Text style={styles.footerTitle}>
@@ -41,12 +37,12 @@ const TipItemList: React.FC<TipItemListProps> = ({
                 </View>
                 <Image style={styles.footerImage} source={{ uri: tip.image }} />
               </View>
-            </TouchableOpacity>
+            </Link>
+            </Fragment>
           ))
       ) : (
         <Text>No tips available</Text>
-      )}
-    </>
+      )
   );
 };
 

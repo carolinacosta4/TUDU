@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import users from '@/api/users'; 
+import users from '@/api/api'; 
 import Tip from '@/interfaces/Tip';
 
 export const useTips = () => {

@@ -1,6 +1,9 @@
 export default interface Tip {
     _id: string;
-    IDcategory: string;
+    IDcategory: {
+      _id: string;
+      name: string;
+    };
     author: string;
     cloudinary_id: string;
     createdAt: string;
@@ -8,6 +11,5 @@ export default interface Tip {
     image: string;
     info: string;
     title: string;
-    __v: number;
   }
   

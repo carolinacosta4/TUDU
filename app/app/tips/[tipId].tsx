@@ -1,88 +1,52 @@
 import { useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useLayoutEffect, useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity, Dimensions } from 'react-native';
+import { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTip } from '@/hooks/useTip';
-import { formatDistanceToNow } from 'date-fns';
-import { Asset } from 'expo-asset';
-import SvgUri from 'react-native-svg-uri';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useUser } from '@/hooks/useUser';
+
 const TipDetail = () => {
   const { userInfo } = useUserInfo();
   const {user} = useUser();
   const { tipId } = useLocalSearchParams();
-  const navigation = useNavigation(); 
-  const { tip, loading, error, removeFromFavorite, markAsFavorite, fetchTip } = useTip();
+  const { tip, loading, removeFromFavorite, markAsFavorite, fetchTip } = useTip();
   const [isLiked, setIsLiked] = useState(false); 
 
   useEffect(() => {
-    fetchTip(tipId)
+    if (typeof tipId === "string") {
+      fetchTip(tipId)
+    }
   }, [tipId])
 
-  const formatRelativeTime = (date: string | Date | null) => {
-    if (!date) return 'Unknown time';
-    try {
-      return formatDistanceToNow(new Date(date), { addSuffix: true }).replace(/^about\s/, '');
-    } catch (error) {
-      console.error('Invalid date:', date, error);
-      return 'Invalid date';
-    }
-  };
+  useEffect(() => {
+    const favoriteTipIds = user ? user.FavoriteTip.map(fav => fav.IDtip) : [];   
+    setIsLiked(favoriteTipIds.includes(String(tipId)));
+  }, [user, tipId, userInfo]);
 
-  // useEffect(() => {
-  //   if (!userInfo?.authToken || !tipId || !user) return;
-    
-  //   const idToCheck = Array.isArray(tipId) ? tipId[0] : tipId;
-  //   const favoriteTipIds = user.FavoriteTip.map(fav => fav.IDtip);
+  if (!userInfo || !tipId || !user || loading) {
+    return <Text>Loading...</Text>;
+  }
 
-  //   setIsLiked(favoriteTipIds.includes(idToCheck));
-  // }, [user, tipId, userInfo?.authToken]);
-/*
-  const handleHeartClick = async () => {
-    if (!userInfo?.authToken) {
-      console.error("User is not logged in or token is not available.");
-      return;
-    }
-  
-    console.log('isLiked:', isLiked);
+  const handleHeartClick = async () => { 
     setIsLiked(prevState => !prevState);
   
     try {
       const id = String(tipId);
       if (isLiked) {
-        console.log('inside the remove from favorite')
-        await removeFromFavorite(id, userInfo?.authToken);
+        await removeFromFavorite(id, userInfo.authToken);
       } else {
-        await markAsFavorite(id, userInfo?.authToken);
+        await markAsFavorite(id, userInfo.authToken);
       }
     } catch (error) {
       console.error("Error with favorite action", error);
       setIsLiked(isLiked); 
     }
   };
-*/
-//   useLayoutEffect(() => {
-//     navigation.setOptions({
-//       headerShown: false,}
-// );
-    
-//   }, [navigation, tip]);
-
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
-
-  // if (error) {
-  //   return <Text>Error: {error}</Text>;
-  // }
-
-  // if (!tip) {
-  //   return <Text>No tip found</Text>;
-  // }
 
   return (
+    tip &&
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <ImageBackground
         source={{ uri: tip.image }}
@@ -93,30 +57,24 @@ const TipDetail = () => {
           colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.7)']} 
           style={styles.linearGradient}
         >
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <SvgUri
-              width="16"
-              height="16"
-              source={require('@/assets/icons/back_white.svg')}
-            />
-          </TouchableOpacity>
           <View style={styles.headerContent}>
             <View style={styles.headerTextContainer}>
               <Text style={styles.title}>{tip.title}</Text>
-              <Text style={styles.subtitle}>{formatRelativeTime(new Date(tip.createdAt))} • {tip.author}</Text>
+              <Text style={styles.subtitle}>{new Date(tip.createdAt).toLocaleDateString("en-GB", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                })} • {tip.author}</Text>
             </View>
             <View style={styles.iconContainer}>
-            <TouchableOpacity >
-            <SvgUri
-                width="32"
-                height="32"
-                source={{
-                    uri: isLiked
-                    ? Asset.fromModule(require('@/assets/icons/heart_after_tips.svg')).uri
-                    : Asset.fromModule(require('@/assets/icons/heart_before_tips.svg')).uri,
-                }}
-                />
-              </TouchableOpacity>
+              
+            <TouchableOpacity onPress={handleHeartClick}>
+              {isLiked ? (
+                <Icon name="heart" size={30} color='#EEE5F5' />
+              ) : (
+                <Icon name="heart-outline" size={30} color='#EEE5F5' />
+              )}
+            </TouchableOpacity>
             </View>
           </View>
         </LinearGradient>
@@ -186,6 +144,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     gap: 4,
+    marginLeft: 16,
   },
   title: {
     alignSelf: 'stretch',
@@ -195,6 +154,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SF Pro Display',
     fontWeight: '500',
     lineHeight: 34.56,
+    flexWrap: 'wrap',
   },
   subtitle: {
     alignSelf: 'stretch',
@@ -206,8 +166,9 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   iconContainer: {
-    width: 42,
-    height: 0,
+    width: 30,
+    height: 30,
+    marginRight: 16,
     position: 'relative',
   },
   icon: {
@@ -217,12 +178,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEE5F5',
   },
   bodyContainer: {
-    height: 664,
     padding: 16,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     gap: 26,
+    marginBottom: Dimensions.get("window").width * 0.1, 
   },
   bodyText: {
     color: '#635C54',

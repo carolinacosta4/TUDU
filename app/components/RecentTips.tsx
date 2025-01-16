@@ -1,14 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import  Tip from '@/interfaces/Tip';
-
+import { Link } from 'expo-router';
 
 interface RecentTipsProps {
   recentTips: Tip[];
-  handleNavigateToTip: (tipId: string) => void;
 }
 
-const RecentTips: React.FC<RecentTipsProps> = ({ recentTips, handleNavigateToTip }) => {
+const RecentTips = ({ recentTips }: RecentTipsProps) => {
   return (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Most Recent</Text>
@@ -16,13 +15,13 @@ const RecentTips: React.FC<RecentTipsProps> = ({ recentTips, handleNavigateToTip
         {recentTips.length > 0 ? (
           recentTips.map((tip) => (
             <View style={styles.cardItem} key={tip._id}>
-              <TouchableOpacity onPress={() => handleNavigateToTip(tip._id)}>
+            <Link href={{pathname: '/tips/[tipId]', params: {tipId: tip._id}}} >
               <Image style={styles.cardImage} source={{ uri: tip.image }} />
                 <View style={styles.cardContent}>
                   <Text style={styles.cardContentTitle}>{tip.title}</Text>
                   <Text style={styles.cardContentDescription}>{tip.info}</Text>
                 </View>
-              </TouchableOpacity>
+              </Link>
             </View>
           ))
         ) : (

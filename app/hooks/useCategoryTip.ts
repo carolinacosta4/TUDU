@@ -1,22 +1,18 @@
-import { useState, useEffect } from 'react';
-import { getCategories } from '@/api/tipsCategory'; 
+import { useState } from 'react';
+import api from '@/api/api'; 
 import TipCategory  from '@/interfaces/TipCategory'; 
 
 export const useTipCategories = () => {
   const [tipCategories, setTipCategories] = useState<TipCategory[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  useEffect(() => {
-    const fetchTipCategories = async () => {
+   const fetchTipCategories = async () => {
       try {
-        const response = await getCategories();
-        const categories = response.data; 
-        //console.log('Fetched categories:', categories);
-
+        const response = await api.get("tipCategory");                
+        const categories = response.data.data; 
         const allCategory = { name: 'All', _id: 'All' };
-        setTipCategories([allCategory, ...categories]); 
+        setTipCategories([allCategory, ...categories]);        
       } catch (err) {
         console.error('Error fetching categories:', err);
         setError('Error fetching tips');
@@ -25,8 +21,5 @@ export const useTipCategories = () => {
       }
     };
 
-    fetchTipCategories();
-  }, []);
-
-  return { tipCategories, loading, error, selectedCategory, setSelectedCategory };
+  return { fetchTipCategories, tipCategories, loading, error };
 };

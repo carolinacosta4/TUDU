@@ -1,5 +1,6 @@
 import Bill from "./Bill";
 import Task from "./Task";
+import Tip from "./Tip";
 
 export default interface User {
   data: {
@@ -19,5 +20,5 @@ export default interface User {
   };
   userTasks: Task[];
   userBills: Bill[];
-  FavoriteTip: { IDtip: string; IDuser: string }[]; 
+  FavoriteTip: Tip[]; 
 }
