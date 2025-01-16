@@ -74,8 +74,6 @@ const BillDetail = () => {
   };
 
   const handleEdit = () => {
-    console.log(bill);
-
     let newEdit = !edit;
     setEdit(newEdit);
   };
@@ -87,22 +85,7 @@ const BillDetail = () => {
           {edit ? (
             <ScrollView style={styles.container}>
               <Text>Edit view</Text>
-              {/* <TouchableOpacity
-                onPress={handleEdit}
-                style={{ paddingBottom: 10 }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Rebond-Grotesque-Medium",
-                    fontSize: 16,
-                    color: "#562CAF",
-                    textAlign: "right",
-                  }}
-                >
-                  Done
-                </Text>
-              </TouchableOpacity> */}
-              <EditBill bill={bill}></EditBill>
+              <EditBill bill={bill} handleEdit={handleEdit}/>
             </ScrollView>
           ) : (
             <ScrollView style={styles.container}>
@@ -129,7 +112,7 @@ const BillDetail = () => {
                     {bill.priority.charAt(0).toUpperCase() +
                       bill.priority.slice(1)}
                   </Text>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={handleEdit}>
                     <Text
                       style={{
                         fontFamily: "Rebond-Grotesque-Medium",
@@ -151,6 +134,13 @@ const BillDetail = () => {
                   style={{ ...styles.startDate, backgroundColor: "#EEEADF" }}
                 >
                   {formatDate(bill.dueDate)}
+                </Text>
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Amount</Text>
+                <Text style={styles.schedule}>
+                  {bill.amount}
                 </Text>
               </View>
 

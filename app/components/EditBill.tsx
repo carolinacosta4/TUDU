@@ -13,8 +13,14 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Bill from "@/interfaces/Bill";
 const { width, height } = Dimensions.get("window");
 
-export default function EditBill({ bill }: { bill: Bill }) {
-  // console.log(task);
+type EditBillProps = {
+  bill: Bill,
+  handleEdit: () => void
+}
+
+
+export default function EditBill({ bill, handleEdit }: EditBillProps) {
+        
   const { editBill } = useBill();
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
@@ -51,7 +57,9 @@ export default function EditBill({ bill }: { bill: Bill }) {
     } else if (editBillItem.priority === "") {
       alert("Please select a priority for the task");
     } else {
-      editBill(bill._id, editBillItem);
+      // editBill(bill._id, editBillItem);
+      console.log(editBillItem);
+      
     }
   };
 
@@ -97,7 +105,7 @@ export default function EditBill({ bill }: { bill: Bill }) {
             Amount
           </Text>
           <TextInput
-            value={amount}
+            value={amount.toString()}
             style={{
               borderColor: "#C4BFB5",
               borderWidth: 1,
