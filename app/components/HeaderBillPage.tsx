@@ -14,7 +14,7 @@ const HeaderBillPage = ({
     pendingBill: Bill | null;
     activeBillsCount: number; 
     nextPayment: Bill | null;
-    monthsTotal: number
+    monthsTotal: { currencySymbol: string; currencyName: string; total: number };
   }) => {
     const dueInText = nextPayment?.dueDate ? getLeftActivationDays(new Date(nextPayment.dueDate)) : '';
 
@@ -68,8 +68,8 @@ const HeaderBillPage = ({
       </View>
       <View style={styles.totalCard}>
         <View style={styles.backgroundCard} />
-        <Text style={styles.monthTitle}>Month’s total</Text>
-        <Text style={styles.totalAmount}>{monthsTotal}</Text>
+        <Text style={styles.monthTitle}>Month’s total ({monthsTotal.currencyName})</Text>
+        <Text style={styles.totalAmount}>{monthsTotal.total}{monthsTotal.currencySymbol}</Text>
       </View>
     </View>
   </View>
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
         fontFamily: 'ES Rebond Grotesque TRIAL',
         fontWeight: '400',
         lineHeight: 16,
-        wordWrap: 'break-word'
+        flexWrap: 'wrap',
       },
       totalAmount: {
         right: 16,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
         fontSize: 33.18,
         fontFamily: 'SF Pro Display',
         fontWeight: '700',
-        wordWrap: 'break-word'
+        flexWrap: 'wrap',
       },
 })
 
