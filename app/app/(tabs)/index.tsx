@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View, Vibration, Platform, Image } from "react-native";
+import { Text, View, Vibration, Platform, Image } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useUser } from "@/hooks/useUser";
@@ -205,9 +205,6 @@ export default function HomeScreen() {
               paddingTop: 10,
             }}
           >
-            <TouchableOpacity onPress={() => router.push("/tips")}>
-              <Text>Tips</Text>
-            </TouchableOpacity>
             <HeaderHomeScreen
               month={today.toLocaleDateString("en-US", { month: "short" })}
               day={today.getDate()}
