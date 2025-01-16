@@ -28,10 +28,20 @@ export function useUserInfo() {
     }
   };
 
+  const logout = async () => {
+    try {
+      await AsyncStorage.clear();
+      setUserInfo(undefined);
+      setLogged(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     getUser();
     setLoading(false);
   }, []);
 
-  return { userInfo, setUserInfo, storeData, loading, logged };
+  return { userInfo, setUserInfo, storeData, loading, logged, logout };
 }
