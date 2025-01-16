@@ -15,7 +15,11 @@ export default interface User {
     vibration: boolean;
     darkMode: boolean;
     isDeactivated: boolean;
-    IDmascot: string;
+    IDmascot: {
+      _id: string;
+      name: string;
+      image: string;
+    };
     onboardingSeen: boolean;
   };
   userTasks: Task[];

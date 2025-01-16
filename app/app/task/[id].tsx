@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  Vibration
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -12,11 +14,17 @@ import useFonts from "@/hooks/useFonts";
 import Task from "@/interfaces/Task";
 import { useTask } from "@/hooks/useTask";
 import { formatDate } from "@/utils/taskUtils";
+import { useTaskStore } from "@/stores/taskStore";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { useUser } from "@/hooks/useUser";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { editTask, handleGetTask, task, handleDeleteTask } = useTask();
+  const { handleGetTask, task } = useTask();
+  const { updateTask, deleteTask } = useTaskStore()
+  const { userInfo } = useUserInfo();
+  const { user } = useUser();
 
   useEffect(() => {
     if (typeof id === "string") {
@@ -24,7 +32,7 @@ const TaskDetail = () => {
     }
   }, [task]);
 
-  if (!task || !fontsLoaded) {
+  if (!task || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
         <Text>Loading task details...</Text>
@@ -90,16 +98,26 @@ const TaskDetail = () => {
     return `${formattedHours}h${formattedMinutes}`;
   };
 
-  const deleteTask = () => {
-    handleDeleteTask(task._id);
+  const handleDeleteTask = () => {
+    deleteTask(task._id, userInfo.authToken);
     router.push("/");
   };
 
+  const ONE_SECOND_IN_MS = 1000;
+  const PATTERN = [1 * ONE_SECOND_IN_MS];
+
   const handleMarkAsDone = async (task: Task) => {
     try {
-      let newStatus = !task.status;
-      await editTask(task._id, { status: newStatus });
-    } catch (error: any) {
+      let newStatus = !task.status;      
+      await updateTask(task._id, { status: newStatus }, userInfo.authToken );
+    
+      if (user?.data.vibration && newStatus === true) {
+        Platform.OS === "android"
+          ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+          : Vibration.vibrate(PATTERN);
+      }
+    }
+     catch (error: any) {
       console.error("Error message:", error);
     }
   };
@@ -190,7 +208,7 @@ const TaskDetail = () => {
               <Text style={styles.sectionTitle}>Options</Text>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={deleteTask}
+                onPress={handleDeleteTask}
               >
                 <Text style={styles.deleteText}>Delete Task</Text>
               </TouchableOpacity>
