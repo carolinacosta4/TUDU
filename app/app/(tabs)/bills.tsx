@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native"; 
+import { View, Text, StyleSheet, ScrollView, Dimensions, Platform, Vibration } from "react-native"; 
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useEffect, useState } from "react";
@@ -25,8 +25,6 @@ export default function BillsScreen() {
           const month = thismonth.getMonth() + 1; 
           const year = thismonth.getFullYear();
           if(userInfo) await fetchMonthBills(month, year, userInfo.authToken);
-          // if(userInfo) handleGetUser(userInfo.userID);
-          // console.log(user?.userBills);
           setloadingBills(false);
         }
       } catch (error) {
@@ -41,10 +39,18 @@ export default function BillsScreen() {
     setUpcomingBills(getUpcomingBills());  
   }, [user?.userBills]);
 
+  const ONE_SECOND_IN_MS = 1000;
+  const PATTERN = [1 * ONE_SECOND_IN_MS];
+
   const changeStatus = async (data: Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
       if(userInfo) await updateBill(data._id, { status: updatedStatus }, userInfo.authToken);
+      if (user?.data.vibration && updatedStatus === true) {
+          Platform.OS === "android"
+            ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+            : Vibration.vibrate(PATTERN);
+          }
     } catch (error) {
       console.error(error);
     }
@@ -104,9 +110,30 @@ export default function BillsScreen() {
 
   const monthsTotal = () => {
     const currentBills = getCurrentMonthBills();
-    const totalAmount = currentBills.reduce((sum, bill) => sum + parseFloat(bill.amount), 0);
-    return totalAmount;
-  }
+    const totalsByCurrency = currentBills.reduce((totals: { total: number; name: string; symbol: string }[], bill) => {
+      const { IDcurrency, amount } = bill;
+      const { symbol, name } = IDcurrency;
+      const existingCurrency = totals.find((item) => item.symbol === symbol);
+  
+      if (existingCurrency) {
+        existingCurrency.total += parseFloat(amount);
+      } else {
+        totals.push({ total: parseFloat(amount), name, symbol });
+      }
+  
+      return totals;
+    }, []);
+  
+    const highestCurrency = totalsByCurrency.reduce((highest, currency) => {
+      return currency.total > highest.total ? currency : highest;
+    }, { total: 0, name: "", symbol: "" });
+  
+    return {
+      currencySymbol: highestCurrency.symbol,
+      currencyName: highestCurrency.name,
+      total: highestCurrency.total,
+    };
+  };
 
   return (
     <SafeAreaProvider>
