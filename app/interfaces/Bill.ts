@@ -9,4 +9,9 @@ export default interface Bill {
   notes: string;
   status: boolean;
   IDuser: string;
+  IDcurrency: {
+    _id: string;
+    name: string;
+    symbol: string;
+  }
 }
