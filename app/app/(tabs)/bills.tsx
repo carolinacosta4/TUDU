@@ -1,21 +1,22 @@
-import { View, Text, StyleSheet } from "react-native"; 
+import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native"; 
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import useFonts from "@/hooks/useFonts";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useEffect, useState } from "react";
 import BillItem from "@/components/BillListForBillPage";
-import { useBill } from "@/hooks/useBill";
 import { useUser } from "@/hooks/useUser";
 import Bill from "@/interfaces/Bill";
 import HeaderBillPage from "@/components/HeaderBillPage";
-import NoBillsView from "@/components/NoBillsView";
+import { useBillStore } from "@/stores/billStore";
+import NoTasksView from "@/components/NoTasksView";
+
 export default function BillsScreen() {
+  const width = Dimensions.get("window").width;
   const thismonth = new Date();
-  const fontsLoaded = useFonts();
-  const { logged } = useUserInfo();
-  const { getBillsForMonth, bills, editBill } = useBill();
-  const { loading } = useUser();
+  const { userInfo, logged } = useUserInfo();
+  const { bills, updateBill, fetchMonthBills } = useBillStore()
+  const { loading, handleGetUser, user } = useUser();
   const [loadingBills, setloadingBills] = useState(true);
+  const [upcomingBills, setUpcomingBills] = useState<Bill[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,7 +24,10 @@ export default function BillsScreen() {
         if (loading === false && logged === true) {
           const month = thismonth.getMonth() + 1; 
           const year = thismonth.getFullYear();
-          await getBillsForMonth(month, year);
+          if(userInfo) await fetchMonthBills(month, year, userInfo.authToken);
+          // if(userInfo) handleGetUser(userInfo.userID);
+          // console.log(user?.userBills);
+          
           setloadingBills(false);
         }
       } catch (error) {
@@ -34,10 +38,14 @@ export default function BillsScreen() {
     fetchData();
   }, [logged, loading]);
 
+  useEffect(() => {
+    setUpcomingBills(getUpcomingBills());  
+  }, [user?.userBills]);
+
   const changeStatus = async (data: Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
-      await editBill(data._id, { status: updatedStatus });
+      if(userInfo) await updateBill(data._id, { status: updatedStatus }, userInfo.authToken);
     } catch (error) {
       console.error(error);
     }
@@ -103,8 +111,6 @@ export default function BillsScreen() {
     return totalAmount;
   }
 
-  const upcomingBills = getUpcomingBills();
-
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.containerScrollView}>
@@ -116,9 +122,10 @@ export default function BillsScreen() {
                 <Text style={styles.headerTitle}>My bills</Text>
               </View>
               {bills.length === 0 ? (
-                <NoBillsView />
+                <NoTasksView />
               ) : (
-                <>
+                  <ScrollView>
+                    <View style={{ marginBottom: width / 0.8 }}>
                   <View style={styles.thisMonth}>
                     <Text style={styles.monthLabel}>This month</Text>
                     <View style={styles.billItem}>
@@ -137,7 +144,8 @@ export default function BillsScreen() {
                       </View>
                     </View>
                   )}
-                </>
+                    </View>
+                  </ScrollView>
               )}
             </View>
           </View>
@@ -181,10 +189,9 @@ const styles = StyleSheet.create({
   footer: {
     width: '100%',
     height: '100%',
-    padding: 16,
+    padding: 24,
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 16,
     backgroundColor: '#EEEADF',
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
@@ -193,7 +200,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     width: '100%',
-    paddingHorizontal: 16,
     gap: 32,
   },
   header: {
@@ -204,7 +210,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   thisMonth: {
-    width: '100%',
+    width: '98%',
     flexDirection: 'column',
     gap: 12,
   },

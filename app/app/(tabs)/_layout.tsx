@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   Dimensions,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Tabs } from "expo-router";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -21,14 +22,13 @@ export default function TabLayout() {
   const [modalVisible, setModalVisible] = useState(false);
   const [addTask, setAddTask] = useState(true);
   const { categories } = useTask();
-
+  const fontsLoaded = useFonts();
   const dataRepeat = [
     { label: "Never", value: "never" },
     { label: "Daily", value: "daily" },
     { label: "Weekly", value: "weekly" },
     { label: "Monthly", value: "monthly" },
   ];
-  const fontsLoaded = useFonts();
 
   if (!fontsLoaded) {
     return <Text>Loading...</Text>;
@@ -158,6 +158,13 @@ export default function TabLayout() {
         transparent={true}
         onRequestClose={toggleModal}
       >
+        <TouchableWithoutFeedback
+          onPress={(e) => {
+            e.target === e.currentTarget && toggleModal();
+          }}
+        >
+          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)" }} />
+        </TouchableWithoutFeedback>
         <View
           style={{
             flex: 1,

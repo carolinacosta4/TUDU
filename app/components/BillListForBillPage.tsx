@@ -1,35 +1,34 @@
 import React from "react";
-import {View, Text, StyleSheet, TouchableWithoutFeedback} from 'react-native'
+import {View, Text, StyleSheet, TouchableWithoutFeedback, Dimensions} from 'react-native'
 import Bill from "@/interfaces/Bill";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Link } from "expo-router";
 interface BillItemProps {
   bill: Bill;
   changeStatus: (data: Bill, name: "bill") => void;
 }
 
 const BillItem = ({ bill, changeStatus }: BillItemProps) => {
-  const getPriorityStyles = (priority: string) => {
+  const getPriorityStyle = (priority: string) => {
     switch (priority) {
       case 'high':
         return {
-          backgroundColor: 'rgba(239, 68, 68, 0.4)', 
+          backgroundColor: '#EF444440', 
         };
       case 'medium':
         return {
-          backgroundColor: 'rgba(251, 209, 96, 0.4)', 
+          backgroundColor: '#FBD16060', 
         };
       case 'low':
         return {
-          backgroundColor: 'rgba(184, 222, 164, 0.8)',
+          backgroundColor: '#B8DEA480',
         };
       default:
-        return {
-          backgroundColor: 'rgba(211, 211, 211, 0.4)',
-        };
+        return {};
     }
   };
 
-  const priorityStyles = getPriorityStyles(bill.priority);
+  const priorityStyles = getPriorityStyle(bill.priority);
 
   return (
     <View style={styles.billItem}>
@@ -39,14 +38,20 @@ const BillItem = ({ bill, changeStatus }: BillItemProps) => {
       </View>
       <View style={styles.billsContainer}>
           <View style={styles.billDetailsContainer}>
+            <Link href={{ pathname: "/bill/[id]", params: { id: bill._id } }}>
+            <View style={{ width: '90%', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
               <View style={styles.billInfoBox}>
                 <Text style={styles.billTitle}>{bill.name}</Text>
                 <View style={[styles.billStatus, { backgroundColor: priorityStyles.backgroundColor }]}>
                     <Text style={styles.billStatusText}>{bill.priority}</Text>
                 </View>
               </View>
+             
             <View style={styles.billCost}>
-              <Text style={styles.amountBillCost}>{bill.amount}€</Text>
+              <Text style={styles.amountBillCost}>{bill.amount}{bill.IDcurrency.symbol}</Text>
+            </View>
+            </View>
+            </Link>
         {bill.status ? (
           <TouchableWithoutFeedback
             onPress={() => {
@@ -66,7 +71,6 @@ const BillItem = ({ bill, changeStatus }: BillItemProps) => {
         )}
             </View>
           </View>
-        </View>
       </View>
   );
 };
@@ -80,7 +84,7 @@ const styles = StyleSheet.create({
   },
   dateBox: {
     backgroundColor: '#291752',
-    width: 72,
+    width: Dimensions.get('window').width * 0.2,
     height: 'auto',
     marginRight: 12,
     flexDirection: 'column',
@@ -120,12 +124,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     width: 'auto',
-    backgroundColor: '#F7F6F0'
+    backgroundColor: '#F7F6F0',
   },
   billsContainer: {
     flexDirection: 'column',
     gap: 12,
-    width: '75%'
+    width: Dimensions.get('window').width * 0.6,
   },
   billInfoBox: {
     flexDirection: 'column',
@@ -137,15 +141,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Rebond-Grotesque-Medium',
     fontWeight: '500',
     lineHeight: 24,
-    wordWrap: 'break-word'
+    wordWrap: 'break-word',
   },
   billStatus: {
-    borderRadius: 4,
     paddingVertical: 4,
     alignItems: 'center',
-    paddingLeft: 4, 
-    paddingRight: 4,
-    width: '70%',
+    alignSelf: "flex-start",
+    paddingHorizontal: 6,
+    borderRadius: 6,
   },
   billStatusText: {
     color: '#352D26',
@@ -153,12 +156,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Rebond-Grotesque-Medium',
     fontWeight: '500',
     wordWrap: 'break-word',
+    lineHeight: 20,
   },
   billCost: {
     flexDirection: 'row',
     gap: 12,
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    height: '100%',
   },
   circleIcon: {
     width: 24,
