@@ -40,7 +40,6 @@ const CalendarScreen = () => {
     today.getMonth() + 1
   );
   const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
-  const [colorDotDays, setColorDotDays] = useState<{ [key: string]: any }>({});
   const [tasksCompleted, setTasksCompleted] = useState<number>(0);
   const [perfectDaysCount, setPerfectDaysCount] = useState<number>(0);
   const [highestStreak, setHighestStreak] = useState<number>(0);
@@ -50,91 +49,7 @@ const CalendarScreen = () => {
   const [monthBills, setMonthBills] = useState<number>(0);
   const [billsCompleted, setBillsCompleted] = useState<number>(0);
 
-  const getDaysColorDots = (month: number, year: number) => {
-    if (!user) {
-      console.log("user not found");
-      return { green: [], orange: [], purple: [] };
-    } else if (!user.userTasks || month === null || year === null) {
-      console.log("not working");
-      return { green: [], orange: [], purple: [] };
-    } else {
-      let userTasks = user.userTasks;
-
-      let tasksOfTheMonth = userTasks.filter((t) => {
-        let taskDate = new Date(t.startDate);
-        let taskMonth = taskDate.getMonth();
-        let taskYear = taskDate.getFullYear();
-        return taskMonth === month && taskYear === year;
-      });
-
-      const groupedByDay = tasksOfTheMonth.reduce((acc: any, task) => {
-        let date = new Date(task.startDate).toISOString().split("T")[0]; // Formato: YYYY-MM-DD
-        if (!acc[date]){
-           acc[date] = [];
-          }
-        acc[date].push(task);
-        return acc;
-      }, {});
-
-      const categorizedDays = Object.entries(groupedByDay).reduce(
-        (acc, [date, tasks]: [string, Task[]]) => {
-          const totalTasks = tasks.length;
-          const completedTasks = tasks.filter((t) => t.status).length;
-          const completionRate = (completedTasks / totalTasks) * 100;
-
-          if (completionRate === 100) {
-            acc.green.push(date);
-          } else if (completionRate >= 50) {
-            acc.orange.push(date);
-          } else {
-            acc.purple.push(date);
-          }
-
-          return acc;
-        },
-        { green: [], orange: [], purple: [] }
-      );
-
-      console.log("Categorized Days:", categorizedDays);
-      return categorizedDays;
-    }
-  };
-
-  useEffect(() => {
-    let today = new Date();
-    let thisMonth = today.getMonth();
-    let thisYear = today.getFullYear();
-    setCurrentMonth(thisMonth);
-    setCurrentYear(thisYear);
-  
-    if (currentMonth && currentYear) {
-      const categorizedDays = getDaysColorDots(currentMonth, currentYear);
-  
-      const colorDotDays = {};
-      categorizedDays.green.forEach((date) => {
-        colorDotDays[date] = {
-          marked: true, selectedColor: 'green'
-        };
-      });
-      categorizedDays.orange.forEach((date) => {
-        colorDotDays[date] = {
-          marked: true, selectedColor: 'orange'
-        };
-      });
-      categorizedDays.purple.forEach((date) => {
-        colorDotDays[date] = {
-          marked: true, selectedColor: 'purple'
-        };
-      });
-  
-      setColorDotDays(colorDotDays);
-      console.log(colorDotDays);
-      
-    }
-  }, [currentMonth, currentYear]);
-
-  // ESTATÍSTICAS :)
-  useEffect(() => {
+  useEffect(() => {  
     if (!user) return;
 
     const {
@@ -227,7 +142,7 @@ const CalendarScreen = () => {
     <SafeAreaView style={styles.container}>
       <Calendar
         style={styles.calendar}
-        markedDates={{ markedDates, colorDotDays }}
+        markedDates={markedDates}
         theme={{
           backgroundColor: "#F7F6F0",
           calendarBackground: "#ffffff",
