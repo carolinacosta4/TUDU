@@ -119,18 +119,6 @@ const TaskDetail = () => {
           {edit ? (
             <ScrollView style={styles.container}>
               <Text>Edit view</Text>
-              {/* <TouchableOpacity onPress={handleEdit} style={{paddingBottom: 10}}>
-                <Text
-                  style={{
-                    fontFamily: "Rebond-Grotesque-Medium",
-                    fontSize: 16,
-                    color: "#562CAF",
-                    textAlign: "right",
-                  }}
-                >
-                  Done
-                </Text>
-              </TouchableOpacity> */}
               <EditTask task={task} handleEdit={handleEdit} />
             </ScrollView>
           ) : (

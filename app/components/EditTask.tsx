@@ -62,18 +62,17 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
   };
 
   const handleEditTask = () => {
-    // if (editTaskItem.name === "") {
-    //   alert("Please enter a name for the task");
-    // } else if (editTaskItem.priority === "") {
-    //   alert("Please select a priority for the task");
-    // } else if (editTaskItem.IDcategory === "") {
-    //   alert("Please select a category for the task");
-    // } else if (editTaskItem.startDate == editTaskItem.endDate) {
-    //   alert("Please different times for start and end");
-    // } else {
-    //   console.log("edit tbd");
-    // }
-    console.log(editTaskItem);
+    if (editTaskItem.name === "") {
+      alert("Please enter a name for the task");
+    } else if (editTaskItem.priority === "") {
+      alert("Please select a priority for the task");
+    } else if (editTaskItem.IDcategory === "") {
+      alert("Please select a category for the task");
+    } else if (editTaskItem.startDate == editTaskItem.endDate) {
+      alert("Please different times for start and end");
+    } else {
+      console.log("edit tbd");
+    }
     handleEdit()
   };
 
