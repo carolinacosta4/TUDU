@@ -11,6 +11,13 @@ const UserAchievements = db.UserAchievements;
 const Streaks = db.Streaks;
 const nodemailer = require("nodemailer");
 
+const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: config.C_CLOUD_NAME,
+  api_key: config.C_API_KEY,
+  api_secret: config.C_API_SECRET
+});
+
 const handleErrorResponse = (res, error) => {
   return res
     .status(500)
@@ -40,11 +47,16 @@ exports.findUser = async (req, res) => {
 
     const user = await User.findById(req.params.idU)
       .populate("IDmascot", "-_id -cloudinary_id")
-      .select("-_id -__v")
+      .select("-__v")
       .exec();
 
     const userFavoriteTips = await FavoriteTip.find({ IDuser: req.params.idU })
       .select("-_id -__v")
+      .populate({
+        path: "IDtip",
+        select: "-__v",
+        populate: { path: "IDcategory", select: "-__v" },
+      })
       .exec();
 
     const userTasks = await Task.find({ IDuser: req.params.idU })
@@ -58,7 +70,8 @@ exports.findUser = async (req, res) => {
     const userAchievements = await UserAchievements.find({
       IDuser: req.params.idU,
     })
-      .select("-_id -__v")
+      .select("-__v")
+      .populate("IDAchievements", "-_id -__v")
       .exec();
 
     return res.status(200).json({
@@ -112,9 +125,9 @@ exports.register = async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10),
-      profilePicture: "https://example.com/profile.jpg",
+      profilePicture: "https://res.cloudinary.com/ditdnslga/image/upload/v1735949597/ipmihkt7ebpogdtnlw4b.png",
       cloudinary_id: 0,
-      IDmascot: "6763080a51fd2aabdb86aab3",
+      IDmascot: "676969dfa5e78f1378a63a71",
     });
 
     const newUser = await user.save();
@@ -160,7 +173,7 @@ exports.login = async (req, res) => {
       });
 
     const token = jwt.sign({ id: user._id }, config.SECRET, {
-      expiresIn: "24h",
+      expiresIn: "48hr",
     });
 
     return res.status(200).json({
@@ -310,26 +323,111 @@ exports.edit = async (req, res) => {
         msg: "You need to provide the body with the request.",
       });
 
-    if (!req.body.name && !req.body.email && !req.body.password)
+    if (
+      !req.body.name &&
+      !req.body.email &&
+      !req.body.password &&
+      req.body.notifications == null &&
+      req.body.onboardingSeen == null &&
+      req.body.sound == null &&
+      req.body.isDeactivated == null &&
+      req.body.vibration == null
+    )
       return res.status(400).json({
         success: false,
         error: "Fields missing",
-        msg: "You need to provide the name, email or password.",
+        msg: "You need to provide the name, email, password, notifications, on boarding, sounds, is deactivated or vibration.",
       });
 
+    if (req.body.password && req.body.oldPassword) {      
+      const isMatch = bcrypt.compareSync(req.body.oldPassword, user.password);      
+      if (!isMatch)       
+        return res.status(404).json({
+          success: false,
+          msg: "Old password is wrong.",
+        });
+    }
+
     await User.findByIdAndUpdate(req.params.idU, {
-      name: req.body.name || user.name,
-      email: req.body.email || user.name,
-      password: req.body.password || user.name,
+      name: req.body.name ? req.body.name : user.name,
+      email: req.body.email ? req.body.email : user.email,
+      password: req.body.password
+        ? bcrypt.hashSync(req.body.password, 10)
+        : user.password,
+      notifications:
+        req.body.notifications != null
+          ? req.body.notifications
+          : user.notifications,
+      onboardingSeen:
+        req.body.onboardingSeen != null
+          ? req.body.onboardingSeen
+          : user.onboardingSeen,
+      sound: req.body.sound != null ? req.body.sound : user.sound,
+      isDeactivated: req.body.isDeactivated != null ? req.body.isDeactivated : user.isDeactivated,
+      vibration:
+        req.body.vibration != null ? req.body.vibration : user.vibration,
     });
 
     const updatedUser = await User.findById(req.params.idU);
+
     return res.status(200).json({
       success: true,
       data: updatedUser,
     });
   } catch (error) {
     handleErrorResponse(res, error);
+  }
+};
+
+exports.changeProfilePicture = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.idU)) {
+      return res.status(400).json({
+        success: false,
+        msg: "Invalid ID.",
+      });
+    }
+
+    let user = await User.findById(req.params.idU);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        msg: `Cannot find any user with ID ${req.params.idU}`,
+      });
+    }
+
+    if (req.loggedUserId == req.params.idU) {
+      let user_image = null;
+      if (req.file) {
+        if (user.cloudinary_id) {
+          await cloudinary.uploader.destroy(user.cloudinary_id);
+        }
+        const b64 = Buffer.from(req.file.buffer).toString("base64");
+        let dataURI = `data:${req.file.mimetype};base64,${b64}`;
+        let result = await cloudinary.uploader.upload(dataURI, {
+          resource_type: "auto",
+        });
+        user_image = result;
+      }
+
+      user.profilePicture = user_image ? user_image.url : null;
+      user.cloudinary_id = user_image ? user_image.public_id : null;
+      await user.save();
+
+      return res.status(201).json({
+        success: true,
+        profilePicture: user_image ? user_image.url : null,
+        cloudinary_id: user_image ? user_image.public_id : null,
+        msg: "Profile picture updated successfully!",
+      });
+    }
+
+    return res.status(403).json({
+      success: false,
+      msg: "You are not authorized to edit other users.",
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, msg: 'An error occurred while updating profile picture.' });
   }
 };
 
@@ -483,4 +581,4 @@ exports.assignMascotToUser = async (req, res) => {
   } catch (error) {
     handleErrorResponse(res, error);
   }
-}
+};

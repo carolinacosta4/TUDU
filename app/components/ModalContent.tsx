@@ -8,6 +8,7 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useFonts from "@/hooks/useFonts";
 import { useState } from "react";
+import { useTask } from "@/hooks/useTask";
 
 interface ModalContentProps {
   setShownModal: (modal: string) => void;
@@ -38,6 +39,7 @@ const ModalContent = ({
   selectedParams,
 }: ModalContentProps) => {
   const fontsLoaded = useFonts();
+  const { categories } = useTask();
   const [selectedParameter, setSelectedParameter] = useState();
   if (!fontsLoaded) return <Text>Loading...</Text>;
 
@@ -70,6 +72,7 @@ const ModalContent = ({
             fontFamily: "Rebond-Grotesque-Regular",
             color: "#474038",
             fontSize: 16,
+            lineHeight: 20
           }}
         >
           {text}
@@ -83,15 +86,29 @@ const ModalContent = ({
             alignItems: "center",
           }}
         >
-          <Text
-            style={{
-              color: "#A5A096",
-              fontSize: 16,
-              fontFamily: "Rebond-Grotesque-Regular",
+          {modal == "category" ? (
+            <Text
+              style={{
+                color: "#A5A096",
+                fontSize: 16,
+                fontFamily: "Rebond-Grotesque-Regular",
+              }}
+            >
+              {categories?.find((category) => category._id === selected)
+                ?.name || "All"}
+            </Text>
+          ) : (
+            <Text
+              style={{
+                color: "#A5A096",
+                fontSize: 16,
+                fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20
             }}
-          >
-            {selected.charAt(0).toUpperCase() + selected.slice(1)}
-          </Text>
+            >
+              {selected.charAt(0).toUpperCase() + selected.slice(1)}
+            </Text>
+          )}
           <Icon name="chevron-right" size={14} color="#A5A096" />
         </View>
       </View>
@@ -114,6 +131,7 @@ const ModalContent = ({
           fontSize: 19.2,
           marginLeft: 6,
           color: "#291752",
+          lineHeight: 20
         }}
       >
         My Stuff
@@ -176,6 +194,7 @@ const ModalContent = ({
             color: "#F7F6F0",
             fontSize: 19.02,
             textAlign: "center",
+            lineHeight: 20
           }}
         >
           Done
@@ -209,6 +228,7 @@ const ModalContent = ({
             fontFamily: "Rebond-Grotesque-Bold",
             fontSize: 19.2,
             color: "#291752",
+            lineHeight: 20
           }}
         >
           {title}
@@ -242,6 +262,7 @@ const ModalContent = ({
                     color: "#291752",
                     fontSize: 16,
                     marginLeft: 6,
+                    lineHeight: 20
                   }}
                 >
                   {parameter.name}
@@ -275,7 +296,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
     backgroundColor: "#F7F6F0",
-    borderRadius: 16,
+    borderTopRightRadius: 16,
+    borderTopLeftRadius: 16,
     bottom: 0,
     position: "absolute",
     width: "100%",

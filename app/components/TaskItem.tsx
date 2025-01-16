@@ -16,7 +16,7 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
     const end = new Date(endDate);
     const durationInMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
     const hours = Math.floor(durationInMinutes / 60);
-    const minutes = durationInMinutes % 60;
+    const minutes = Math.round(durationInMinutes % 60);
     return `${hours > 0 ? `${hours} hours ` : ""}${minutes} minutes`;
   };
 
@@ -30,20 +30,14 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
       case "high":
         return {
           backgroundColor: "#EF444440",
-          borderRadius: 6,
-          width: 40,
         };
       case "medium":
         return {
-          borderRadius: 6,
           backgroundColor: "#FBD16060",
-          width: 61,
         };
       case "low":
         return {
           backgroundColor: "#B8DEA480",
-          borderRadius: 6,
-          width: 38,
         };
       default:
         return {};
@@ -51,14 +45,19 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
   };
 
   return type === "cards" ? (
-    <Link href={{ pathname: "/task/[id]", params: { id: task._id, task: JSON.stringify(task) } }}>
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: "#DDD8CE",
-          padding: 10,
-          borderRadius: 16,
-          alignItems: "center",
+    <View
+      style={{
+        flexDirection: "row",
+        padding: 10,
+        alignItems: "center",
+        backgroundColor: "#DDD8CE",
+        borderRadius: 16,
+      }}
+    >
+      <Link
+        href={{
+          pathname: "/task/[id]",
+          params: { id: task._id, task: JSON.stringify(task) },
         }}
       >
         <View
@@ -66,24 +65,34 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
             width: "90%",
           }}
         >
-          <Text
+          <View
             style={{
-              fontSize: 13.33,
-              color: "#474038",
-              fontFamily: "Rebond-Grotesque-Medium",
-              padding: 4,
-              textAlign: "center",
+              alignSelf: "flex-start",
+              paddingHorizontal: 6,
+              borderRadius: 6,
               ...getPriorityStyle(task.priority),
             }}
           >
-            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-          </Text>
+            <Text
+              style={{
+                fontSize: 13.33,
+                color: "#474038",
+                fontFamily: "Rebond-Grotesque-Medium",
+                padding: 4,
+                textAlign: "center",
+                lineHeight: 20,
+              }}
+            >
+              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            </Text>
+          </View>
           <Text
             style={{
               fontSize: 16,
               color: "#291752",
               fontFamily: "Rebond-Grotesque-Medium",
               marginTop: 6,
+              lineHeight: 20,
             }}
           >
             {task.name}
@@ -94,31 +103,32 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
                 fontSize: 13.3,
                 color: "#A5A096",
                 fontFamily: "Rebond-Grotesque-Regular",
+                lineHeight: 20,
               }}
             >
               {duration}
             </Text>
           )}
         </View>
-        {task.status ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              changeStatus(task, "task");
-            }}
-          >
-            <Icon name="check-circle" size={20} color="#562CAF" />
-          </TouchableWithoutFeedback>
-        ) : (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              changeStatus(task, "task");
-            }}
-          >
-            <Icon name="circle-outline" size={20} color="#562CAF" />
-          </TouchableWithoutFeedback>
-        )}
-      </View>
-    </Link>
+      </Link>
+      {task.status ? (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            changeStatus(task, "task");
+          }}
+        >
+          <Icon name="check-circle" size={24} color="#562CAF" />
+        </TouchableWithoutFeedback>
+      ) : (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            changeStatus(task, "task");
+          }}
+        >
+          <Icon name="circle-outline" size={24} color="#562CAF" />
+        </TouchableWithoutFeedback>
+      )}
+    </View>
   ) : (
     <Link href={{ pathname: "/task/[id]", params: { id: task._id } }}>
       <View
@@ -153,6 +163,7 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
             color: "#291752",
             fontFamily: "Rebond-Grotesque-Medium",
             marginTop: 6,
+            lineHeight: 20,
           }}
         >
           {task.name}
@@ -160,18 +171,27 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
         <View
           style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
         >
-          <Text
+          <View
             style={{
-              fontSize: 13.33,
-              color: "#474038",
-              fontFamily: "Rebond-Grotesque-Medium",
-              padding: 4,
-              textAlign: "center",
+              alignSelf: "flex-start",
+              paddingHorizontal: 6,
+              borderRadius: 6,
               ...getPriorityStyle(task.priority),
             }}
           >
-            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-          </Text>
+            <Text
+              style={{
+                fontSize: 13.33,
+                color: "#474038",
+                fontFamily: "Rebond-Grotesque-Medium",
+                padding: 4,
+                textAlign: "center",
+                lineHeight: 20,
+              }}
+            >
+              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            </Text>
+          </View>
         </View>
       </View>
     </Link>
