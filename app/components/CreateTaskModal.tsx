@@ -1,6 +1,6 @@
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useTaskStore } from "@/stores/taskStore";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,9 @@ import {
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import useAchievementsStore from "@/stores/achievementsStore";
+import useUserStore from "@/stores/userStore";
+import { analyseAchievement } from "@/utils/achievementUtils";
 
 const { width, height } = Dimensions.get("window");
 
@@ -48,6 +51,9 @@ export default function CreateTaskModal({
   const [notes, setNotes] = useState("");
   const [showError, setShowError] = useState(false);
   const [error, setError] = useState("");
+  const {user, fetchUser} = useUserStore()
+  const {unlockAchievement} = useAchievementsStore()
+
   const newTask = {
     name: name,
     priority: priority,
@@ -68,6 +74,12 @@ export default function CreateTaskModal({
     setEndDate(date);
     setShowEndDatePicker(false);
   };
+
+  useEffect(() => {
+    if(userInfo) {
+      fetchUser(userInfo.userID)
+    }
+  }, [userInfo])
 
   const handleCreateTask = async () => {
     if (newTask.name === "") {
@@ -109,6 +121,10 @@ export default function CreateTaskModal({
           setError("User information is missing");
         }
         toggleModal();
+        if(userInfo) {
+          await analyseAchievement("50 tasks challenge", user, userInfo, unlockAchievement)
+          await analyseAchievement("20 daily tasks challenge", user, userInfo, unlockAchievement)
+        }
       }
     }
   };

@@ -22,6 +22,8 @@ import NoTasksView from "@/components/NoTasksView";
 import StuffHeader from "@/components/StuffHeader";
 import { useTaskStore } from "@/stores/taskStore";
 import { useBillStore } from "@/stores/billStore";
+import useAchievementsStore from "@/stores/achievementsStore";
+import { analyseAchievement, analyseStreaksAchievement } from "@/utils/achievementUtils";
 
 export default function HomeScreen() {
   const today = new Date();
@@ -34,6 +36,7 @@ export default function HomeScreen() {
     handleUserStreak,
     handleGetStreak,
   } = useUser();
+  
   const { userInfo, logged } = useUserInfo();
   const fontsLoaded = useFonts();
   const [showFilter, setShowFilter] = useState(false);
@@ -50,6 +53,7 @@ export default function HomeScreen() {
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
+  const {unlockAchievement} = useAchievementsStore()
 
   const getMascotStyle = (mascot: string) => {
     switch (mascot) {
@@ -95,6 +99,13 @@ export default function HomeScreen() {
     }
   }, [tasks, bills, loaded]);
 
+  useEffect(() => {
+    if (user && userInfo && loaded) {
+      analyseAchievement("On time, every time", user, userInfo, unlockAchievement);
+    }
+  }, [user, userInfo, loaded]);
+  
+
   if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo)
     return <LoadingScreen/>
 
@@ -113,6 +124,7 @@ export default function HomeScreen() {
       await handleUserStreak(user.data._id);
       handleGetStreak(user.data._id);
     }
+    await analyseStreaksAchievement(user, userInfo, unlockAchievement, userStreak)
   };
 
   const checkAndUpdateMascots = async (tasks: Task[], bills: Bill[]) => {
@@ -133,6 +145,7 @@ export default function HomeScreen() {
         await editUserMascot(user.data._id, "676969dfa5e78f1378a63a71");
         handleGetUser(user.data._id);
       }
+      await analyseAchievement("Happy pet, happy you", user, userInfo, unlockAchievement)
     }
   };
 
@@ -159,6 +172,9 @@ export default function HomeScreen() {
           ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
           : Vibration.vibrate(PATTERN);
       }
+      
+      await analyseAchievement("Clean Sweep", user, userInfo, unlockAchievement)
+      
     } catch (error) {
       console.error(error);
     }

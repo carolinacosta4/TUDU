@@ -17,6 +17,9 @@ import { formatDate } from "@/utils/taskUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useUser } from "@/hooks/useUser";
+import useAchievementsStore from "@/stores/achievementsStore";
+import useUserStore from "@/stores/userStore";
+import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const BillDetail = () => {
@@ -26,12 +29,21 @@ const BillDetail = () => {
   const {updateBill, deleteBill} = useBillStore();
   const {userInfo} = useUserInfo()
   const { user } = useUser();
+  const {fetchUser} = useUserStore()
+  const {unlockAchievement} = useAchievementsStore()
 
   useEffect(() => {
     if (typeof id === "string") {
       handleGetBill(id);
     }
   }, [bill]);
+
+  
+  useEffect(() => {
+    if(userInfo) {
+      fetchUser(userInfo.userID)
+    }
+  }, [userInfo])
 
   if (!bill || !fontsLoaded || !userInfo) {
     return (
@@ -84,6 +96,8 @@ const BillDetail = () => {
         ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
         : Vibration.vibrate(PATTERN);
       }
+      await analyseAchievement("Clean Sweep", user, userInfo, unlockAchievement)
+      
     } catch (error: any) {
       console.error("Error message:", error);
     }

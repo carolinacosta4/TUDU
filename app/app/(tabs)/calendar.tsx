@@ -1,25 +1,21 @@
 import useFonts from "@/hooks/useFonts";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useEffect, useState } from "react";
-import { router } from "expo-router";
 import React from "react";
 import NoTasksView from "@/components/NoTasksView";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTask } from "@/hooks/useTask";
 import ListHome from "@/components/ListHome";
 import { groupTasksByTime, categorizeTasks } from "@/utils/taskUtils";
 import Task from "@/interfaces/Task";
 import Bill from "@/interfaces/Bill";
 import { useUser } from "@/hooks/useUser";
-import { useBill } from "@/hooks/useBill";
 import { calculateStatistics } from "@/utils/statisticsUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useTaskStore } from "@/stores/taskStore";
@@ -31,11 +27,10 @@ const CalendarScreen = () => {
   const { userInfo } = useUserInfo();
   const [showStat, setShowStat] = useState(true);
   const [day, setDay] = useState();
-  const { categories } = useTask();
-  const { fetchTasks, tasks, updateTask } = useTaskStore();
-  const { fetchBills, updateBill, bills } = useBillStore();
+  const { fetchCalendarTasks, calendarTasks, updateTask } = useTaskStore();
+  const { fetchCalendarBills, updateBill, calendarBills } = useBillStore();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const categorizedTasks = categorizeTasks(tasks);
+  const categorizedTasks = categorizeTasks(calendarTasks);
   const { allDayTasks, timedTasks } = categorizedTasks;
   const groupedStuff = groupTasksByTime(timedTasks);
   const [markedDates, setMarkedDates] = useState<{ [key: string]: any }>({});
@@ -52,6 +47,7 @@ const CalendarScreen = () => {
   const [monthTasks, setMonthTasks] = useState<number>(0);
   const [monthBills, setMonthBills] = useState<number>(0);
   const [billsCompleted, setBillsCompleted] = useState<number>(0);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!user) return;
@@ -80,7 +76,9 @@ const CalendarScreen = () => {
     setHighestStreak(highestStreak);
     setMonthTasks(monthTasksCount);
     setMonthBills(monthBillsCount);
-  }, [currentMonth, currentYear, user, tasks, bills]);
+    setLoading(false)
+
+  }, [currentMonth, currentYear, user, calendarTasks, calendarBills]);
 
   const stats = [
     { label: "Total Tasks", value: monthTasks },
@@ -113,8 +111,8 @@ const CalendarScreen = () => {
       setSelectedDay(newSelectedDate);
       setShowStat(false);
       if (userInfo) {
-        fetchTasks(new Date(newSelectedDate), userInfo.authToken);
-        fetchBills(new Date(newSelectedDate), userInfo.authToken);
+        fetchCalendarTasks(new Date(newSelectedDate), userInfo.authToken);
+        fetchCalendarBills(new Date(newSelectedDate), userInfo.authToken);
       }
 
       setMarkedDates({
@@ -125,7 +123,7 @@ const CalendarScreen = () => {
     setDay(newSelectedDate);
   };
 
-  if (!fontsLoaded) return  <LoadingScreen />
+  if (!fontsLoaded || loading) return <LoadingScreen />;
 
   const changeStatus = async (data: Task | Bill, name: string) => {
     try {
@@ -133,10 +131,10 @@ const CalendarScreen = () => {
       if (selectedDay && userInfo) {
         if (name === "task") {
           await updateTask(data._id, { status: updatedStatus }, userInfo.authToken);
-          fetchTasks(new Date(selectedDay), userInfo.authToken);
+          fetchCalendarTasks(new Date(selectedDay), userInfo.authToken);
         } else {
           await updateBill(data._id, { status: updatedStatus }, userInfo.authToken);
-          fetchBills(new Date(selectedDay), userInfo.authToken);
+          fetchCalendarBills(new Date(selectedDay), userInfo.authToken);
         }
       }
     } catch (error) {
@@ -175,11 +173,11 @@ const CalendarScreen = () => {
         />
       ) : (
         <View style={styles.statsList}>
-          {tasks.length > 0 ? (
+          {calendarTasks.length > 0 ? (
             <ListHome
               allDayTasks={allDayTasks}
               groupedTasks={groupedStuff}
-              filteredBills={bills}
+              filteredBills={calendarBills}
               changeStatus={changeStatus}
               user={user}
             />
