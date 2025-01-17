@@ -10,6 +10,7 @@ import Filter from "@/components/Filter";
 import HeaderHomeScreen from "@/components/HeaderHomeScreen";
 import CardsHome from "@/components/CardsHome";
 import ListHome from "@/components/ListHome";
+import LoadingScreen from "@/components/LoadingScreen";
 import {
   groupTasksByTime,
   categorizeTasks,
@@ -95,7 +96,8 @@ export default function HomeScreen() {
   }, [tasks, bills, loaded]);
 
   if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo)
-    return <Text>Loading...</Text>;
+    return <LoadingScreen/>
+
 
   const ONE_SECOND_IN_MS = 1000;
   const PATTERN = [1 * ONE_SECOND_IN_MS];
@@ -205,6 +207,7 @@ export default function HomeScreen() {
               paddingTop: 10,
             }}
           >
+            <LoadingScreen />
             <HeaderHomeScreen
               month={today.toLocaleDateString("en-US", { month: "short" })}
               day={today.getDate()}
