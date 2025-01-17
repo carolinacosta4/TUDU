@@ -21,7 +21,6 @@ type EditTaskProps = {
 };
 
 export default function EditTask({ task, handleEdit }: EditTaskProps) {
-  // console.log(task);
   const { categories } = useTask();
   const { updateTask } = useTaskStore();
   const { userInfo } = useUserInfo();
@@ -238,8 +237,6 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
                       },
                     ]}
                     onPress={() => {
-                      console.log(category);
-                      
                       setSelectedCategory(category.name);
                       setIDcategory(category._id);
                     }}

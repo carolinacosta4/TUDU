@@ -179,8 +179,6 @@ exports.findTask = async (req, res) => {
 
 exports.edit = async (req, res) => {
   try {
-    console.log(req.body);
-
     if (!mongoose.isValidObjectId(req.params.idT))
       return res.status(400).json({
         success: false,
@@ -237,7 +235,6 @@ exports.edit = async (req, res) => {
     });
 
     const updatedTask = await Task.findById(req.params.idT);
-    console.log(updatedTask);
     return res.status(200).json({
       success: true,
       data: updatedTask,

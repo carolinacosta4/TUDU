@@ -31,7 +31,6 @@ const TaskDetail = () => {
   const { fetchUser } = useUserStore();
   const { unlockAchievement } = useAchievementsStore();
   const [edit, setEdit] = useState<Boolean>(false);
-  const [loading, setLoading] = useState(true)
   
   useEffect(() => {
     if (typeof id === "string") {
