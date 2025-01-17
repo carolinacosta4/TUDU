@@ -122,7 +122,7 @@ export default function HomeScreen() {
       await handleUserStreak(user.data._id);
       handleGetStreak(user.data._id);
     }
-    await analyseStreaksAchievement("Streak starter", user, userInfo, unlockAchievement, userStreak)
+    await analyseStreaksAchievement(user, userInfo, unlockAchievement, userStreak)
   };
 
   const checkAndUpdateMascots = async (tasks: Task[], bills: Bill[]) => {

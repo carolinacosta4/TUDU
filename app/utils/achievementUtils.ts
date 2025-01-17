@@ -158,18 +158,20 @@ export const analyseAchievement = (
 
 
 export const analyseStreaksAchievement = (
-    achievementName: string,
     user: any,
     userInfo: any,
     unlockAchievement: any,
     userStreak: any
   ) => {
-    // if (achievementName == "Streak starter") {  
       let foundStreakStarter = user.userAchievements.find(
         (a: any) => a.IDAchievements.name == "Streak starter"
       );
+
+      let found100Streaks = user.userAchievements.find(
+        (a: any) => a.IDAchievements.name == "100-day streak"
+      );
   
-      if (!foundStreakStarter) {
+      if (!foundStreakStarter) {        
           if (userStreak.streak >= 1) {            
             if (userInfo) {
               unlockAchievement(
@@ -182,9 +184,20 @@ export const analyseStreaksAchievement = (
             return;
           }
       }
-    // }
-    //  else {
-    //   console.log("other achievement");
-    // }
+      if (!found100Streaks) {
+        console.log('entrou');
+        
+          // if (userStreak.streak >= 1) {            
+          //   if (userInfo) {
+          //     unlockAchievement(
+          //       userInfo.userID,
+          //       "67659d704ff69edb3f0640ec",
+          //       userInfo.authToken
+          //     );
+          //   }
+          //   unlockUltimateAchievement(userInfo, unlockAchievement, user);
+          //   return;
+          // }
+      }
   };
   
