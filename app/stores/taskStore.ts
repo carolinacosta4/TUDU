@@ -4,9 +4,12 @@ import Task from "../interfaces/Task";
 
 interface TaskState {
   tasks: Task[];
+  task: Task;
+  loadingTask: boolean;
   calendarTasks: Task[];
   fetchTasks: (date: Date, authToken: string) => Promise<void>;
   fetchCalendarTasks: (date: Date, authToken: string) => Promise<void>;
+  fetchTask: (id: string) => Promise<void>;
   addTask: (task: any, authToken: string) => Promise<void>;
   updateTask: (
     id: string,
@@ -18,6 +21,8 @@ interface TaskState {
 
 export const useTaskStore = create<TaskState>((set) => ({
   tasks: [],
+  task: {} as Task,
+  loadingTask: true,
   calendarTasks: [],
   fetchTasks: async (date, authToken) => {
     try {
@@ -42,7 +47,16 @@ export const useTaskStore = create<TaskState>((set) => ({
     } catch (error) {
       console.error(error);
     }
-  } ,
+  },
+  fetchTask: async (id: string) => {
+    try {
+      const response = await api.get(`tasks/${id}`);
+      set({ task: response.data.data });
+      set({ loadingTask: false });
+    } catch (error) {
+      console.warn(error);
+    }
+  },
   addTask: async (task, authToken) => {
     try {
       const response = await api.post("tasks", task, {
@@ -77,6 +91,10 @@ export const useTaskStore = create<TaskState>((set) => ({
         tasks: state.tasks.map((task) =>
           task._id == id ? { ...task, ...updatedTask } : task
         ),
+      }));
+
+      set((state) => ({
+        task: state.tasks.find((task) => task._id == id),
       }));
     } catch (error) {
       console.error(error);
