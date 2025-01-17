@@ -2,36 +2,40 @@ import React, { useState } from "react";
 import {
   View,
   StyleSheet,
-  Modal,
   Text,
   TouchableOpacity,
   Dimensions,
+  TouchableWithoutFeedback,
+  Modal,
+  ScrollView,
 } from "react-native";
 import { Tabs } from "expo-router";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useFonts from "@/hooks/useFonts";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import ModalCreateStuff from "@/components/ModalCreateStuff";
 import { useTask } from "@/hooks/useTask";
-import { ScrollView } from "react-native";
 import CreateTaskModal from "@/components/CreateTaskModal";
 import CreateBillModal from "@/components/CreateBillModal";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const { width, height } = Dimensions.get("window");
 
 export default function TabLayout() {
+  const { userInfo } = useUserInfo();
   const [modalVisible, setModalVisible] = useState(false);
   const [addTask, setAddTask] = useState(true);
   const { categories } = useTask();
-
+  const fontsLoaded = useFonts();
   const dataRepeat = [
     { label: "Never", value: "never" },
     { label: "Daily", value: "daily" },
     { label: "Weekly", value: "weekly" },
     { label: "Monthly", value: "monthly" },
   ];
-  const fontsLoaded = useFonts();
 
   if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
+    return  <LoadingScreen />
   }
 
   const toggleModal = () => {
@@ -113,16 +117,22 @@ export default function TabLayout() {
           options={{
             headerShown: false,
             tabBarIcon: ({ focused, color, size }) => (
-              <View
-                style={[
-                  styles.iconContainer,
-                  focused && styles.activeIconBackground,
-                ]}
-              >
-                <Icon name="account-outline" size={size} color={color} />
-              </View>
+                <View
+                  style={[
+                    styles.iconContainer,
+                    focused && styles.activeIconBackground,
+                  ]}
+                >
+                  <Icon name="account-outline" size={size} color={color} />
+                </View>
             ),
           }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              navigation.navigate("profile/[id]", { id: userInfo?.userID });
+            },
+          })}
         />
       </Tabs>
 
@@ -145,7 +155,7 @@ export default function TabLayout() {
             color: "#562CAF",
             fontSize: 19.2,
             fontFamily: "Rebond-Grotesque-Bold",
-            lineHeight: 20
+            lineHeight: 20,
           }}
         >
           + Add
@@ -158,6 +168,13 @@ export default function TabLayout() {
         transparent={true}
         onRequestClose={toggleModal}
       >
+        <TouchableWithoutFeedback
+          onPress={(e) => {
+            e.target === e.currentTarget && toggleModal();
+          }}
+        >
+          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)" }} />
+        </TouchableWithoutFeedback>
         <View
           style={{
             flex: 1,
@@ -204,7 +221,7 @@ export default function TabLayout() {
                         fontFamily: "Rebond-Grotesque-Medium",
                         paddingHorizontal: 16,
                         paddingVertical: 8,
-                        lineHeight: 20
+                        lineHeight: 20,
                       }}
                     >
                       Task
@@ -225,7 +242,7 @@ export default function TabLayout() {
                         fontFamily: "Rebond-Grotesque-Medium",
                         paddingHorizontal: 16,
                         paddingVertical: 8,
-                        lineHeight: 20
+                        lineHeight: 20,
                       }}
                     >
                       Bill
@@ -253,12 +270,10 @@ export default function TabLayout() {
     </>
   );
 }
-
 const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: "center",
     alignItems: "center",
-    // marginBottom: (height * 0.09) / 2,
   },
 
   activeIconBackground: {

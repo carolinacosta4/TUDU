@@ -52,6 +52,11 @@ exports.findUser = async (req, res) => {
 
     const userFavoriteTips = await FavoriteTip.find({ IDuser: req.params.idU })
       .select("-_id -__v")
+      .populate({
+        path: "IDtip",
+        select: "-__v",
+        populate: { path: "IDcategory", select: "-__v" },
+      })
       .exec();
 
     const userTasks = await Task.find({ IDuser: req.params.idU })
@@ -66,7 +71,7 @@ exports.findUser = async (req, res) => {
       IDuser: req.params.idU,
     })
       .select("-__v")
-      .populate("IDAchievements", "-_id -__v")
+      .populate("IDAchievements", "-__v")
       .exec();
 
     return res.status(200).json({

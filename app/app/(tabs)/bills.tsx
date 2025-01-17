@@ -1,21 +1,34 @@
-import { View, Text, StyleSheet } from "react-native"; 
+import { View, Text, StyleSheet, ScrollView, Dimensions, Platform, Vibration } from "react-native"; 
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import useFonts from "@/hooks/useFonts";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useEffect, useState } from "react";
 import BillItem from "@/components/BillListForBillPage";
-import { useBill } from "@/hooks/useBill";
 import { useUser } from "@/hooks/useUser";
 import Bill from "@/interfaces/Bill";
 import HeaderBillPage from "@/components/HeaderBillPage";
-import NoBillsView from "@/components/NoBillsView";
+import { useBillStore } from "@/stores/billStore";
+import NoTasksView from "@/components/NoTasksView";
+import useAchievementsStore from "@/stores/achievementsStore";
+import useUserStore from "@/stores/userStore";
+import { analyseAchievement } from "@/utils/achievementUtils";
+import LoadingScreen from "@/components/LoadingScreen";
+
 export default function BillsScreen() {
+  const width = Dimensions.get("window").width;
   const thismonth = new Date();
-  const fontsLoaded = useFonts();
-  const { logged } = useUserInfo();
-  const { getBillsForMonth, bills, editBill } = useBill();
-  const { loading } = useUser();
+  const { userInfo, logged } = useUserInfo();
+  const { monthlyBills, updateBill, fetchMonthBills } = useBillStore()
+  const { loading, handleGetUser, user } = useUser();
   const [loadingBills, setloadingBills] = useState(true);
+  const [upcomingBills, setUpcomingBills] = useState<Bill[]>([]);
+  const {unlockAchievement} = useAchievementsStore()
+  const {fetchUser} = useUserStore()
+
+  useEffect(() => {
+    if(userInfo) {
+      fetchUser(userInfo.userID)
+    }
+  }, [userInfo])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,7 +36,7 @@ export default function BillsScreen() {
         if (loading === false && logged === true) {
           const month = thismonth.getMonth() + 1; 
           const year = thismonth.getFullYear();
-          await getBillsForMonth(month, year);
+          if(userInfo) await fetchMonthBills(month, year, userInfo.authToken);
           setloadingBills(false);
         }
       } catch (error) {
@@ -33,11 +46,27 @@ export default function BillsScreen() {
 
     fetchData();
   }, [logged, loading]);
+ 
+  useEffect(() => {
+    setUpcomingBills(getUpcomingBills());  
+  }, [user?.userBills]);
+
+  const ONE_SECOND_IN_MS = 1000;
+  const PATTERN = [1 * ONE_SECOND_IN_MS];
 
   const changeStatus = async (data: Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
-      await editBill(data._id, { status: updatedStatus });
+      if(userInfo) {
+        await updateBill(data._id, { status: updatedStatus }, userInfo.authToken);
+      if (user?.data.vibration && updatedStatus === true) {
+          Platform.OS === "android"
+            ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+            : Vibration.vibrate(PATTERN);
+          }
+        await analyseAchievement("Clean Sweep", user, userInfo, unlockAchievement)
+      }
+      
     } catch (error) {
       console.error(error);
     }
@@ -51,7 +80,7 @@ export default function BillsScreen() {
   };
 
   const pendingBill = () => {
-    const currentBills = bills.filter((bill) => {
+    const currentBills = monthlyBills.filter((bill) => {
       const billDate = new Date(bill.dueDate);
       const isPastUnpaidBill = billDate < thismonth && !bill.status; 
       const isFutureUnpaidBill = billDate >= thismonth && !bill.status; 
@@ -61,23 +90,21 @@ export default function BillsScreen() {
   };
 
   const nextPayment = () => {
-    const upcomingUnpaidBills = bills.filter((bill) => {
-      const billDate = new Date(bill.dueDate);
-      return billDate > thismonth && !bill.status; 
+    const upcomingUnpaidBills = monthlyBills.filter((bill) => {
+      const billDate = new Date(bill.dueDate);      
+      return billDate.getDate() > thismonth.getDate() && !bill.status; 
     });
-
-    const sortedUpcomingBills = upcomingUnpaidBills.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
-
+    const sortedUpcomingBills = upcomingUnpaidBills.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());    
     return sortedUpcomingBills.length > 0 ? sortedUpcomingBills[0] : null;
   };
 
   const activeBillsCount = () => {
-    const currentBills = bills.filter((bill) => !bill.status);
+    const currentBills = monthlyBills.filter((bill) => !bill.status);
     return currentBills.length;
   }
 
   const getUpcomingBills = () => {
-    return bills.filter(bill => {
+    return monthlyBills.filter(bill => {
       const billDate = new Date(bill.dueDate);
       const isCurrentMonth = 
         billDate.getMonth() === thismonth.getMonth() &&
@@ -88,7 +115,7 @@ export default function BillsScreen() {
   };
 
   const getCurrentMonthBills = () => {
-    return bills.filter(bill => {
+    return monthlyBills.filter(bill => {
       const billDate = new Date(bill.dueDate);
       return (
         billDate.getMonth() === thismonth.getMonth() &&
@@ -99,11 +126,34 @@ export default function BillsScreen() {
 
   const monthsTotal = () => {
     const currentBills = getCurrentMonthBills();
-    const totalAmount = currentBills.reduce((sum, bill) => sum + parseFloat(bill.amount), 0);
-    return totalAmount;
-  }
+    const totalsByCurrency = currentBills.reduce((totals: { total: number; name: string; symbol: string }[], bill) => {
+      const { IDcurrency, amount } = bill;
+      const { symbol, name } = IDcurrency;
+      const existingCurrency = totals.find((item) => item.symbol === symbol);
+  
+      if (existingCurrency) {
+        existingCurrency.total += parseFloat(amount);
+      } else {
+        totals.push({ total: parseFloat(amount), name, symbol });
+      }
+  
+      return totals;
+    }, []);
+  
+    const highestCurrency = totalsByCurrency.reduce((highest, currency) => {
+      return currency.total > highest.total ? currency : highest;
+    }, { total: 0, name: "", symbol: "" });
+  
+    return {
+      currencySymbol: highestCurrency.symbol,
+      currencyName: highestCurrency.name,
+      total: highestCurrency.total,
+    };
+  };
 
-  const upcomingBills = getUpcomingBills();
+  if(loading){
+    return  <LoadingScreen />
+  }
 
   return (
     <SafeAreaProvider>
@@ -115,10 +165,11 @@ export default function BillsScreen() {
               <View style={styles.header}>
                 <Text style={styles.headerTitle}>My bills</Text>
               </View>
-              {bills.length === 0 ? (
-                <NoBillsView />
+              {monthlyBills.length === 0 ? (
+                <NoTasksView />
               ) : (
-                <>
+                  <ScrollView>
+                    <View style={{ marginBottom: width / 0.8 }}>
                   <View style={styles.thisMonth}>
                     <Text style={styles.monthLabel}>This month</Text>
                     <View style={styles.billItem}>
@@ -137,7 +188,8 @@ export default function BillsScreen() {
                       </View>
                     </View>
                   )}
-                </>
+                    </View>
+                  </ScrollView>
               )}
             </View>
           </View>
@@ -181,10 +233,9 @@ const styles = StyleSheet.create({
   footer: {
     width: '100%',
     height: '100%',
-    padding: 16,
+    padding: 24,
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 16,
     backgroundColor: '#EEEADF',
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
@@ -193,7 +244,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     width: '100%',
-    paddingHorizontal: 16,
     gap: 32,
   },
   header: {
@@ -204,7 +254,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   thisMonth: {
-    width: '100%',
+    width: '98%',
     flexDirection: 'column',
     gap: 12,
   },

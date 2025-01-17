@@ -1,7 +1,6 @@
 import React from "react";
-import {View, Text, StyleSheet, TouchableWithoutFeedback} from 'react-native'
+import {View, Text, StyleSheet, Dimensions} from 'react-native'
 import Bill from "@/interfaces/Bill";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { getLeftActivationDays } from '@/utils/relativeTime';
 
 const HeaderBillPage = ({
@@ -15,9 +14,8 @@ const HeaderBillPage = ({
     pendingBill: Bill | null;
     activeBillsCount: number; 
     nextPayment: Bill | null;
-    monthsTotal: number
+    monthsTotal: { currencySymbol: string; currencyName: string; total: number };
   }) => {
-   
     const dueInText = nextPayment?.dueDate ? getLeftActivationDays(new Date(nextPayment.dueDate)) : '';
 
   return (
@@ -40,7 +38,7 @@ const HeaderBillPage = ({
         {pendingBill ? (
             <View style={styles.billDetails}>
               <Text style={styles.amountPendingCard}>
-                {pendingBill.amount}€
+                {pendingBill.amount}{pendingBill.IDcurrency.symbol}
               </Text>
               <Text style={styles.billType}>{pendingBill.name}</Text>
             </View>
@@ -56,7 +54,7 @@ const HeaderBillPage = ({
         <Text style={styles.nextPaymentTitle}>Next Payment</Text>
         <View style={styles.paymentDetails}>
         {nextPayment ? (
-             <Text style={styles.amountNextPayment}>{nextPayment?.amount}€</Text>
+             <Text style={styles.amountNextPayment}>{nextPayment.amount}{nextPayment.IDcurrency.symbol}</Text>
         ) : (
             <Text style={styles.amountNextPayment}>All Set!</Text>
         )}
@@ -70,8 +68,8 @@ const HeaderBillPage = ({
       </View>
       <View style={styles.totalCard}>
         <View style={styles.backgroundCard} />
-        <Text style={styles.monthTitle}>Month’s total</Text>
-        <Text style={styles.totalAmount}>{monthsTotal}€</Text>
+        <Text style={styles.monthTitle}>Month’s total ({monthsTotal.currencyName})</Text>
+        <Text style={styles.totalAmount}>{monthsTotal.total}{monthsTotal.currencySymbol}</Text>
       </View>
     </View>
   </View>
@@ -80,6 +78,8 @@ const HeaderBillPage = ({
 
 const styles = StyleSheet.create({
     card: {
+        paddingLeft: 16,
+        paddingRight: 16,
         height: 256,
         flexDirection: 'column',
         justifyContent: 'flex-start',
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
         paddingBottom: 7,
         paddingLeft: 8,
         paddingRight: 8,
+        width: Dimensions.get("window").width * 0.55,
         backgroundColor: '#FBD160',
         borderRadius: 8,
         flexDirection: 'column',
@@ -106,7 +107,6 @@ const styles = StyleSheet.create({
         gap: 4,
       },
       paymentTitle: {
-        width: 200,
         color: '#303030',
         fontSize: 13.33,
         fontFamily: 'ES Rebond Grotesque TRIAL',
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
         lineHeight: 16,
       },
       stats: {
-        width: 221,
+        width: '100%',
         height: 85,
         position: 'relative',
         flexDirection: 'column',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         lineHeight: 34.56,
       },
       progressBar: {
-        width: 221,
+        width: '100%',
         height: 24,
         backgroundColor: '#EEEADF',
         borderRadius: 50,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
       },
       pendingCard: {
-        width: 124,
+        width: Dimensions.get("window").width * 0.35,
         height: 124,
         paddingLeft: 8,
         paddingRight: 8,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
         fontWeight: '400',
       },
       nextPayment: {
-        width: 124,
+        width: Dimensions.get("window").width * 0.35,
         height: 124,
         paddingTop: 8,
         paddingBottom: 8,
@@ -218,7 +218,6 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
       },
       nextPaymentTitle: {
-        width: 108,
         color: '#F94D89',
         fontSize: 13.33,
         fontFamily: 'ES Rebond Grotesque TRIAL',
@@ -242,12 +241,12 @@ const styles = StyleSheet.create({
         lineHeight: 16,
       },
       totalCard: {
-        width: 237,
+        width: Dimensions.get("window").width * 0.55,
         height: 124,
         position: 'relative',
       },
       backgroundCard: {
-        width: 237,
+        width: Dimensions.get("window").width * 0.55,
         height: 124,
         paddingLeft: 8,
         paddingRight: 8,
@@ -260,7 +259,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
       },
       monthTitle: {
-        width: 110,
         left: 8,
         top: 12,
         position: 'absolute',
@@ -270,7 +268,7 @@ const styles = StyleSheet.create({
         fontFamily: 'ES Rebond Grotesque TRIAL',
         fontWeight: '400',
         lineHeight: 16,
-        wordWrap: 'break-word'
+        flexWrap: 'wrap',
       },
       totalAmount: {
         right: 16,
@@ -280,7 +278,7 @@ const styles = StyleSheet.create({
         fontSize: 33.18,
         fontFamily: 'SF Pro Display',
         fontWeight: '700',
-        wordWrap: 'break-word'
+        flexWrap: 'wrap',
       },
 })
 

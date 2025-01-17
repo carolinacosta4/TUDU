@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  Vibration,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -12,12 +14,24 @@ import useFonts from "@/hooks/useFonts";
 import Task from "@/interfaces/Task";
 import { useTask } from "@/hooks/useTask";
 import { formatDate } from "@/utils/taskUtils";
+import { useTaskStore } from "@/stores/taskStore";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { useUser } from "@/hooks/useUser";
+import useAchievementsStore from "@/stores/achievementsStore";
+import useUserStore from "@/stores/userStore";
+import { analyseAchievement } from "@/utils/achievementUtils";
+import LoadingScreen from "@/components/LoadingScreen";
 import EditTask from "@/components/EditTask";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { editTask, handleGetTask, task, handleDeleteTask } = useTask();
+  const { handleGetTask, task } = useTask();
+  const { updateTask, deleteTask } = useTaskStore();
+  const { userInfo } = useUserInfo();
+  const { user } = useUser();
+  const { fetchUser } = useUserStore();
+  const { unlockAchievement } = useAchievementsStore();
   const [edit, setEdit] = useState<Boolean>(false);
 
   useEffect(() => {
@@ -26,10 +40,16 @@ const TaskDetail = () => {
     }
   }, [task]);
 
-  if (!task || !fontsLoaded) {
+  useEffect(() => {
+    if (userInfo) {
+      fetchUser(userInfo.userID);
+    }
+  }, [userInfo]);
+  
+  if (!task || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
-        <Text>Loading task details...</Text>
+        <LoadingScreen/>
       </View>
     );
   }
@@ -92,15 +112,30 @@ const TaskDetail = () => {
     return `${formattedHours}h${formattedMinutes}`;
   };
 
-  const deleteTask = () => {
-    handleDeleteTask(task._id);
+  const handleDeleteTask = () => {
+    deleteTask(task._id, userInfo.authToken);
     router.push("/");
   };
+
+  const ONE_SECOND_IN_MS = 1000;
+  const PATTERN = [1 * ONE_SECOND_IN_MS];
 
   const handleMarkAsDone = async (task: Task) => {
     try {
       let newStatus = !task.status;
-      await editTask(task._id, { status: newStatus });
+      await updateTask(task._id, { status: newStatus }, userInfo.authToken);
+
+      if (user?.data.vibration && newStatus === true) {
+        Platform.OS === "android"
+          ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
+          : Vibration.vibrate(PATTERN);
+      }
+      await analyseAchievement(
+        "Clean Sweep",
+        user,
+        userInfo,
+        unlockAchievement
+      );
     } catch (error: any) {
       console.error("Error message:", error);
     }
@@ -205,15 +240,15 @@ const TaskDetail = () => {
                 )}
               </View>
 
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Options</Text>
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={deleteTask}
-                >
-                  <Text style={styles.deleteText}>Delete Task</Text>
-                </TouchableOpacity>
-              </View>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Options</Text>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDeleteTask}
+              >
+                <Text style={styles.deleteText}>Delete Task</Text>
+              </TouchableOpacity>
+            </View>
 
               {!task.status ? (
                 <TouchableOpacity

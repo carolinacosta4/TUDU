@@ -122,13 +122,14 @@ exports.create = async (req, res) => {
       !req.body.priority ||
       !req.body.amount ||
       !req.body.dueDate ||
+      !req.body.IDcurrency ||
       !req.body.periodicity ||
       req.body.notification == null
     ) {
       return res.status(400).json({
         success: false,
         error: "Fields missing",
-        msg: "You need to provide the name, priority, amount, dueDate, periodicity and notification.",
+        msg: "You need to provide the name, priority, amount, dueDate, IDcurrency, periodicity and notification.",
       });
     }
 
@@ -144,6 +145,7 @@ exports.create = async (req, res) => {
         dueDate: new Date(currentDueDate),
         periodicity: req.body.periodicity,
         notification: req.body.notification,
+        IDcurrency: req.body.IDcurrency,
         notes: req.body.notes || "",
         status: false,
         IDuser: req.loggedUserId,
