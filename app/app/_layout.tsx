@@ -17,7 +17,7 @@ export default function RootLayout() {
         />
         <Stack.Screen name="+not-found" />
       <Stack.Screen name="task/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="achievements"/>
+      <Stack.Screen name="achievements" options={{ headerShown: false }}/>
       </Stack>
     </GestureHandlerRootView>
   );

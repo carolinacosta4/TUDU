@@ -22,7 +22,7 @@ import StuffHeader from "@/components/StuffHeader";
 import { useTaskStore } from "@/stores/taskStore";
 import { useBillStore } from "@/stores/billStore";
 import useAchievementsStore from "@/stores/achievementsStore";
-import { analyseAchievement } from "@/utils/achievementUtils";
+import { analyseAchievement, analyseStreaksAchievement } from "@/utils/achievementUtils";
 
 export default function HomeScreen() {
   const today = new Date();
@@ -122,7 +122,7 @@ export default function HomeScreen() {
       await handleUserStreak(user.data._id);
       handleGetStreak(user.data._id);
     }
-    await analyseAchievement("Streak starter", userStreak, userInfo, unlockAchievement)
+    await analyseStreaksAchievement("Streak starter", user, userInfo, unlockAchievement, userStreak)
   };
 
   const checkAndUpdateMascots = async (tasks: Task[], bills: Bill[]) => {

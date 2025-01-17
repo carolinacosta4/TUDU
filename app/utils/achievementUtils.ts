@@ -164,26 +164,23 @@ export const analyseStreaksAchievement = (
     unlockAchievement: any,
     userStreak: any
   ) => {
-    if (achievementName == "Streak starter") {
-      console.log(userStreak);
-  
+    if (achievementName == "Streak starter") {  
       let found = user.userAchievements.find(
         (a: any) => a.IDAchievements.name == achievementName
       );
   
       if (!found) {
-        //   if (user) {
-        //     if (userInfo) {
-        //       unlockAchievement(
-        //         userInfo.userID,
-        //         "67659d704ff69edb3f0640ec",
-        //         userInfo.authToken
-        //       );
-        //     }
-        //     unlockUltimateAchievement(userInfo, unlockAchievement, user);
-        //     return;
-        //   }
-        console.log("not found");
+          if (userStreak.streak >= 1) {            
+            if (userInfo) {
+              unlockAchievement(
+                userInfo.userID,
+                "67659d704ff69edb3f0640ec",
+                userInfo.authToken
+              );
+            }
+            unlockUltimateAchievement(userInfo, unlockAchievement, user);
+            return;
+          }
       }
     } else {
       console.log("other achievement");
