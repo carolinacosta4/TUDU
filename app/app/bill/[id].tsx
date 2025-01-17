@@ -17,6 +17,7 @@ import { formatDate } from "@/utils/taskUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useUser } from "@/hooks/useUser";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const BillDetail = () => {
   const fontsLoaded = useFonts();
@@ -35,7 +36,7 @@ const BillDetail = () => {
   if (!bill || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
-        <Text>Loading bill details...</Text>
+         <LoadingScreen />
       </View>
     );
   }

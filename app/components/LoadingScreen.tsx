@@ -1,9 +1,10 @@
 import LottieView from "lottie-react-native";
-import { View, Text } from "react-native";
+import { View, Text, Dimensions } from "react-native";
+const { width, height } = Dimensions.get("window");
 
 const LoadingScreen = () => {
   return (
-    <View style={{ height: 600, aspectRatio: 1, alignContent: 'center' }}>
+    <View style={{ marginBottom: width / 0.1, height: height * 0.75 }}>
       <LottieView
         style={{ flex: 1 }}
         source={require("@/assets/lotties/loading.json")}

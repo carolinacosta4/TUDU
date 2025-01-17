@@ -207,7 +207,6 @@ export default function HomeScreen() {
               paddingTop: 10,
             }}
           >
-            <LoadingScreen />
             <HeaderHomeScreen
               month={today.toLocaleDateString("en-US", { month: "short" })}
               day={today.getDate()}

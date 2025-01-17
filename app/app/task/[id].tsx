@@ -17,6 +17,7 @@ import { formatDate } from "@/utils/taskUtils";
 import { useTaskStore } from "@/stores/taskStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useUser } from "@/hooks/useUser";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
@@ -35,7 +36,7 @@ const TaskDetail = () => {
   if (!task || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
-        <Text>Loading task details...</Text>
+        <LoadingScreen/>
       </View>
     );
   }

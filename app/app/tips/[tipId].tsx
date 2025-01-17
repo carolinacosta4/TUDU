@@ -6,6 +6,7 @@ import { useTip } from '@/hooks/useTip';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useUser } from '@/hooks/useUser';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const TipDetail = () => {
   const { userInfo } = useUserInfo();
@@ -26,7 +27,7 @@ const TipDetail = () => {
   }, [user, tipId, userInfo]);
 
   if (!userInfo || !tipId || !user || loading) {
-    return <Text>Loading...</Text>;
+    return <LoadingScreen/>
   }
 
   const handleHeartClick = async () => { 
