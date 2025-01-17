@@ -7,6 +7,7 @@ import { router } from "expo-router";
 import { useUserStore } from "@/stores/userStore";
 import { useAchievementsStore } from "@/stores/achievementsStore";
 import Achievement from "@/interfaces/Achievement";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function AchievementsScreen() {
   const fontsLoaded = useFonts();
@@ -54,7 +55,7 @@ export default function AchievementsScreen() {
     }
   };
 
-  if (!fontsLoaded || !user || loading) return <Text>Loading...</Text>;
+  if (!fontsLoaded || !user || loading) return <LoadingScreen/>
 
   return (
     <SafeAreaProvider>

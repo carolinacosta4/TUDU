@@ -20,6 +20,7 @@ import { useUser } from "@/hooks/useUser";
 import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const BillDetail = () => {
   const fontsLoaded = useFonts();
@@ -47,7 +48,7 @@ const BillDetail = () => {
   if (!bill || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
-        <Text>Loading bill details...</Text>
+         <LoadingScreen />
       </View>
     );
   }

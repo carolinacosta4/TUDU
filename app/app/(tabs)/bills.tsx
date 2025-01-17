@@ -11,6 +11,7 @@ import NoTasksView from "@/components/NoTasksView";
 import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function BillsScreen() {
   const width = Dimensions.get("window").width;
@@ -45,7 +46,7 @@ export default function BillsScreen() {
 
     fetchData();
   }, [logged, loading]);
-
+ 
   useEffect(() => {
     setUpcomingBills(getUpcomingBills());  
   }, [user?.userBills]);
@@ -149,6 +150,10 @@ export default function BillsScreen() {
       total: highestCurrency.total,
     };
   };
+
+  if(loading){
+    return  <LoadingScreen />
+  }
 
   return (
     <SafeAreaProvider>

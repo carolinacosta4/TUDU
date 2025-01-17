@@ -17,6 +17,7 @@ import ModalCreateStuff from "@/components/ModalCreateStuff";
 import { useTask } from "@/hooks/useTask";
 import CreateTaskModal from "@/components/CreateTaskModal";
 import CreateBillModal from "@/components/CreateBillModal";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const { width, height } = Dimensions.get("window");
 
@@ -34,7 +35,7 @@ export default function TabLayout() {
   ];
 
   if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
+    return  <LoadingScreen />
   }
 
   const toggleModal = () => {
