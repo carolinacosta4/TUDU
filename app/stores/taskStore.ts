@@ -4,7 +4,9 @@ import Task from "../interfaces/Task";
 
 interface TaskState {
   tasks: Task[];
+  calendarTasks: Task[];
   fetchTasks: (date: Date, authToken: string) => Promise<void>;
+  fetchCalendarTasks: (date: Date, authToken: string) => Promise<void>;
   addTask: (task: any, authToken: string) => Promise<void>;
   updateTask: (
     id: string,
@@ -16,6 +18,7 @@ interface TaskState {
 
 export const useTaskStore = create<TaskState>((set) => ({
   tasks: [],
+  calendarTasks: [],
   fetchTasks: async (date, authToken) => {
     try {
       const response = await api.get(`tasks?date=${date.toISOString()}`, {
@@ -28,6 +31,18 @@ export const useTaskStore = create<TaskState>((set) => ({
       console.error(error);
     }
   },
+  fetchCalendarTasks: async (date, authToken) => {
+    try {
+      const response = await api.get(`tasks?date=${date.toISOString()}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      set({ calendarTasks: response.data.data });
+    } catch (error) {
+      console.error(error);
+    }
+  } ,
   addTask: async (task, authToken) => {
     try {
       const response = await api.post("tasks", task, {
