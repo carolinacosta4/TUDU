@@ -112,6 +112,10 @@ const CalendarScreen = () => {
       setSelectedDay(newSelectedDate);
       setShowStat(false);
       if (userInfo) {
+        console.log(userInfo);
+        console.log(newSelectedDate);
+        
+        
         fetchTasks(new Date(newSelectedDate), userInfo.authToken);
         fetchBills(new Date(newSelectedDate), userInfo.authToken);
       }
