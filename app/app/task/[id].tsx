@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
-  Vibration
+  Vibration,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -17,14 +17,19 @@ import { formatDate } from "@/utils/taskUtils";
 import { useTaskStore } from "@/stores/taskStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useUser } from "@/hooks/useUser";
+import useAchievementsStore from "@/stores/achievementsStore";
+import useUserStore from "@/stores/userStore";
+import { analyseAchievement } from "@/utils/achievementUtils";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
   const { handleGetTask, task } = useTask();
-  const { updateTask, deleteTask } = useTaskStore()
+  const { updateTask, deleteTask } = useTaskStore();
   const { userInfo } = useUserInfo();
   const { user } = useUser();
+  const { fetchUser } = useUserStore();
+  const { unlockAchievement } = useAchievementsStore();
 
   useEffect(() => {
     if (typeof id === "string") {
@@ -32,6 +37,12 @@ const TaskDetail = () => {
     }
   }, [task]);
 
+  useEffect(() => {
+    if (userInfo) {
+      fetchUser(userInfo.userID);
+    }
+  }, [userInfo]);
+  
   if (!task || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
@@ -108,16 +119,21 @@ const TaskDetail = () => {
 
   const handleMarkAsDone = async (task: Task) => {
     try {
-      let newStatus = !task.status;      
-      await updateTask(task._id, { status: newStatus }, userInfo.authToken );
-    
+      let newStatus = !task.status;
+      await updateTask(task._id, { status: newStatus }, userInfo.authToken);
+
       if (user?.data.vibration && newStatus === true) {
         Platform.OS === "android"
           ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
           : Vibration.vibrate(PATTERN);
       }
-    }
-     catch (error: any) {
+      await analyseAchievement(
+        "Clean Sweep",
+        user,
+        userInfo,
+        unlockAchievement
+      );
+    } catch (error: any) {
       console.error("Error message:", error);
     }
   };
@@ -166,20 +182,20 @@ const TaskDetail = () => {
               <Text style={styles.taskTitle}>{task.name}</Text>
             </View>
             <Text
-                style={{
-                  fontSize: 13.33,
-                  fontFamily: "Rebond-Grotesque-Medium",
-                  padding: 7,
-                  lineHeight: 15,
-                  borderRadius: 100,
-                  marginBottom: 20,
-                  textAlign: "center",
-                  color: task.IDcategory.color,
-                  backgroundColor: task.IDcategory.backgroundColor,
-                }}
-              >
-                {task.IDcategory.name}
-              </Text>
+              style={{
+                fontSize: 13.33,
+                fontFamily: "Rebond-Grotesque-Medium",
+                padding: 7,
+                lineHeight: 15,
+                borderRadius: 100,
+                marginBottom: 20,
+                textAlign: "center",
+                color: task.IDcategory.color,
+                backgroundColor: task.IDcategory.backgroundColor,
+              }}
+            >
+              {task.IDcategory.name}
+            </Text>
 
             <View style={styles.startInfo}>
               <Text style={styles.countdown}>Starts in</Text>
