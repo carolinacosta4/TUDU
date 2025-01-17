@@ -4,6 +4,8 @@ import Bill from "../interfaces/Bill";
 
 interface BillState {
   bills: Bill[];
+  bill: Bill;
+  loadingBill: Boolean,
   monthlyBills: Bill[];
   calendarBills: Bill[];
   fetchBills: (date: Date, authToken: string) => Promise<void>;
@@ -13,6 +15,7 @@ interface BillState {
     authToken: string
   ) => Promise<void>;
   fetchCalendarBills: (date: Date, authToken: string) => Promise<void>;
+  fetchBill: (id: string) => Promise<void>;
   addBills: (bill: any, authToken: string) => Promise<void>;
   updateBill: (
     id: string,
@@ -24,6 +27,8 @@ interface BillState {
 
 export const useBillStore = create<BillState>((set) => ({
   bills: [],
+  bill: {} as Bill,
+  loadingBill: true,
   monthlyBills: [],
   calendarBills: [],
   fetchBills: async (date, authToken) => {
@@ -62,6 +67,15 @@ export const useBillStore = create<BillState>((set) => ({
       console.error(error);
     }
   },
+  fetchBill: async (id: string) => {
+      try {
+        const response = await api.get(`bills/${id}`);
+        set({ bill: response.data.data });
+        set({ loadingBill: false });
+      } catch (error) {
+        console.warn(error);
+      }
+    },
   addBills: async (bill, authToken) => {
     try {
       const response = await api.post("bills", bill, {
@@ -111,6 +125,10 @@ export const useBillStore = create<BillState>((set) => ({
         monthlyBills: state.monthlyBills.map((bill) =>
           bill._id == id ? { ...bill, ...updatedBills } : bill
         ),
+      }));
+
+      set((state) => ({
+        bill: state.bills.find((bill) => bill._id == id),
       }));
     } catch (error) {
       console.error(error);

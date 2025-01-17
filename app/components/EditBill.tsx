@@ -1,5 +1,5 @@
 import { useBill } from "@/hooks/useBill";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -12,16 +12,20 @@ import { Dropdown } from "react-native-element-dropdown";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Bill from "@/interfaces/Bill";
 const { width, height } = Dimensions.get("window");
+import { useBillStore } from "@/stores/billStore";
+import { useUserInfo } from "@/hooks/useUserInfo";
 
 type EditBillProps = {
-  bill: Bill,
-  handleEdit: () => void
-}
-
+  bill: Bill;
+  handleEdit: () => void;
+};
 
 export default function EditBill({ bill, handleEdit }: EditBillProps) {
-        
-  const { editBill } = useBill();
+  const { updateBill } = useBillStore();
+  const { currencies } = useBill();
+  const [isFocusIDcurrency, setIsFocusIDcurrency] = useState(false);
+
+  const { userInfo } = useUserInfo();
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -32,12 +36,15 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
   const [priority, setPriority] = useState(bill.priority || "");
   const [amount, setAmount] = useState(bill.amount || "");
   const [periodicity, setPeriodicity] = useState(bill.periodicity || "never");
+  const [IDcurrency, setIDcurrency] = useState(bill.IDcurrency);
   const [notification, setNotification] = useState(bill.notification || false);
   const [notes, setNotes] = useState(bill.notes || "Type here...");
+  
   const editBillItem = {
     name: name,
     priority: priority,
-    startDate: dueDate.toISOString(),
+    dueDate: dueDate.toISOString(),
+    IDcurrency: IDcurrency,
     amount: Number(amount),
     periodicity: periodicity,
     notification: notification,
@@ -49,7 +56,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
     setShowDatePicker(false);
   };
 
-  const handleEditBill = () => {
+  const handleEditBill = async () => {
     if (editBillItem.name === "") {
       alert("Please enter a name for the task");
     } else if (editBillItem.amount === 0) {
@@ -57,9 +64,23 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
     } else if (editBillItem.priority === "") {
       alert("Please select a priority for the task");
     } else {
-      // editBill(bill._id, editBillItem);
-      console.log(editBillItem);
-      
+      if (userInfo) {
+        await updateBill(
+          bill._id,
+          {
+            name: editBillItem.name,
+            priority: editBillItem.priority,
+            dueDate: new Date(editBillItem.dueDate),
+            amount: String(editBillItem.amount),
+            IDcurrency: editBillItem.IDcurrency,
+            periodicity: editBillItem.periodicity,
+            notification: editBillItem.notification,
+            notes: editBillItem.notes,
+          },
+          userInfo.authToken
+        );
+      }
+      handleEdit();
     }
   };
 
@@ -117,6 +138,76 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
             }}
             placeholderTextColor={"#C4BFB5"}
             onChangeText={setAmount}
+          />
+        </View>
+
+        <View style={{ rowGap: 8 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#A5A096",
+              fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20,
+            }}
+          >
+            Currency
+          </Text>
+          <Dropdown
+            style={[
+              {
+                height: 40,
+                borderColor: "#C4BFB5",
+                borderWidth: 1,
+                borderRadius: 8,
+                paddingHorizontal: 8,
+                backgroundColor: "#F7F6F0",
+              },
+              isFocusIDcurrency && { borderColor: "#562CAF" },
+            ]}
+            containerStyle={{
+              backgroundColor: "#F7F6F0",
+              borderBottomRightRadius: 8,
+              borderBottomLeftRadius: 8,
+            }}
+            placeholderStyle={{
+              fontSize: 13.33,
+              fontFamily: "Rebond-Grotesque-Medium",
+              lineHeight: 20,
+              color: "#474038",
+            }}
+            selectedTextStyle={{
+              fontSize: 13.33,
+              fontFamily: "Rebond-Grotesque-Medium",
+              lineHeight: 20,
+              color: "#474038",
+            }}
+            iconStyle={{
+              width: 24,
+              height: 24,
+            }}
+            itemTextStyle={{
+              fontSize: 13.33,
+              color: "#A5A096",
+              fontFamily: "Rebond-Grotesque-Regular",
+              lineHeight: 20,
+            }}
+            data={currencies.map((currency) => ({
+              label: currency.name,
+              value: currency._id,
+            }))}
+            labelField="label"
+            valueField="value"
+            placeholder={IDcurrency.name}
+            value={String(IDcurrency)}
+            onFocus={() => setIsFocusIDcurrency(true)}
+            onBlur={() => setIsFocusIDcurrency(false)}
+            onChange={(item) => {
+              const selectedCurrency = currencies.find(currency => currency._id === item.value);
+              if (selectedCurrency) {
+                setIDcurrency(selectedCurrency);
+              }
+              setIsFocusIDcurrency(false);
+            }}
           />
         </View>
 

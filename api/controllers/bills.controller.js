@@ -30,14 +30,17 @@ exports.findBillsForMonth = async (req, res) => {
       });
     }
 
-    const startDate = new Date(year, month - 1, 1); 
-    const endDate = new Date(year, month, 0); 
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
 
     const bills = await Bill.find({
       IDuser: req.loggedUserId,
       dueDate: { $gte: startDate, $lte: endDate },
     })
-      .populate("IDuser", "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot")
+      .populate(
+        "IDuser",
+        "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
+      )
       .populate("IDcurrency", "-__v")
       .select("-__v")
       .exec();
@@ -57,7 +60,6 @@ exports.findBillsForMonth = async (req, res) => {
     handleErrorResponse(res, error);
   }
 };
-
 
 exports.findBills = async (req, res) => {
   try {
@@ -211,6 +213,7 @@ exports.findBill = async (req, res) => {
 };
 
 exports.edit = async (req, res) => {
+    
   try {
     if (!mongoose.isValidObjectId(req.params.idB))
       return res.status(400).json({
@@ -250,8 +253,16 @@ exports.edit = async (req, res) => {
       periodicity: req.body.periodicity
         ? req.body.periodicity
         : bill.periodicity,
+      name: req.body.name ? req.body.name : bill.name,
+      IDcurrency: req.body.IDcurrency ? req.body.IDcurrency : bill.IDcurrency,
+      amount: req.body.amount ? Number(req.body.amount) : bill.amount,
+      priority: req.body.priority ? req.body.priority : bill.priority,
       dueDate: req.body.dueDate ? req.body.dueDate : bill.dueDate,
       status: req.body.status != null ? req.body.status : bill.status,
+      notification: req.body.notification
+        ? req.body.notification
+        : bill.notification,
+      notes: req.body.notes ? req.body.notes : bill.notes,
     });
 
     const updatedBill = await Bill.findById(req.params.idB);
@@ -259,7 +270,7 @@ exports.edit = async (req, res) => {
       success: true,
       data: updatedBill,
     });
-  } catch (error) {
+  } catch (error) {    
     handleErrorResponse(res, error);
   }
 };

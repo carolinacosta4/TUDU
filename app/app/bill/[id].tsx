@@ -12,7 +12,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import useFonts from "@/hooks/useFonts";
 import Bill from "@/interfaces/Bill";
-import { useBill } from "@/hooks/useBill";
 import { formatDate } from "@/utils/taskUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
@@ -26,8 +25,7 @@ import EditBill from "@/components/EditBill";
 const BillDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { handleGetBill, bill } = useBill();
-  const {updateBill, deleteBill} = useBillStore();
+  const {updateBill, deleteBill, fetchBill, bill, loadingBill} = useBillStore();
   const {userInfo} = useUserInfo()
   const { user } = useUser();
   const {fetchUser} = useUserStore()
@@ -36,7 +34,7 @@ const BillDetail = () => {
 
   useEffect(() => {
     if (typeof id === "string") {
-      handleGetBill(id);
+      fetchBill(id);
     }
   }, [bill]);
 
@@ -47,7 +45,7 @@ const BillDetail = () => {
     }
   }, [userInfo])
 
-  if (!bill || !fontsLoaded || !userInfo) {
+  if (!bill || !fontsLoaded || !userInfo || loadingBill) {
     return (
       <View style={styles.container}>
          <LoadingScreen />
@@ -172,9 +170,11 @@ const BillDetail = () => {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Amount</Text>
                 <Text style={styles.schedule}>
-                  {bill.amount}
+                  {bill.amount}{bill.IDcurrency.symbol}
                 </Text>
               </View>
+
+              
 
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Schedule</Text>
