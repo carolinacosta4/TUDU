@@ -156,48 +156,44 @@ export const analyseAchievement = (
   }
 };
 
-
 export const analyseStreaksAchievement = (
-    user: any,
-    userInfo: any,
-    unlockAchievement: any,
-    userStreak: any
-  ) => {
-      let foundStreakStarter = user.userAchievements.find(
-        (a: any) => a.IDAchievements.name == "Streak starter"
-      );
+  user: any,
+  userInfo: any,
+  unlockAchievement: any,
+  userStreak: any
+) => {
 
-      let found100Streaks = user.userAchievements.find(
-        (a: any) => a.IDAchievements.name == "100-day streak"
-      );
-  
-      if (!foundStreakStarter) {        
-          if (userStreak.streak >= 1) {            
-            if (userInfo) {
-              unlockAchievement(
-                userInfo.userID,
-                "67659d704ff69edb3f0640ec",
-                userInfo.authToken
-              );
-            }
-            unlockUltimateAchievement(userInfo, unlockAchievement, user);
-            return;
-          }
+  let foundStreakStarter = user.userAchievements.find(
+    (a: any) => a.IDAchievements.name == "Streak starter"
+  );
+
+  let found100Streaks = user.userAchievements.find(
+    (a: any) => a.IDAchievements.name == "100-day streak"
+  );
+
+  if (!foundStreakStarter) {
+    if (userStreak.streak >= 1) {
+      if (userInfo) {
+        unlockAchievement(
+          userInfo.userID,
+          "67659d704ff69edb3f0640ec",
+          userInfo.authToken
+        );
       }
-      if (!found100Streaks) {
-        console.log('entrou');
-        
-          // if (userStreak.streak >= 1) {            
-          //   if (userInfo) {
-          //     unlockAchievement(
-          //       userInfo.userID,
-          //       "67659d704ff69edb3f0640ec",
-          //       userInfo.authToken
-          //     );
-          //   }
-          //   unlockUltimateAchievement(userInfo, unlockAchievement, user);
-          //   return;
-          // }
+      unlockUltimateAchievement(userInfo, unlockAchievement, user);
+      return;
+    }
+  } else if (!found100Streaks) {
+    if (userStreak.streak >= 100) {
+      if (userInfo) {
+        unlockAchievement(
+          userInfo.userID,
+          "67659b784ff69edb3f0640d6",
+          userInfo.authToken
+        );
       }
-  };
-  
+      unlockUltimateAchievement(userInfo, unlockAchievement, user);
+      return;
+    }
+  }
+};

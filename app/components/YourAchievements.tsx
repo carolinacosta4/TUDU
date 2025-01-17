@@ -1,5 +1,4 @@
-import { Image, Text, View, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { Image, Text, View } from "react-native";
 import { Fragment } from "react";
 import User from "@/interfaces/User";
 import { Link } from "expo-router";
@@ -29,20 +28,17 @@ const YourAchievements = ({ achievements }: YourAchievementsProps) => {
         >
           Your achievements
         </Text>
-        <TouchableOpacity> 
-          {/* Aqui o touchable opacity n funciona */}
-          <Link href={{pathname: "/achievements"}}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: "Rebond-Grotesque-Medium",
-                lineHeight: 20,
-              }}
-            >
-              See All
-            </Text>
-          </Link>
-        </TouchableOpacity>
+        <Link href={{pathname: "/achievements"}}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "Rebond-Grotesque-Medium",
+              lineHeight: 20,
+            }}
+          >
+            See All
+          </Text>
+        </Link>
       </View>
       <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'space-around' }}>
       {achievements.length > 0 ? (

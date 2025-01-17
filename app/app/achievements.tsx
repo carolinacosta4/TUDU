@@ -1,4 +1,4 @@
-import { Text, StyleSheet, Image, View, ScrollView } from "react-native";
+import { Text, StyleSheet, Image, View, ScrollView, Share, TouchableWithoutFeedback, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import useFonts from "@/hooks/useFonts";
 import { useUserInfo } from "@/hooks/useUserInfo";
@@ -14,6 +14,7 @@ export default function AchievementsScreen() {
   const { user } = useUserStore();
   const { achievements, fetchAchievements } = useAchievementsStore();
   const [achievementsList, setAchievementsList] = useState<Achievement[]>([]);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (logged === false) {
@@ -35,10 +36,25 @@ export default function AchievementsScreen() {
           )
       );
       setAchievementsList(lockedAchievements);
+      setLoading(false)
     }
+    
   }, [achievements, user.userAchievements]);
 
-  if (!fontsLoaded || !user) return <Text>Loading...</Text>;
+  const handleShare = async (achievement: Achievement) => {
+    try {
+      await Share.share({
+        title: 'WOW!',
+        message:
+          `Look what I just got! I got the ${achievement.name} achievement on the TUDU app!`,
+          url: achievement.image
+      });
+    } catch (error: any) {
+      Alert.alert(error.message);
+    }
+  };
+
+  if (!fontsLoaded || !user || loading) return <Text>Loading...</Text>;
 
   return (
     <SafeAreaProvider>
@@ -64,7 +80,7 @@ export default function AchievementsScreen() {
             }}
           >
             {user.userAchievements.map((achievement) => (
-              <Fragment key={achievement._id}>
+              <TouchableWithoutFeedback key={achievement._id} onPress={() => handleShare(achievement.IDAchievements)}>
                 <View style={styles.cardItems}>
                   <Image
                     source={{ uri: achievement.IDAchievements.image }}
@@ -87,7 +103,7 @@ export default function AchievementsScreen() {
                     {achievement.IDAchievements.name}
                   </Text>
                 </View>
-              </Fragment>
+              </TouchableWithoutFeedback>
             ))}
 
             {achievementsList.map((achievement) => (
