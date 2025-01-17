@@ -44,8 +44,9 @@ const YourAchievements = ({ achievements }: YourAchievementsProps) => {
           </Link>
         </TouchableOpacity>
       </View>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'space-around' }}>
       {achievements.length > 0 ? (
-        achievements.map((achievement) => (
+        achievements.slice(0, 3).map((achievement) => (
           <Fragment key={achievement._id}>
             <Image
               source={{
@@ -69,6 +70,7 @@ const YourAchievements = ({ achievements }: YourAchievementsProps) => {
       ) : (
         <Text>Work harder to have achievements!!</Text>
       )}
+      </View>
     </View>
   );
 };

@@ -14,7 +14,6 @@ export default function AchievementsScreen() {
   const { user } = useUserStore();
   const { achievements, fetchAchievements } = useAchievementsStore();
   const [achievementsList, setAchievementsList] = useState<Achievement[]>([]);
-  const [userAchievements, setuserAchievements] = useState([]);
 
   useEffect(() => {
     if (logged === false) {
@@ -57,75 +56,67 @@ export default function AchievementsScreen() {
           >
             Achievements page
           </Text>
-          {user.userAchievements.length > 0 && achievementsList.length > 0 ? (
-              <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-around" }}>
-                {user.userAchievements.map((achievement) => (
-                  <Fragment key={achievement._id}>
-                    <View style={styles.cardItems}>
-                      <Image
-                        source={{ uri: achievement.IDAchievements.image }}
-                        style={{
-                          width: undefined,
-                          height: 102,
-                          aspectRatio: 1,
-                          resizeMode: "contain",
-                        }}
-                      />
-                      <Text
-                        style={{
-                          fontSize: 13.33,
-                          color: "#291752",
-                          fontFamily: "SF-Pro-Display-Medium",
-                          padding: 4,
-                          lineHeight: 24,
-                        }}
-                      >
-                        {achievement.IDAchievements.name}
-                      </Text>
-                    </View>
-                  </Fragment>
-                ))}
-              
-                {achievementsList.map((achievement) => (
-                  <Fragment key={achievement._id}>
-                    <View style={styles.cardItems}>
-                      <Image
-                        source={{ uri: achievement.lockedImage }}
-                        style={{
-                          width: undefined,
-                          height: 102,
-                          aspectRatio: 1,
-                          resizeMode: "contain",
-                        }}
-                      />
-                      <Text
-                        style={{
-                          fontSize: 13.33,
-                          color: "#291752",
-                          fontFamily: "SF-Pro-Display-Medium",
-                          padding: 4,
-                          lineHeight: 24,
-                        }}
-                      >
-                        {achievement.name}
-                      </Text>
-                    </View>
-                  </Fragment>
-                ))}
-              </View>
-          ) : (
-            <Text
-              style={{
-                fontSize: 13.33,
-                color: "#474038",
-                fontFamily: "Rebond-Grotesque-Medium",
-                padding: 4,
-                lineHeight: 24,
-              }}
-            >
-              No achievements yet
-            </Text>
-          )}
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              justifyContent: "space-around",
+            }}
+          >
+            {user.userAchievements.map((achievement) => (
+              <Fragment key={achievement._id}>
+                <View style={styles.cardItems}>
+                  <Image
+                    source={{ uri: achievement.IDAchievements.image }}
+                    style={{
+                      width: undefined,
+                      height: 102,
+                      aspectRatio: 1,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 13.33,
+                      color: "#291752",
+                      fontFamily: "SF-Pro-Display-Medium",
+                      padding: 4,
+                      lineHeight: 24,
+                    }}
+                  >
+                    {achievement.IDAchievements.name}
+                  </Text>
+                </View>
+              </Fragment>
+            ))}
+
+            {achievementsList.map((achievement) => (
+              <Fragment key={achievement._id}>
+                <View style={styles.cardItems}>
+                  <Image
+                    source={{ uri: achievement.lockedImage }}
+                    style={{
+                      width: undefined,
+                      height: 102,
+                      aspectRatio: 1,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 13.33,
+                      color: "#291752",
+                      fontFamily: "SF-Pro-Display-Medium",
+                      padding: 4,
+                      lineHeight: 24,
+                    }}
+                  >
+                    {achievement.name}
+                  </Text>
+                </View>
+              </Fragment>
+            ))}
+          </View>
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -139,8 +130,8 @@ const styles = StyleSheet.create({
   cardItems: {
     justifyContent: "center",
     alignItems: "center",
-    margin: 10, 
-    borderRadius: 10, 
-    padding: 10, 
+    margin: 10,
+    borderRadius: 10,
+    padding: 10,
   },
 });

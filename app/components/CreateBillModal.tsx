@@ -1,7 +1,7 @@
 import { useBill } from "@/hooks/useBill";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useBillStore } from "@/stores/billStore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,9 @@ import {
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { analyseAchievement } from "@/utils/achievementUtils";
+import useUserStore from "@/stores/userStore";
+import useAchievementsStore from "@/stores/achievementsStore";
 
 const { width, height } = Dimensions.get("window");
 
@@ -43,6 +46,7 @@ export default function CreateBillModal({
   const [notes, setNotes] = useState("");
   const [showError, setShowError] = useState(false);
   const [error, setError] = useState("");
+  const {user, fetchUser} = useUserStore()
   const newTask = {
     name: name,
     priority: priority,
@@ -53,6 +57,13 @@ export default function CreateBillModal({
     IDcurrency: IDcurrency,
     notes: notes,
   };
+  const {unlockAchievement} = useAchievementsStore()
+
+  useEffect(() => {
+    if(userInfo) {
+      fetchUser(userInfo.userID)
+    }
+  }, [userInfo])
 
   const handleConfirm = (date: Date): void => {
     setDueDate(date);
@@ -82,6 +93,9 @@ export default function CreateBillModal({
         setError("User information is missing");
       }
       toggleModal();
+      if(userInfo) await analyseAchievement("Debt-free hero", user, userInfo, unlockAchievement)
+       
+        
     }
   };
 
