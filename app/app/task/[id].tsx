@@ -12,7 +12,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import useFonts from "@/hooks/useFonts";
 import Task from "@/interfaces/Task";
-import { useTask } from "@/hooks/useTask";
 import { formatDate } from "@/utils/taskUtils";
 import { useTaskStore } from "@/stores/taskStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
@@ -26,17 +25,17 @@ import EditTask from "@/components/EditTask";
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { handleGetTask, task } = useTask();
-  const { updateTask, deleteTask } = useTaskStore();
+  const { updateTask, deleteTask, fetchTask, task, loadingTask } = useTaskStore();
   const { userInfo } = useUserInfo();
   const { user } = useUser();
   const { fetchUser } = useUserStore();
   const { unlockAchievement } = useAchievementsStore();
   const [edit, setEdit] = useState<Boolean>(false);
-
+  const [loading, setLoading] = useState(true)
+  
   useEffect(() => {
     if (typeof id === "string") {
-      handleGetTask(id);
+      fetchTask(id);      
     }
   }, [task]);
 
@@ -46,7 +45,7 @@ const TaskDetail = () => {
     }
   }, [userInfo]);
   
-  if (!task || !fontsLoaded || !userInfo) {
+  if (!task || !fontsLoaded || !userInfo || loadingTask) {
     return (
       <View style={styles.container}>
         <LoadingScreen/>
@@ -123,7 +122,7 @@ const TaskDetail = () => {
   const handleMarkAsDone = async (task: Task) => {
     try {
       let newStatus = !task.status;
-      await updateTask(task._id, { status: newStatus }, userInfo.authToken);
+      await updateTask(task._id, { status: newStatus }, userInfo.authToken); //AQUI
 
       if (user?.data.vibration && newStatus === true) {
         Platform.OS === "android"

@@ -12,15 +12,19 @@ import { Dropdown } from "react-native-element-dropdown";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Task from "@/interfaces/Task";
 const { width, height } = Dimensions.get("window");
+import { useTaskStore } from "@/stores/taskStore";
+import { useUserInfo } from "@/hooks/useUserInfo";
 
 type EditTaskProps = {
-  task: Task,
-  handleEdit: () => void
-}
+  task: Task;
+  handleEdit: () => void;
+};
 
 export default function EditTask({ task, handleEdit }: EditTaskProps) {
   // console.log(task);
-  const { editTask, categories } = useTask();
+  const { categories } = useTask();
+  const { updateTask } = useTaskStore();
+  const { userInfo } = useUserInfo();
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(
@@ -36,7 +40,7 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
   );
   const [name, setName] = useState(task.name || "");
   const [priority, setPriority] = useState(task.priority || "");
-  const [IDcategory, setIDcategory] = useState(task.IDcategory || "");
+  const [IDcategory, setIDcategory] = useState(task.IDcategory._id || "");
   const [periodicity, setPeriodicity] = useState(task.periodicity || "never");
   const [notification, setNotification] = useState(task.notification || false);
   const [notes, setNotes] = useState(task.notes || "Type here...");
@@ -61,7 +65,7 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
     setShowEndDatePicker(false);
   };
 
-  const handleEditTask = () => {
+  const handleEditTask = async (editTaskItem: any) => {
     if (editTaskItem.name === "") {
       alert("Please enter a name for the task");
     } else if (editTaskItem.priority === "") {
@@ -71,9 +75,26 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
     } else if (editTaskItem.startDate == editTaskItem.endDate) {
       alert("Please different times for start and end");
     } else {
-      console.log("edit tbd");
+      if (userInfo) {
+      await updateTask(
+        task._id,
+        {
+          name: editTaskItem.name,
+          priority: editTaskItem.priority,
+          IDcategory: editTaskItem.IDcategory,
+          startDate: editTaskItem.startDate,
+          endDate: editTaskItem.endDate,
+          periodicity: editTaskItem.periodicity,
+          notification: editTaskItem.notification,
+          notes: editTaskItem.notes,
+        },
+        userInfo.authToken
+      );
     }
-    handleEdit()
+    }
+    
+
+    handleEdit();
   };
 
   return (
@@ -217,6 +238,8 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
                       },
                     ]}
                     onPress={() => {
+                      console.log(category);
+                      
                       setSelectedCategory(category.name);
                       setIDcategory(category._id);
                     }}
@@ -461,27 +484,27 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
           </View>
         </View>
         <TouchableOpacity
-                style={{
-                  backgroundColor: "#6B47DC",
-                  padding: height * 0.012,
-                  borderRadius: 16,
-                  height: 48,
-                  justifyContent: "center",
-                }}
-                onPress={handleEditTask}
-              >
-                <Text
-                  style={{
-                    color: "#F7F6F0",
-                    textAlign: "center",
-                    fontFamily: "Rebond-Grotesque-Bold",
-                    borderRadius: 5,
-                    fontSize: 19.02,
-                  }}
-                >
-                  Done
-                </Text>
-              </TouchableOpacity>
+          style={{
+            backgroundColor: "#6B47DC",
+            padding: height * 0.012,
+            borderRadius: 16,
+            height: 48,
+            justifyContent: "center",
+          }}
+          onPress={() => handleEditTask(editTaskItem)}
+        >
+          <Text
+            style={{
+              color: "#F7F6F0",
+              textAlign: "center",
+              fontFamily: "Rebond-Grotesque-Bold",
+              borderRadius: 5,
+              fontSize: 19.02,
+            }}
+          >
+            Done
+          </Text>
+        </TouchableOpacity>
       </View>
     </>
   );
