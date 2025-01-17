@@ -20,6 +20,7 @@ import { useUser } from "@/hooks/useUser";
 import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
@@ -46,7 +47,7 @@ const TaskDetail = () => {
   if (!task || !fontsLoaded || !userInfo) {
     return (
       <View style={styles.container}>
-        <Text>Loading task details...</Text>
+        <LoadingScreen/>
       </View>
     );
   }

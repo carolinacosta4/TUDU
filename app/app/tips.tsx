@@ -9,6 +9,7 @@ import useFonts from "@/hooks/useFonts";
 import { useTips } from '@/hooks/useTips';
 import Tip from '@/interfaces/Tip';
 import { useTipCategories } from '@/hooks/useCategoryTip';
+import LoadingScreen from '@/components/LoadingScreen';
 
 export default function TipsPage() {
   const { tips, error } = useTips()
@@ -55,8 +56,8 @@ export default function TipsPage() {
     );
   }
 
-  if (!fontsLoaded || !tipCategories) {
-    return <Text>Loading tips...</Text>;
+  if (!fontsLoaded || !tipCategories || !tips) {
+    return <LoadingScreen/>
   }
 
   return (

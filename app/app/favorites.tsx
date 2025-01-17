@@ -5,6 +5,7 @@ import TipItemList from '@/components/TipItemList';
 import useFonts from "@/hooks/useFonts";
 import { formatDistanceToNow } from 'date-fns';
 import Tip from '@/interfaces/Tip';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const Favorites = () => {
   const [filteredTips, setFilteredTips] = useState<Tip[]>([]);
@@ -21,7 +22,7 @@ const Favorites = () => {
     };
   
     if (!fontsLoaded || !user) {
-      return <Text>Loading tips...</Text>;
+      return <LoadingScreen/>
     }
 
   return (

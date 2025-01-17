@@ -11,6 +11,7 @@ import Customization from "@/components/Customization";
 import AccountManagement from "@/components/AccountManagement";
 import UserAccountInfo from "@/components/UserAccountInfo";
 import { useUserStore } from "@/stores/userStore";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function ProfileScreen() {
   const { height } = Dimensions.get("window");
@@ -46,7 +47,7 @@ export default function ProfileScreen() {
   }, [isUserFetched]);
 
   if (!isUserFetched || !userInfo || !userInfo.userID || !user || !fontsLoaded)
-    return <Text>Loading...</Text>;
+    return  <LoadingScreen />
 
   const handlePersonalInfo = async (newName?: string, newEmail?: string) => {
     try {

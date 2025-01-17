@@ -19,6 +19,7 @@ import { useUser } from "@/hooks/useUser";
 import { calculateStatistics } from "@/utils/statisticsUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useTaskStore } from "@/stores/taskStore";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const CalendarScreen = () => {
   const { user } = useUser();
@@ -122,7 +123,7 @@ const CalendarScreen = () => {
     setDay(newSelectedDate);
   };
 
-  if (!fontsLoaded || loading) return <Text>Loading...</Text>;
+  if (!fontsLoaded || loading) return <LoadingScreen />;
 
   const changeStatus = async (data: Task | Bill, name: string) => {
     try {
