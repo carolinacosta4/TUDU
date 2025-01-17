@@ -1,5 +1,7 @@
+import Achievement from "./Achievement";
 import Bill from "./Bill";
 import Task from "./Task";
+import Tip from "./Tip";
 
 export default interface User {
   data: {
@@ -14,9 +16,21 @@ export default interface User {
     vibration: boolean;
     darkMode: boolean;
     isDeactivated: boolean;
-    IDmascot: string;
+    IDmascot: {
+      _id: string;
+      name: string;
+      image: string;
+      description: string;
+    };
     onboardingSeen: boolean;
   };
   userTasks: Task[];
   userBills: Bill[];
+  FavoriteTip: Tip[]; 
+  userAchievements: {
+    _id: string;
+    IDAchievements: Achievement;
+    IDuser: string;
+    unlockedAt: Date;
+  }[];
 }

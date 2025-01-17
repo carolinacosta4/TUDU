@@ -33,6 +33,7 @@ const ListHome = ({
                 fontFamily: "Rebond-Grotesque-Medium",
                 marginTop: 24,
                 marginBottom: 4,
+                lineHeight: 20,
               }}
             >
               All-day
@@ -70,6 +71,7 @@ const ListHome = ({
                 fontFamily: "Rebond-Grotesque-Medium",
                 marginTop: 10,
                 marginBottom: 4,
+                lineHeight: 20,
               }}
             >
               {group.time}

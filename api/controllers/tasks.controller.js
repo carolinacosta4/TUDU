@@ -89,25 +89,55 @@ exports.create = async (req, res) => {
       });
     }
 
-    let task = new Task({
-      name: req.body.name,
-      priority: req.body.priority,
-      IDcategory: req.body.IDcategory,
-      startDate: new Date(req.body.startDate),
-      endDate: new Date(req.body.endDate),
-      periodicity: req.body.periodicity,
-      notification: req.body.notification,
-      notes: req.body.notes || "",
-      status: false,
-      IDuser: req.loggedUserId,
-    });
+    const taskInstances = [];
+    const numberOfRepetitions = 5;
+    let currentStartDate = new Date(req.body.startDate);
+    let currentEndDate = new Date(req.body.endDate);
 
-    const newTask = await task.save();
+    for (let i = 0; i < numberOfRepetitions; i++) {
+      taskInstances.push({
+        name: req.body.name,
+        priority: req.body.priority,
+        IDcategory: req.body.IDcategory,
+        startDate: new Date(currentStartDate),
+        endDate: new Date(currentEndDate),
+        periodicity: req.body.periodicity,
+        notification: req.body.notification,
+        notes: req.body.notes || "",
+        status: false,
+        IDuser: req.loggedUserId,
+      });
+
+      switch (req.body.periodicity) {
+        case "daily":
+          currentStartDate.setDate(currentStartDate.getDate() + 1);
+          currentEndDate.setDate(currentEndDate.getDate() + 1);
+          break;
+        case "weekly":
+          currentStartDate.setDate(currentStartDate.getDate() + 7);
+          currentEndDate.setDate(currentEndDate.getDate() + 7);
+          break;
+        case "monthly":
+          currentStartDate.setMonth(currentStartDate.getMonth() + 1);
+          currentEndDate.setMonth(currentEndDate.getMonth() + 1);
+          break;
+        case "never":
+          i = numberOfRepetitions;
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            msg: "Invalid periodicity value.",
+          });
+      }
+    }
+
+    const newTasks = await Task.insertMany(taskInstances);
 
     return res.status(201).json({
       success: true,
       msg: "Task created successfully.",
-      data: newTask,
+      data: newTasks,
     });
   } catch (error) {
     handleErrorResponse(res, error);
@@ -189,6 +219,13 @@ exports.edit = async (req, res) => {
       });
 
     await Task.findByIdAndUpdate(req.params.idT, {
+      name: req.body.name ? req.body.name : task.name,
+      priority: req.body.priority ? req.body.priority : task.priority,
+      IDcategory: req.body.IDcategory ? req.body.IDcategory : task.IDcategory,
+      notification: req.body.notification
+        ? req.body.notification
+        : task.notification,
+      notes: req.body.notes ? req.body.notes : task.notes,
       periodicity: req.body.periodicity
         ? req.body.periodicity
         : task.periodicity,
@@ -209,7 +246,6 @@ exports.edit = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    
     if (!mongoose.isValidObjectId(req.params.idT))
       return res.status(400).json({
         success: false,
@@ -237,8 +273,6 @@ exports.delete = async (req, res) => {
       msg: "Task deleted successfully.",
     });
   } catch (error) {
-    console.log(error);
-    
     handleErrorResponse(res, error);
   }
 };

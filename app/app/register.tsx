@@ -115,6 +115,7 @@ export default function RegisterScreen() {
                   fontSize: 16,
                   color: "#562CAF",
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 Say goodbye to chaos!
@@ -168,6 +169,7 @@ export default function RegisterScreen() {
                     color: "#EEEADF",
                     fontSize: 19.2,
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                   }}
                 >
                   Create account
@@ -184,6 +186,7 @@ export default function RegisterScreen() {
                   paddingRight: 90,
                   textAlign: "center",
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 When you register, you're agreeing to our terms and privacy
@@ -196,6 +199,7 @@ export default function RegisterScreen() {
                     color: "#291752",
                     textAlign: "center",
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                   }}
                 >
                   Already have an account?

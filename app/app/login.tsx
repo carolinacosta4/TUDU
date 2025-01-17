@@ -100,6 +100,7 @@ export default function LoginScreen() {
                   fontSize: 16,
                   color: "#562CAF",
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 Back to planning, back to progress.
@@ -138,6 +139,7 @@ export default function LoginScreen() {
                     color: "#EEEADF",
                     fontSize: 19.2,
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                   }}
                 >
                   Login
@@ -160,6 +162,7 @@ export default function LoginScreen() {
                       paddingRight: 80,
                       textAlign: "center",
                       fontFamily: "Rebond-Grotesque-Bold",
+                      lineHeight: 20,
                     }}
                   >
                     Forgot your password?
@@ -173,6 +176,7 @@ export default function LoginScreen() {
                     paddingRight: 80,
                     textAlign: "center",
                     fontFamily: "Rebond-Grotesque-Regular",
+                    lineHeight: 20,
                   }}
                 >
                   No worries, we've got you covered!
@@ -185,6 +189,7 @@ export default function LoginScreen() {
                     color: "#291752",
                     textAlign: "center",
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                   }}
                 >
                   Don't have an account?
