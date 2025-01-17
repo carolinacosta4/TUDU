@@ -219,6 +219,13 @@ exports.edit = async (req, res) => {
       });
 
     await Task.findByIdAndUpdate(req.params.idT, {
+      name: req.body.name ? req.body.name : task.name,
+      priority: req.body.priority ? req.body.priority : task.priority,
+      IDcategory: req.body.IDcategory ? req.body.IDcategory : task.IDcategory,
+      notification: req.body.notification
+        ? req.body.notification
+        : task.notification,
+      notes: req.body.notes ? req.body.notes : task.notes,
       periodicity: req.body.periodicity
         ? req.body.periodicity
         : task.periodicity,
@@ -239,7 +246,6 @@ exports.edit = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    
     if (!mongoose.isValidObjectId(req.params.idT))
       return res.status(400).json({
         success: false,
@@ -267,8 +273,6 @@ exports.delete = async (req, res) => {
       msg: "Task deleted successfully.",
     });
   } catch (error) {
-    console.log(error);
-    
     handleErrorResponse(res, error);
   }
 };
