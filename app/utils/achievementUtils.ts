@@ -164,12 +164,12 @@ export const analyseStreaksAchievement = (
     unlockAchievement: any,
     userStreak: any
   ) => {
-    if (achievementName == "Streak starter") {  
-      let found = user.userAchievements.find(
-        (a: any) => a.IDAchievements.name == achievementName
+    // if (achievementName == "Streak starter") {  
+      let foundStreakStarter = user.userAchievements.find(
+        (a: any) => a.IDAchievements.name == "Streak starter"
       );
   
-      if (!found) {
+      if (!foundStreakStarter) {
           if (userStreak.streak >= 1) {            
             if (userInfo) {
               unlockAchievement(
@@ -182,8 +182,9 @@ export const analyseStreaksAchievement = (
             return;
           }
       }
-    } else {
-      console.log("other achievement");
-    }
+    // }
+    //  else {
+    //   console.log("other achievement");
+    // }
   };
   
