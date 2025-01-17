@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import useFonts from "@/hooks/useFonts";
 import Bill from "@/interfaces/Bill";
-import { useBill } from "@/hooks/useBill";
 import { formatDate } from "@/utils/taskUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
@@ -21,20 +20,21 @@ import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
+import EditBill from "@/components/EditBill";
 
 const BillDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { handleGetBill, bill } = useBill();
-  const {updateBill, deleteBill} = useBillStore();
+  const {updateBill, deleteBill, fetchBill, bill, loadingBill} = useBillStore();
   const {userInfo} = useUserInfo()
   const { user } = useUser();
   const {fetchUser} = useUserStore()
   const {unlockAchievement} = useAchievementsStore()
+  const [edit, setEdit] = useState<Boolean>(false);
 
   useEffect(() => {
     if (typeof id === "string") {
-      handleGetBill(id);
+      fetchBill(id);
     }
   }, [bill]);
 
@@ -45,7 +45,7 @@ const BillDetail = () => {
     }
   }, [userInfo])
 
-  if (!bill || !fontsLoaded || !userInfo) {
+  if (!bill || !fontsLoaded || !userInfo || loadingBill) {
     return (
       <View style={styles.container}>
          <LoadingScreen />
@@ -103,68 +103,92 @@ const BillDetail = () => {
     }
   };
 
+  const handleEdit = () => {
+    let newEdit = !edit;
+    setEdit(newEdit);
+  };
+
   return (
     bill && (
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F6F0" }}>
-          <ScrollView style={styles.container}>
-            <View style={styles.billHeader}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text
+          {edit ? (
+            <ScrollView style={styles.container}>
+              <Text>Edit view</Text>
+              <EditBill bill={bill} handleEdit={handleEdit}/>
+            </ScrollView>
+          ) : (
+            <ScrollView style={styles.container}>
+              <View style={styles.billHeader}>
+                <View
                   style={{
-                    fontSize: 13.33,
-                    color: "#474038",
-                    fontFamily: "Rebond-Grotesque-Medium",
-                    padding: 4,
-                    textAlign: "center",
-                    lineHeight: 24,
-                    ...getPriorityStyle(bill.priority),
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  {bill.priority.charAt(0).toUpperCase() +
-                    bill.priority.slice(1)}
-                </Text>
-                <TouchableOpacity>
                   <Text
                     style={{
+                      fontSize: 13.33,
+                      color: "#474038",
                       fontFamily: "Rebond-Grotesque-Medium",
-                      fontSize: 16,
-                      color: "#562CAF",
-                      textAlign: "right",
+                      padding: 4,
+                      textAlign: "center",
+                      lineHeight: 24,
+                      ...getPriorityStyle(bill.priority),
                     }}
                   >
-                    Edit
+                    {bill.priority.charAt(0).toUpperCase() +
+                      bill.priority.slice(1)}
                   </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity onPress={handleEdit}>
+                    <Text
+                      style={{
+                        fontFamily: "Rebond-Grotesque-Medium",
+                        fontSize: 16,
+                        color: "#562CAF",
+                        textAlign: "right",
+                      }}
+                    >
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.billTitle}>{bill.name}</Text>
               </View>
-              <Text style={styles.billTitle}>{bill.name}</Text>
-            </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Due date</Text>
-              <Text style={{...styles.startDate, backgroundColor: "#EEEADF",}}>{formatDate(bill.dueDate)}</Text>
-            </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Due date</Text>
+                <Text
+                  style={{ ...styles.startDate, backgroundColor: "#EEEADF" }}
+                >
+                  {formatDate(bill.dueDate)}
+                </Text>
+              </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Schedule</Text>
-              <Text style={styles.schedule}>
-                {bill.periodicity.charAt(0).toUpperCase() +
-                  bill.periodicity.slice(1)}{" "}
-              </Text>
-            </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Amount</Text>
+                <Text style={styles.schedule}>
+                  {bill.amount}{bill.IDcurrency.symbol}
+                </Text>
+              </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Notes</Text>
-              {bill.notes && <Text style={styles.notes}>{bill.notes}</Text>}
-              {!bill.notes && <Text style={styles.notes}>No notes yet!</Text>}
-            </View>
+              
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Schedule</Text>
+                <Text style={styles.schedule}>
+                  {bill.periodicity.charAt(0).toUpperCase() +
+                    bill.periodicity.slice(1)}{" "}
+                </Text>
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Notes</Text>
+                {bill.notes && <Text style={styles.notes}>{bill.notes}</Text>}
+                {!bill.notes && <Text style={styles.notes}>No notes yet!</Text>}
+              </View>
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Options</Text>
@@ -176,22 +200,23 @@ const BillDetail = () => {
               </TouchableOpacity>
             </View>
 
-            {!bill.status ? (
-              <TouchableOpacity
-                style={{ ...styles.checkButton, backgroundColor: "#6A60F0" }}
-                onPress={() => handleMarkAsDone(bill)}
-              >
-                <Text style={styles.checkText}>Check as done</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={{ ...styles.checkButton, backgroundColor: "#837D74" }}
-                onPress={() => handleMarkAsDone(bill)}
-              >
-                <Text style={styles.checkText}>Uncheck as done</Text>
-              </TouchableOpacity>
-            )}
-          </ScrollView>
+              {!bill.status ? (
+                <TouchableOpacity
+                  style={{ ...styles.checkButton, backgroundColor: "#6A60F0" }}
+                  onPress={() => handleMarkAsDone(bill)}
+                >
+                  <Text style={styles.checkText}>Check as done</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={{ ...styles.checkButton, backgroundColor: "#837D74" }}
+                  onPress={() => handleMarkAsDone(bill)}
+                >
+                  <Text style={styles.checkText}>Uncheck as done</Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+          )}
         </SafeAreaView>
       </SafeAreaProvider>
     )
