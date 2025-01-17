@@ -8,6 +8,9 @@ import Bill from "@/interfaces/Bill";
 import HeaderBillPage from "@/components/HeaderBillPage";
 import { useBillStore } from "@/stores/billStore";
 import NoTasksView from "@/components/NoTasksView";
+import useAchievementsStore from "@/stores/achievementsStore";
+import useUserStore from "@/stores/userStore";
+import { analyseAchievement } from "@/utils/achievementUtils";
 
 export default function BillsScreen() {
   const width = Dimensions.get("window").width;
@@ -17,6 +20,14 @@ export default function BillsScreen() {
   const { loading, handleGetUser, user } = useUser();
   const [loadingBills, setloadingBills] = useState(true);
   const [upcomingBills, setUpcomingBills] = useState<Bill[]>([]);
+  const {unlockAchievement} = useAchievementsStore()
+  const {fetchUser} = useUserStore()
+
+  useEffect(() => {
+    if(userInfo) {
+      fetchUser(userInfo.userID)
+    }
+  }, [userInfo])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,12 +56,16 @@ export default function BillsScreen() {
   const changeStatus = async (data: Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
-      if(userInfo) await updateBill(data._id, { status: updatedStatus }, userInfo.authToken);
+      if(userInfo) {
+        await updateBill(data._id, { status: updatedStatus }, userInfo.authToken);
       if (user?.data.vibration && updatedStatus === true) {
           Platform.OS === "android"
             ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
             : Vibration.vibrate(PATTERN);
           }
+        await analyseAchievement("Clean Sweep", user, userInfo, unlockAchievement)
+      }
+      
     } catch (error) {
       console.error(error);
     }

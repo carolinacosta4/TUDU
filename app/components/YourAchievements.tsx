@@ -1,6 +1,7 @@
 import { Image, Text, View } from "react-native";
 import { Fragment } from "react";
 import User from "@/interfaces/User";
+import { Link } from "expo-router";
 
 type YourAchievementsProps = {
   achievements: User["userAchievements"];
@@ -27,18 +28,21 @@ const YourAchievements = ({ achievements }: YourAchievementsProps) => {
         >
           Your achievements
         </Text>
-        <Text
-          style={{
-            fontSize: 16,
-            fontFamily: "Rebond-Grotesque-Medium",
-            lineHeight: 20,
-          }}
-        >
-          See All
-        </Text>
+        <Link href={{pathname: "/achievements"}}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "Rebond-Grotesque-Medium",
+              lineHeight: 20,
+            }}
+          >
+            See All
+          </Text>
+        </Link>
       </View>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'space-around' }}>
       {achievements.length > 0 ? (
-        achievements.map((achievement) => (
+        achievements.slice(0, 3).map((achievement) => (
           <Fragment key={achievement._id}>
             <Image
               source={{
@@ -62,6 +66,7 @@ const YourAchievements = ({ achievements }: YourAchievementsProps) => {
       ) : (
         <Text>Work harder to have achievements!!</Text>
       )}
+      </View>
     </View>
   );
 };
