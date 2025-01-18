@@ -6,6 +6,8 @@ import useFonts from "@/hooks/useFonts";
 import { formatDistanceToNow } from 'date-fns';
 import Tip from '@/interfaces/Tip';
 import LoadingScreen from '@/components/LoadingScreen';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import HeaderItem from '@/components/Header';
 
 const Favorites = () => {
   const [filteredTips, setFilteredTips] = useState<Tip[]>([]);
@@ -26,7 +28,34 @@ const Favorites = () => {
     }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+      <View style={{ flexDirection: "row", alignItems: "center", padding: 20, }}>
+          <View style={{ width: 28 }}>
+            <HeaderItem page="Favorites" />
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignContent: "center",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 23.04,
+                color: "#562CAF",
+                fontFamily: "SF-Pro-Display-Medium",
+                textAlign: "center",
+                lineHeight: 24,
+              }}
+            >
+              Favorites
+            </Text>
+          </View>
+        </View>
+    <ScrollView contentContainerStyle={styles.contentContainer}>
       {filteredTips.length > 0 ? (
         <View style={styles.popularContainer}>
           <TipItemList
@@ -49,6 +78,8 @@ const Favorites = () => {
         </View>
       )}
     </ScrollView>
+    </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
@@ -98,7 +129,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'ES Rebond Grotesque TRIAL',
     fontWeight: '400',
-    lineHeight: 16,
+    lineHeight: 20,
   },
   mascotImage: {
     width: 100,

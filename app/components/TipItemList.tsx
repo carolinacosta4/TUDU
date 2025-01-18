@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     fontSize: 13.33,
     fontFamily: "Rebond-Grotesque-Regular",
     fontWeight: '500',
-    lineHeight: 16,
+    lineHeight: 20,
     marginBottom: 8,
     wordWrap: 'break-word',
   },
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Rebond-Grotesque-Medium",
     fontWeight: '500',
-    lineHeight: 16,
+    lineHeight: 20,
     wordWrap: 'break-word',
     
   },
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     fontSize: 13.33,
     fontFamily: "Rebond-Grotesque-Regular",
     fontWeight: '400',
-    lineHeight: 16,
+    lineHeight: 20,
     wordWrap: 'break-word',
   },
 });
