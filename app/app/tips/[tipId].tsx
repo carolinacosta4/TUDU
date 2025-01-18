@@ -8,6 +8,7 @@ import { useUserInfo } from '@/hooks/useUserInfo';
 import { useUser } from '@/hooks/useUser';
 import LoadingScreen from '@/components/LoadingScreen';
 import useFonts from '@/hooks/useFonts';
+import HeaderItem from '@/components/Header';
 
 const TipDetail = () => {
   const { userInfo } = useUserInfo();
@@ -61,6 +62,7 @@ const TipDetail = () => {
           colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.7)']} 
           style={styles.linearGradient}
         >
+          <HeaderItem page="Tip" />
           <View style={styles.headerContent}>
             <View style={styles.headerTextContainer}>
               <Text style={styles.title}>{tip.title}</Text>

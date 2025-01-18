@@ -10,6 +10,8 @@ import { useTips } from '@/hooks/useTips';
 import Tip from '@/interfaces/Tip';
 import { useTipCategories } from '@/hooks/useCategoryTip';
 import LoadingScreen from '@/components/LoadingScreen';
+import HeaderItem from '@/components/Header';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TipsPage() {
   const { tips, error } = useTips()
@@ -65,8 +67,12 @@ export default function TipsPage() {
 
   return (
     loadedFilters &&
+    <SafeAreaProvider>
+      <SafeAreaView style={{ backgroundColor: '#F7F6F0' }}>
+        <View style={{ padding: 20, }}>
+          <HeaderItem page="Tips" />   
+        </View>
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Link href={{pathname: '/favorites'}}>Fav</Link>
       <SearchAndCategories
         tipCategories={tipCategories}
         selectedCategory={selectedCategory}
@@ -86,16 +92,17 @@ export default function TipsPage() {
         />
       </View>
     </ScrollView>
+    </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#F7F6F0',
   },
   contentContainer: {
-    padding: 20,
+    paddingHorizontal: 20,
     paddingBottom: 40, 
   },
   popularContainer: {
