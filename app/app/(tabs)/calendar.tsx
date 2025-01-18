@@ -20,9 +20,10 @@ import { calculateStatistics } from "@/utils/statisticsUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useTaskStore } from "@/stores/taskStore";
 import LoadingScreen from "@/components/LoadingScreen";
+import HeaderItem from "@/components/Header";
 
 const CalendarScreen = () => {
-  const { user } = useUser();
+  const { user, userStreak } = useUser();
   const fontsLoaded = useFonts();
   const { userInfo } = useUserInfo();
   const [showStat, setShowStat] = useState(true);
@@ -144,6 +145,10 @@ const CalendarScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingHorizontal: 20 }}>
+          <Text style={{color: '#291752', fontSize: 23.04, fontFamily: 'SF-Pro-Display-Medium'}}>Calendar</Text>
+          <HeaderItem page="Calendar" userStreak={userStreak} />
+        </View>
       <Calendar
         style={styles.calendar}
         markedDates={markedDates}
