@@ -10,6 +10,7 @@ import Filter from "@/components/Filter";
 import HeaderHomeScreen from "@/components/HeaderHomeScreen";
 import CardsHome from "@/components/CardsHome";
 import ListHome from "@/components/ListHome";
+import LoadingScreen from "@/components/LoadingScreen";
 import {
   groupTasksByTime,
   categorizeTasks,
@@ -23,6 +24,8 @@ import { useTaskStore } from "@/stores/taskStore";
 import { useBillStore } from "@/stores/billStore";
 import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
+import useAchievementsStore from "@/stores/achievementsStore";
+import { analyseAchievement, analyseStreaksAchievement } from "@/utils/achievementUtils";
 
 export default function HomeScreen() {
   const today = new Date();
@@ -35,6 +38,7 @@ export default function HomeScreen() {
     handleUserStreak,
     handleGetStreak,
   } = useUser();
+  
   const { userInfo, logged } = useUserInfo();
   const fontsLoaded = useFonts();
   const [showFilter, setShowFilter] = useState(false);
@@ -51,6 +55,7 @@ export default function HomeScreen() {
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
+  const {unlockAchievement} = useAchievementsStore()
 
   const getMascotStyle = (mascot: string) => {
     switch (mascot) {
@@ -108,8 +113,16 @@ export default function HomeScreen() {
     }
   }, [tasks, bills, loaded]);
 
+  useEffect(() => {
+    if (user && userInfo && loaded) {
+      analyseAchievement("On time, every time", user, userInfo, unlockAchievement);
+    }
+  }, [user, userInfo, loaded]);
+  
+
   if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo)
-    return <Text>Loading...</Text>;
+    return <LoadingScreen/>
+
 
   const ONE_SECOND_IN_MS = 1000;
   const PATTERN = [1 * ONE_SECOND_IN_MS];
@@ -133,6 +146,7 @@ export default function HomeScreen() {
       await handleUserStreak(user.data._id);
       handleGetStreak(user.data._id);
     }
+    await analyseStreaksAchievement(user, userInfo, unlockAchievement, userStreak)
   };
 
   const checkAndUpdateMascots = async (tasks: Task[], bills: Bill[]) => {
@@ -153,6 +167,7 @@ export default function HomeScreen() {
         await editUserMascot(user.data._id, "676969dfa5e78f1378a63a71");
         handleGetUser(user.data._id);
       }
+      await analyseAchievement("Happy pet, happy you", user, userInfo, unlockAchievement)
     }
   };
 
@@ -209,6 +224,9 @@ export default function HomeScreen() {
           ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
           : Vibration.vibrate(PATTERN);
       }
+      
+      await analyseAchievement("Clean Sweep", user, userInfo, unlockAchievement)
+      
     } catch (error) {
       console.error(error);
     }

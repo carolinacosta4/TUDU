@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,36 +6,48 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
-  Vibration
+  Vibration,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import useFonts from "@/hooks/useFonts";
 import Task from "@/interfaces/Task";
-import { useTask } from "@/hooks/useTask";
 import { formatDate } from "@/utils/taskUtils";
 import { useTaskStore } from "@/stores/taskStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useUser } from "@/hooks/useUser";
+import useAchievementsStore from "@/stores/achievementsStore";
+import useUserStore from "@/stores/userStore";
+import { analyseAchievement } from "@/utils/achievementUtils";
+import LoadingScreen from "@/components/LoadingScreen";
+import EditTask from "@/components/EditTask";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
-  const { handleGetTask, task } = useTask();
-  const { updateTask, deleteTask } = useTaskStore()
+  const { updateTask, deleteTask, fetchTask, task, loadingTask } = useTaskStore();
   const { userInfo } = useUserInfo();
   const { user } = useUser();
-
+  const { fetchUser } = useUserStore();
+  const { unlockAchievement } = useAchievementsStore();
+  const [edit, setEdit] = useState<Boolean>(false);
+  
   useEffect(() => {
     if (typeof id === "string") {
-      handleGetTask(id);
+      fetchTask(id);      
     }
   }, [task]);
 
-  if (!task || !fontsLoaded || !userInfo) {
+  useEffect(() => {
+    if (userInfo) {
+      fetchUser(userInfo.userID);
+    }
+  }, [userInfo]);
+  
+  if (!task || !fontsLoaded || !userInfo || loadingTask) {
     return (
       <View style={styles.container}>
-        <Text>Loading task details...</Text>
+        <LoadingScreen/>
       </View>
     );
   }
@@ -108,64 +120,81 @@ const TaskDetail = () => {
 
   const handleMarkAsDone = async (task: Task) => {
     try {
-      let newStatus = !task.status;      
-      await updateTask(task._id, { status: newStatus }, userInfo.authToken );
-    
+      let newStatus = !task.status;
+      await updateTask(task._id, { status: newStatus }, userInfo.authToken); //AQUI
+
       if (user?.data.vibration && newStatus === true) {
         Platform.OS === "android"
           ? Vibration.vibrate(1 * ONE_SECOND_IN_MS)
           : Vibration.vibrate(PATTERN);
       }
-    }
-     catch (error: any) {
+      await analyseAchievement(
+        "Clean Sweep",
+        user,
+        userInfo,
+        unlockAchievement
+      );
+    } catch (error: any) {
       console.error("Error message:", error);
     }
+  };
+
+  const handleEdit = () => {
+
+    let newEdit = !edit;
+    setEdit(newEdit);
   };
 
   return (
     task && (
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F6F0" }}>
-          <ScrollView style={styles.container}>
-            <View style={styles.taskHeader}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text
+          {edit ? (
+            <ScrollView style={styles.container}>
+              <Text>Edit view</Text>
+              <EditTask task={task} handleEdit={handleEdit} />
+            </ScrollView>
+          ) : (
+            <ScrollView style={styles.container}>
+              <View style={styles.taskHeader}>
+                <View
                   style={{
-                    fontSize: 13.33,
-                    color: "#474038",
-                    fontFamily: "Rebond-Grotesque-Medium",
-                    padding: 4,
-                    textAlign: "center",
-                    lineHeight: 24,
-                    ...getPriorityStyle(task.priority),
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  {task.priority.charAt(0).toUpperCase() +
-                    task.priority.slice(1)}
-                </Text>
-                <TouchableOpacity>
                   <Text
                     style={{
+                      fontSize: 13.33,
+                      color: "#474038",
                       fontFamily: "Rebond-Grotesque-Medium",
-                      fontSize: 16,
-                      color: "#562CAF",
-                      textAlign: "right",
+                      padding: 4,
+                      textAlign: "center",
+                      lineHeight: 24,
+                      ...getPriorityStyle(task.priority),
                     }}
                   >
-                    Edit
+                    {task.priority.charAt(0).toUpperCase() +
+                      task.priority.slice(1)}
                   </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity onPress={handleEdit}>
+                    <Text
+                      style={{
+                        fontFamily: "Rebond-Grotesque-Medium",
+                        fontSize: 16,
+                        color: "#562CAF",
+                        textAlign: "right",
+                      }}
+                    >
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.taskTitle}>{task.name}</Text>
               </View>
-              <Text style={styles.taskTitle}>{task.name}</Text>
-            </View>
-            <Text
+              <Text
                 style={{
                   fontSize: 13.33,
                   fontFamily: "Rebond-Grotesque-Medium",
@@ -181,28 +210,33 @@ const TaskDetail = () => {
                 {task.IDcategory.name}
               </Text>
 
-            <View style={styles.startInfo}>
-              <Text style={styles.countdown}>Starts in</Text>
-              <Text style={styles.timeRemaining}>
-                {getCountdown(task.startDate)}
-              </Text>
-              <Text style={styles.startDate}>{formatDate(task.startDate)}</Text>
-            </View>
+              <View style={styles.startInfo}>
+                <Text style={styles.countdown}>Starts in</Text>
+                <Text style={styles.timeRemaining}>
+                  {getCountdown(task.startDate)}
+                </Text>
+                <Text style={styles.startDate}>
+                  {formatDate(task.startDate)}
+                </Text>
+              </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Schedule</Text>
-              <Text style={styles.schedule}>
-                {task.periodicity.charAt(0).toUpperCase() +
-                  task.periodicity.slice(1)}{" "}
-                - {formatTime(task.startDate)}
-              </Text>
-            </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Schedule</Text>
+                <Text style={styles.schedule}>
+                  {task.periodicity.charAt(0).toUpperCase() +
+                    task.periodicity.slice(1)}{" "}
+                  - {formatTime(task.startDate)}
+                </Text>
+              </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Notes</Text>
-              {task.notes && <Text style={styles.notes}>{task.notes}</Text>}
-              {!task.notes && <Text style={styles.notes}>No notes yet!</Text>}
-            </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Notes</Text>
+                {task.notes != "" ? (
+                  <Text style={styles.notes}>{task.notes}</Text>
+                ) : (
+                  <Text style={styles.notes}>No notes yet!</Text>
+                )}
+              </View>
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Options</Text>
@@ -214,22 +248,23 @@ const TaskDetail = () => {
               </TouchableOpacity>
             </View>
 
-            {!task.status ? (
-              <TouchableOpacity
-                style={{ ...styles.checkButton, backgroundColor: "#6A60F0" }}
-                onPress={() => handleMarkAsDone(task)}
-              >
-                <Text style={styles.checkText}>Check as done</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={{ ...styles.checkButton, backgroundColor: "#837D74" }}
-                onPress={() => handleMarkAsDone(task)}
-              >
-                <Text style={styles.checkText}>Uncheck as done</Text>
-              </TouchableOpacity>
-            )}
-          </ScrollView>
+              {!task.status ? (
+                <TouchableOpacity
+                  style={{ ...styles.checkButton, backgroundColor: "#6A60F0" }}
+                  onPress={() => handleMarkAsDone(task)}
+                >
+                  <Text style={styles.checkText}>Check as done</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={{ ...styles.checkButton, backgroundColor: "#837D74" }}
+                  onPress={() => handleMarkAsDone(task)}
+                >
+                  <Text style={styles.checkText}>Uncheck as done</Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+          )}
         </SafeAreaView>
       </SafeAreaProvider>
     )
@@ -335,8 +370,8 @@ const styles = StyleSheet.create({
   deleteText: {
     fontSize: 16,
     color: "#D32F2F",
-    fontWeight: "bold",
     fontFamily: "Rebond-Grotesque-Medium",
+    lineHeight: 24,
   },
   checkButton: {
     padding: 15,
