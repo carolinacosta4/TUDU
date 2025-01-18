@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'ES Rebond Grotesque TRIAL',
     fontWeight: '400',
-    lineHeight: 16,
+    lineHeight: 20,
   },
   mascotImage: {
     width: 100,

@@ -18,14 +18,15 @@ export default function TipsPage() {
   const fontsLoaded = useFonts();
   const [filteredTips, setFilteredTips] = useState<Tip[]>([])
   const [recentTips, setRecentTips] = useState<Tip[]>([])
-  const { fetchTipCategories, tipCategories } = useTipCategories();  
+  const { fetchTipCategories, tipCategories, loading } = useTipCategories();  
+  const [loadedFilters, setLoadedFilters] = useState<boolean>(false);
 
   useEffect(() => {
     fetchTipCategories()
   }, [])
 
   useEffect(() => {
-    if (!tips) {
+    if (!tips || loading) {
       return;
     }
     
@@ -41,6 +42,8 @@ export default function TipsPage() {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5);
     setRecentTips(recentTipsSort);
+
+    setLoadedFilters(true);
   }, [tips, selectedCategory, searchText]);
 
   const formatRelativeTime = (date: Date) => {
@@ -56,11 +59,12 @@ export default function TipsPage() {
     );
   }
 
-  if (!fontsLoaded || !tipCategories || !tips) {
+  if (!fontsLoaded || !tipCategories || !tips || loading || !loadedFilters) {
     return <LoadingScreen/>
   }
 
   return (
+    loadedFilters &&
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Link href={{pathname: '/favorites'}}>Fav</Link>
       <SearchAndCategories
