@@ -151,7 +151,7 @@ export default function BillsScreen() {
     };
   };
 
-  if(loading){
+  if(loading || loadingBills){
     return  <LoadingScreen />
   }
 
