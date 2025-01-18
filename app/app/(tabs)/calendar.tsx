@@ -8,6 +8,7 @@ import {
   Text,
   StyleSheet,
   FlatList,
+  Dimensions,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -49,6 +50,7 @@ const CalendarScreen = () => {
   const [monthBills, setMonthBills] = useState<number>(0);
   const [billsCompleted, setBillsCompleted] = useState<number>(0);
   const [loading, setLoading] = useState(true)
+  const width = Dimensions.get("window").width;
 
   useEffect(() => {
     if (!user) return;
@@ -174,7 +176,7 @@ const CalendarScreen = () => {
           data={stats}
           renderItem={renderStatItem}
           keyExtractor={(item) => item.label}
-          style={styles.statsList}
+          style={{...styles.statsList, marginBottom: width * 0.2,}}
         />
       ) : (
         <View style={styles.statsList}>
