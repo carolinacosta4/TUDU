@@ -120,9 +120,7 @@ export default function HomeScreen() {
   }, [user, userInfo, loaded]);
   
 
-  if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo)
-    return <LoadingScreen/>
-
+  
 
   const ONE_SECOND_IN_MS = 1000;
   const PATTERN = [1 * ONE_SECOND_IN_MS];
@@ -201,6 +199,9 @@ export default function HomeScreen() {
     }
   };
 
+  if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo || !user)
+    return <LoadingScreen/>
+    
   const changeStatus = async (data: Task | Bill, name: string) => {
     try {
       const updatedStatus = !data.status;
