@@ -21,6 +21,8 @@ import NoTasksView from "@/components/NoTasksView";
 import StuffHeader from "@/components/StuffHeader";
 import { useTaskStore } from "@/stores/taskStore";
 import { useBillStore } from "@/stores/billStore";
+import * as Notifications from "expo-notifications";
+import { SchedulableTriggerInputTypes } from "expo-notifications";
 
 export default function HomeScreen() {
   const today = new Date();
@@ -63,6 +65,17 @@ export default function HomeScreen() {
     }
   };
 
+  const requestPermissions = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== "granted") {
+      alert("You need to enable notifications in settings");
+    }
+  };
+
+  useEffect(() => {
+    requestPermissions();
+  }, []);
+
   useEffect(() => {
     if (logged === false) {
       router.push("/register");
@@ -91,6 +104,7 @@ export default function HomeScreen() {
     if ((tasks.length > 0 || bills.length > 0) && loaded == true) {
       checkAndUpdateMascots(tasks, bills);
       checkAndUpdateStreak(tasks, bills);
+      scheduleTaskNotifications(tasks);
     }
   }, [tasks, bills, loaded]);
 
@@ -99,6 +113,14 @@ export default function HomeScreen() {
 
   const ONE_SECOND_IN_MS = 1000;
   const PATTERN = [1 * ONE_SECOND_IN_MS];
+
+  Notifications.setNotificationHandler({
+    handleNotification: async (notification) => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
 
   const checkAndUpdateStreak = async (tasks: Task[], bills: Bill[]) => {
     const totalItems = tasks.length + bills.length;
@@ -130,6 +152,36 @@ export default function HomeScreen() {
       } else {
         await editUserMascot(user.data._id, "676969dfa5e78f1378a63a71");
         handleGetUser(user.data._id);
+      }
+    }
+  };
+
+  const scheduleTaskNotifications = async (tasks: Task[]) => {
+    const now = new Date();
+
+    for (const task of tasks) {
+      if (task.status == false && task.notification == true) {
+        const dueDate = new Date(task.startDate);
+        const timeUntilNotification = dueDate.getTime() - now.getTime() - 60000;
+        if (timeUntilNotification > 0) {          
+          const identifier = await Notifications.scheduleNotificationAsync({
+            content: {
+              title: "TUDU Awaits!",
+              body: `🌟 You have an important task: "${task.name}". Don't forget to complete it!`,
+              color: "#F7F6F0",
+            },
+            trigger: {
+              type: SchedulableTriggerInputTypes.TIME_INTERVAL,
+              seconds: Math.round(timeUntilNotification / 1000),
+            },
+          });
+          console.log(`Notification scheduled for: ${task.name}, to be sent in ${Math.round(timeUntilNotification / 1000)} seconds`);
+
+          setTimeout(async () => {
+            await Notifications.cancelScheduledNotificationAsync(identifier);
+            console.log(`Notification for task "${task.name}" has been cancelled.`);
+          }, timeUntilNotification + 60000);
+        }
       }
     }
   };
