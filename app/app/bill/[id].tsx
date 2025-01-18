@@ -21,6 +21,7 @@ import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
 import EditBill from "@/components/EditBill";
+import HeaderItem from "@/components/Header";
 
 const BillDetail = () => {
   const fontsLoaded = useFonts();
@@ -112,6 +113,31 @@ const BillDetail = () => {
     bill && (
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F6F0" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", padding: 20, }}>
+          <View style={{ width: 28 }}>
+            <HeaderItem page="Bill" />
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignContent: "center",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 23.04,
+                color: "#562CAF",
+                fontFamily: "SF-Pro-Display-Medium",
+                textAlign: "center",
+                lineHeight: 24,
+              }}
+            >
+              Bill
+            </Text>
+          </View>
+        </View>
           {edit ? (
             <ScrollView style={styles.container}>
               <Text>Edit view</Text>

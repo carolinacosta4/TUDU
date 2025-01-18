@@ -12,13 +12,14 @@ import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
+import HeaderItem from "@/components/Header";
 
 export default function BillsScreen() {
   const width = Dimensions.get("window").width;
   const thismonth = new Date();
   const { userInfo, logged } = useUserInfo();
   const { monthlyBills, updateBill, fetchMonthBills } = useBillStore()
-  const { loading, handleGetUser, user } = useUser();
+  const { loading, handleGetUser, user, userStreak } = useUser();
   const [loadingBills, setloadingBills] = useState(true);
   const [upcomingBills, setUpcomingBills] = useState<Bill[]>([]);
   const {unlockAchievement} = useAchievementsStore()
@@ -158,6 +159,10 @@ export default function BillsScreen() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.containerScrollView}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, paddingHorizontal: 20 }}>
+          <Text style={{color: '#291752', fontSize: 23.04, fontFamily: 'SF-Pro-Display-Medium'}}>Bills</Text>
+          <HeaderItem page="Bills" userStreak={userStreak} />
+        </View>
         <View style={styles.container}>
         <HeaderBillPage progress={calculateProgress()} activeBillsCount={activeBillsCount()} pendingBill={pendingBill()} nextPayment={nextPayment()} monthsTotal={monthsTotal()}/>
           <View style={styles.footer}>

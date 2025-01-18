@@ -1,7 +1,7 @@
-import { Text, View, TouchableHighlight } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import StreaksItem from "./StreaksItem";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 
 type HeaderItemProps = {
   page: string;
@@ -33,11 +33,15 @@ const HeaderItem = ({ page, userStreak }: HeaderItemProps) => {
         </View>
       </View>
     )
-  ) : page == "Achievements" ? (
-    <Icon name="chevron-left" size={28} color="#562CAF" />
+  ) : page == "Achievements" || page == "Favorites" || page == "Bill" || page == "Task" ? (
+    <TouchableOpacity onPress={() => router.back()}>
+      <Icon name="chevron-left" size={28} color="#562CAF" />
+    </TouchableOpacity>
   ) : page == "Tip" ? (
-    <Icon name="chevron-left" size={28} color="#562CAF" />
-  ) : page == "Tips" ? (
+    <TouchableOpacity onPress={() => router.back()} style={{ padding: 20, paddingTop: 50 }}>
+      <Icon name="chevron-left" size={28} color="#EEE5F5" />
+    </TouchableOpacity>
+  ) : page == "Tips" && (
     <View
       style={{
         flexDirection: "row",
@@ -45,26 +49,34 @@ const HeaderItem = ({ page, userStreak }: HeaderItemProps) => {
         justifyContent: "space-between",
       }}
     >
-      <Icon name="chevron-left" size={28} color="#562CAF" />
-      <Icon name="heart" size={28} color="#562CAF" />
-    </View>
-  ) : (
-    page == "Bill" ||
-    (page == "Task" && (
+      <TouchableOpacity onPress={() => router.back()}>
+        <Icon name="chevron-left" size={28} color="#562CAF" />
+      </TouchableOpacity>
       <View
         style={{
-          flexDirection: "row",
+          flex: 1,
+          alignContent: "center",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: "center",
         }}
       >
-        <Icon name="chevron-left" size={28} color="#562CAF" />
-        <TouchableHighlight>
-          <Text>Done</Text>
-        </TouchableHighlight>
+        <Text
+          style={{
+            fontSize: 23.04,
+            color: "#562CAF",
+            fontFamily: "SF-Pro-Display-Medium",
+            textAlign: "center",
+            lineHeight: 24,
+          }}
+        >
+          Tips
+        </Text>
       </View>
-    ))
-  );
+      <Link href={{ pathname: "/favorites" }}>
+        <Icon name="heart" size={28} color="#562CAF" />
+      </Link>
+    </View>
+  )
 };
 
 export default HeaderItem;

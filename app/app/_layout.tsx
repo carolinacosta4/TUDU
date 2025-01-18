@@ -11,12 +11,15 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="recoverPassword" options={{ headerShown: false }} />
         <Stack.Screen name="tips/[tipId]" options={{ headerShown: false }} />
-      <Stack.Screen
+        <Stack.Screen name="tips" options={{ headerShown: false }} />
+        <Stack.Screen name="favorites" options={{ headerShown: false }} />
+        <Stack.Screen
           name="resetPassword/[id]"
           options={{ headerShown: false }}
         />
         <Stack.Screen name="+not-found" />
       <Stack.Screen name="task/[id]" options={{ headerShown: false }} />
+      <Stack.Screen name="bill/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="achievements" options={{ headerShown: false }}/>
       </Stack>
     </GestureHandlerRootView>

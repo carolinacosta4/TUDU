@@ -8,6 +8,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useAchievementsStore } from "@/stores/achievementsStore";
 import Achievement from "@/interfaces/Achievement";
 import LoadingScreen from "@/components/LoadingScreen";
+import HeaderItem from "@/components/Header";
 
 export default function AchievementsScreen() {
   const fontsLoaded = useFonts();
@@ -60,19 +61,32 @@ export default function AchievementsScreen() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <ScrollView>
-          <Text
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ width: 28 }}>
+            <HeaderItem page="Achievements" />
+          </View>
+          <View
             style={{
-              fontSize: 16,
-              color: "#474038",
-              fontFamily: "Rebond-Grotesque-Medium",
-              padding: 4,
-              textAlign: "center",
-              lineHeight: 24,
+              flex: 1,
+              alignContent: "center",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Achievements page
-          </Text>
+            <Text
+              style={{
+                fontSize: 23.04,
+                color: "#562CAF",
+                fontFamily: "SF-Pro-Display-Medium",
+                textAlign: "center",
+                lineHeight: 24,
+              }}
+            >
+              Achievements
+            </Text>
+          </View>
+        </View>
+        <ScrollView>  
           <View
             style={{
               flexDirection: "row",
