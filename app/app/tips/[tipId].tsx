@@ -7,6 +7,8 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useUser } from '@/hooks/useUser';
 import LoadingScreen from '@/components/LoadingScreen';
+import useFonts from '@/hooks/useFonts';
+import HeaderItem from '@/components/Header';
 
 const TipDetail = () => {
   const { userInfo } = useUserInfo();
@@ -14,6 +16,7 @@ const TipDetail = () => {
   const { tipId } = useLocalSearchParams();
   const { tip, loading, removeFromFavorite, markAsFavorite, fetchTip } = useTip();
   const [isLiked, setIsLiked] = useState(false); 
+  const fontsLoaded = useFonts();
 
   useEffect(() => {
     if (typeof tipId === "string") {
@@ -22,11 +25,12 @@ const TipDetail = () => {
   }, [tipId])
 
   useEffect(() => {
-    const favoriteTipIds = user ? user.FavoriteTip.map(fav => fav.IDtip) : [];   
+    if(!user || loading) return;
+    const favoriteTipIds = user ? user.FavoriteTip.map(fav => fav.IDtip._id) : [];       
     setIsLiked(favoriteTipIds.includes(String(tipId)));
-  }, [user, tipId, userInfo]);
+  }, [user, tipId, userInfo, loading]);
 
-  if (!userInfo || !tipId || !user || loading) {
+  if (!userInfo || !tipId || !user || loading || !fontsLoaded) {
     return <LoadingScreen/>
   }
 
@@ -58,6 +62,7 @@ const TipDetail = () => {
           colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.7)']} 
           style={styles.linearGradient}
         >
+          <HeaderItem page="Tip" />
           <View style={styles.headerContent}>
             <View style={styles.headerTextContainer}>
               <Text style={styles.title}>{tip.title}</Text>
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
     fontSize: 13.33,
     fontFamily: 'ES Rebond Grotesque TRIAL',
     fontWeight: '400',
-    lineHeight: 16,
+    lineHeight: 20,
   },
   iconContainer: {
     width: 30,
@@ -191,7 +196,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'ES Rebond Grotesque TRIAL',
     fontWeight: '400',
-    lineHeight: 16,
+    lineHeight: 20,
   },
   section: {
     alignSelf: 'stretch',
@@ -208,7 +213,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'ES Rebond Grotesque TRIAL',
     fontWeight: '400',
-    lineHeight: 16,
+    lineHeight: 20,
   },
   sectionText: {
     alignSelf: 'stretch',
@@ -222,7 +227,7 @@ const styles = StyleSheet.create({
     fontSize: 13.33,
     fontFamily: 'ES Rebond Grotesque TRIAL',
     fontWeight: '400',
-    lineHeight: 16,
+    lineHeight: 20,
   },
 });
 

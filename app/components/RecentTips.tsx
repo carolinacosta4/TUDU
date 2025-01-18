@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginBottom: 12,
     fontFamily: "Rebond-Grotesque-Medium",
+    lineHeight: 24,
   },
   cardRow: {
     flexDirection: 'row',
@@ -72,13 +73,16 @@ const styles = StyleSheet.create({
     color: '#22163D',
     fontSize: 16,
     fontWeight: '500',
-    height: 48,
     fontFamily: "Rebond-Grotesque-Medium",
+    marginTop: 8,
+    lineHeight: 20,
   },
   cardContentDescription: {
     color: '#635C54',
     fontSize: 13.33,
     fontFamily: "Rebond-Grotesque-Regular",
+    lineHeight: 20,
+    marginTop: 4,
   },
 });
 

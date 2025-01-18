@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Rebond-Grotesque-Medium',
     fontWeight: '500',
+    lineHeight: 20,
   },
 
   searchInput: {

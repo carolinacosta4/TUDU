@@ -21,6 +21,7 @@ import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
 import EditTask from "@/components/EditTask";
+import HeaderItem from "@/components/Header";
 
 const TaskDetail = () => {
   const fontsLoaded = useFonts();
@@ -149,6 +150,31 @@ const TaskDetail = () => {
     task && (
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F6F0" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", padding: 20, }}>
+          <View style={{ width: 28 }}>
+            <HeaderItem page="Task" />
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignContent: "center",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 23.04,
+                color: "#562CAF",
+                fontFamily: "SF-Pro-Display-Medium",
+                textAlign: "center",
+                lineHeight: 24,
+              }}
+            >
+              Task
+            </Text>
+          </View>
+        </View>
           {edit ? (
             <ScrollView style={styles.container}>
               <Text>Edit view</Text>
