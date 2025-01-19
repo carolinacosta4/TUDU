@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Dimensions, Platform, Vibration } from "react-native"; 
+import { View, Text, StyleSheet, ScrollView, Dimensions, Platform, Vibration, Button } from "react-native"; 
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useEffect, useState } from "react";
@@ -184,10 +184,6 @@ export default function BillsScreen() {
                       ))}
                     </View>
                   </View>
-                  <Link href={{pathname: '/SplashScreen'}} >
-                  ANIMATION
-                  </Link>
-                  <Text>HOLA</Text>
                   {upcomingBills.length > 0 && (
                     <View style={styles.upcomingMonths}>
                       <Text style={styles.upcomingLabel}>Upcoming months</Text>

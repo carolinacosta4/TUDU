@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Vibration, Platform, Image } from "react-native";
+import { View, Vibration, Platform, Image, Button } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useUser } from "@/hooks/useUser";
