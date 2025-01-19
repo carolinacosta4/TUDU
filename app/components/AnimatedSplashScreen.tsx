@@ -29,7 +29,7 @@ const AnimatedLottie  = Animated.createAnimatedComponent(LottieView)
                 height: '100%',
                 
                 }}
-                source={require('@/assets/lotties/splash_screen_logged.json')}
+                source={require('@/assets/lotties/splashscreen_logged_animation.json')}
             />
         </Animated.View>
     )
