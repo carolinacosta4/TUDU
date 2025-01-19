@@ -198,7 +198,7 @@ export default function OnboardingScreen({  onClose }: Props) {
       setScreenIndex(screenIndex + 1);
     }
   };
-
+  
   const onBack = () => {
     const isFirstScreen = screenIndex === 0
     if (isFirstScreen) {

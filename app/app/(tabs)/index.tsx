@@ -72,14 +72,13 @@ export default function HomeScreen() {
         return "#000000";
     }
   };
-/*
+
   useEffect(() => {
     if (logged === false) {
-      router.push("/register");
+      router.push("/onboarding");
     }
   }, [logged]);
 
-*/
 
   useEffect(() => {
     if (loading === false && logged === true && userInfo) {
@@ -269,10 +268,6 @@ export default function HomeScreen() {
               billsDueToday={bills}
               onFilterToggle={() => setShowFilter(true)}
             />
-            <Link href={{pathname: "/onboarding"}} asChild>
-              <Button title="go to onboarding"/>
-            </Link>
-            
             <>
               {allDayTasks.length > 0 ||
               filteredBills.length > 0 ||
