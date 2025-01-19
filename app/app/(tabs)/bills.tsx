@@ -13,6 +13,7 @@ import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
 import HeaderItem from "@/components/Header";
+import { Link } from 'expo-router';
 
 export default function BillsScreen() {
   const width = Dimensions.get("window").width;
@@ -183,6 +184,10 @@ export default function BillsScreen() {
                       ))}
                     </View>
                   </View>
+                  <Link href={{pathname: '/SplashScreen'}} >
+                  ANIMATION
+                  </Link>
+                  <Text>HOLA</Text>
                   {upcomingBills.length > 0 && (
                     <View style={styles.upcomingMonths}>
                       <Text style={styles.upcomingLabel}>Upcoming months</Text>

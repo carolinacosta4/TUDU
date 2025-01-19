@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Link } from 'expo-router';
 import SearchAndCategories from '@/components/SearchAndCategories';
 import { formatDistanceToNow } from 'date-fns';
 import TipItemList from '@/components/TipItemList';
