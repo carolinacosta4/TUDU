@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Vibration, Platform, Image, Button } from "react-native";
+import { View, Vibration, Platform, Image, Button, Modal } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useUser } from "@/hooks/useUser";
@@ -11,6 +11,9 @@ import HeaderHomeScreen from "@/components/HeaderHomeScreen";
 import CardsHome from "@/components/CardsHome";
 import ListHome from "@/components/ListHome";
 import LoadingScreen from "@/components/LoadingScreen";
+import { Link } from "expo-router";
+import { useOnboarding } from '@/hooks/useOnboarding';
+
 import {
   groupTasksByTime,
   categorizeTasks,
@@ -24,6 +27,7 @@ import { useTaskStore } from "@/stores/taskStore";
 import { useBillStore } from "@/stores/billStore";
 import useAchievementsStore from "@/stores/achievementsStore";
 import { analyseAchievement, analyseStreaksAchievement } from "@/utils/achievementUtils";
+import OnboardingScreen from "@/app/onboarding";
 
 export default function HomeScreen() {
   const today = new Date();
@@ -54,6 +58,7 @@ export default function HomeScreen() {
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
   const {unlockAchievement} = useAchievementsStore()
+  const { showOnboarding, onFirstLaunchClosed } = useOnboarding();
 
   const getMascotStyle = (mascot: string) => {
     switch (mascot) {
@@ -67,12 +72,14 @@ export default function HomeScreen() {
         return "#000000";
     }
   };
-
+/*
   useEffect(() => {
     if (logged === false) {
       router.push("/register");
     }
   }, [logged]);
+
+*/
 
   useEffect(() => {
     if (loading === false && logged === true && userInfo) {
@@ -217,6 +224,9 @@ export default function HomeScreen() {
     user && (
       <SafeAreaProvider>
         <SafeAreaView style={{ backgroundColor: "#F7F6F0", flex: 1 }}>
+        <Modal visible={showOnboarding}>
+          <OnboardingScreen onClose={onFirstLaunchClosed} />
+        </Modal>
           <View
             style={{
               marginHorizontal: 20,
@@ -259,6 +269,10 @@ export default function HomeScreen() {
               billsDueToday={bills}
               onFilterToggle={() => setShowFilter(true)}
             />
+            <Link href={{pathname: "/onboarding"}} asChild>
+              <Button title="go to onboarding"/>
+            </Link>
+            
             <>
               {allDayTasks.length > 0 ||
               filteredBills.length > 0 ||

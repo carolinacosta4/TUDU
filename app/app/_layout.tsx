@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import useFonts from "@/hooks/useFonts";
 import AnimatedSplashScreen from '@/components/AnimatedSplashScreen'
 import Animated, { FadeIn } from "react-native-reanimated";
-//SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
   const [appReady, setAppReady] = useState(false)
@@ -21,7 +20,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded) {
-      //SplashScreen.hideAsync().catch(console.warn);
       setAppReady(true);
     }
   }, [fontsLoaded]);
@@ -38,7 +36,7 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{flex: 1}}>
           <Animated.View style={{flex: 1}} entering={FadeIn}>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -48,6 +46,7 @@ export default function RootLayout() {
               <Stack.Screen name="tips/[tipId]" options={{ headerShown: false }} />
               <Stack.Screen name="tips" options={{ headerShown: false }} />
               <Stack.Screen name="favorites" options={{ headerShown: false }} />
+              <Stack.Screen name="onboarding" options={{ headerShown: false }} />
               <Stack.Screen
                 name="resetPassword/[id]"
                 options={{ headerShown: false }}

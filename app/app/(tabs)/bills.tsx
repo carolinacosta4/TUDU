@@ -13,7 +13,6 @@ import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
 import HeaderItem from "@/components/Header";
-import { Link } from 'expo-router';
 
 export default function BillsScreen() {
   const width = Dimensions.get("window").width;
