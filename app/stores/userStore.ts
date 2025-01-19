@@ -5,6 +5,8 @@ import User from "../interfaces/User";
 interface UserState {
   user: User;
   fetchUser: (userID: string) => Promise<void>;
+  addUser: (user: any) => Promise<void>;
+  loginUser: (email: string, password: string) => Promise<any>;
   updateUser: (
     id: string,
     updatedUser: any,
@@ -16,6 +18,12 @@ interface UserState {
     authToken: string
   ) => Promise<void>;
   deleteUser: (id: string, authToken: string) => Promise<void>;
+  sendEmail: (email: string) => Promise<void>;
+  resetPassword: (
+    id: string,
+    password: string,
+    confirmPassword: string
+  ) => Promise<any>;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -28,6 +36,24 @@ export const useUserStore = create<UserState>((set) => ({
       console.error(error);
     }
   },
+  addUser: async (user) => {
+    try {
+      await api.post("users", user);
+    } catch (error: any) {
+      throw error.response?.data?.msg;
+    }
+  },
+  loginUser: async (email, password) => {
+    try {
+      const response = await api.post("users/login", {
+        email: email,
+        password: password,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data?.msg;
+    }
+  },
   updateUser: async (id, updatedUser, authToken) => {
     try {
       await api.patch(`users/${id}`, updatedUser, {
@@ -37,11 +63,10 @@ export const useUserStore = create<UserState>((set) => ({
       });
       const response = await api.get(`users/${id}`);
       set({ user: response.data });
-    } catch (error: any) {     
+    } catch (error: any) {
       throw error.response?.data?.msg;
     }
   },
-  
   updateUserProfilePicture: async (id, formData, authToken) => {
     try {
       await api.patch(`users/${id}/change-profile-picture`, formData, {
@@ -65,6 +90,27 @@ export const useUserStore = create<UserState>((set) => ({
       });
     } catch (error) {
       console.error(error);
+    }
+  },
+  sendEmail: async (email) => {
+    try {
+      await api.post("users/password-recovery", {
+        email: email,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  resetPassword: async (id, password, confirmPassword) => {
+    try {
+      const response = await api.post(`users/reset-password/${id}`, {
+        password: password,
+        confirmPassword: confirmPassword,
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data?.msg;
     }
   },
 }));
