@@ -28,6 +28,7 @@ import { useBillStore } from "@/stores/billStore";
 import useAchievementsStore from "@/stores/achievementsStore";
 import { analyseAchievement, analyseStreaksAchievement } from "@/utils/achievementUtils";
 import OnboardingScreen from "@/app/onboarding";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
   const today = new Date();
@@ -58,8 +59,8 @@ export default function HomeScreen() {
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
   const {unlockAchievement} = useAchievementsStore()
-  const { showOnboarding, onFirstLaunchClosed } = useOnboarding();
-
+  //const { showOnboarding, onFirstLaunchClosed } = useOnboarding();
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const getMascotStyle = (mascot: string) => {
     switch (mascot) {
       case "Lady Mess":
@@ -75,11 +76,24 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (logged === false) {
-      router.push("/onboarding");
+      router.push("/register");
     }
   }, [logged]);
 
+useEffect(() => {
+  async function checkFirstLaunch(){
+    const firstLaunchVal = await AsyncStorage.getItem('IS_ONBOARDED');
+    if (!firstLaunchVal) {
+      setShowOnboarding(true)
+    }
+  }
+  checkFirstLaunch()
+}, []);
 
+async function onFirstLaunchClosed() {
+  await AsyncStorage.setItem('IS_ONBOARDED', 'true');
+  setShowOnboarding(false)
+}
   useEffect(() => {
     if (loading === false && logged === true && userInfo) {
       fetchTasks(today, userInfo.authToken);
@@ -223,9 +237,6 @@ export default function HomeScreen() {
     user && (
       <SafeAreaProvider>
         <SafeAreaView style={{ backgroundColor: "#F7F6F0", flex: 1 }}>
-        <Modal visible={showOnboarding}>
-          <OnboardingScreen onClose={onFirstLaunchClosed} />
-        </Modal>
           <View
             style={{
               marginHorizontal: 20,
@@ -305,6 +316,12 @@ export default function HomeScreen() {
               setFilterSelection={setFilterSelection}
             />
           )}
+        <Modal 
+          visible={showOnboarding}
+          onRequestClose={() => setShowOnboarding(false)}
+        >
+          <OnboardingScreen onClose={onFirstLaunchClosed} />
+        </Modal>
         </SafeAreaView>
       </SafeAreaProvider>
     )

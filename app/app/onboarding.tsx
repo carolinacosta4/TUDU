@@ -193,12 +193,12 @@ export default function OnboardingScreen({  onClose }: Props) {
     const isLastScreen = screenIndex === onboardingSteps.length - 1;
     if (isLastScreen) {
       setScreenIndex(0);
-      onClose ? onClose() : router.push('/login');
+      onClose ? onClose() : router.push('/');
     } else {
       setScreenIndex(screenIndex + 1);
     }
   };
-  
+
   const onBack = () => {
     const isFirstScreen = screenIndex === 0
     if (isFirstScreen) {
