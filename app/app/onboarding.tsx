@@ -9,7 +9,7 @@ import logoWhite from '@/assets/images/logo_white.png';
 import logoBlue from "@/assets/images/logo_blue.png";
 import logoGreen from "@/assets/images/logo_green.png";
 import logoYellow from "@/assets/images/logo_yellow.png";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const COLORS = {
   primary: '#562CAF',
   secondary: '#291752',
@@ -181,11 +181,11 @@ const onboardingSteps = [
     icon: null
   },
 ];
-
+/*
 type Props = {
   onClose: () => void
-}
-export default function OnboardingScreen({  onClose }: Props) {
+}*/
+export default function OnboardingScreen(/*{  onClose }: Props*/) {
   const [screenIndex, setScreenIndex] = useState(0);
   const data = onboardingSteps[screenIndex];
 
@@ -193,7 +193,9 @@ export default function OnboardingScreen({  onClose }: Props) {
     const isLastScreen = screenIndex === onboardingSteps.length - 1;
     if (isLastScreen) {
       setScreenIndex(0);
-      onClose ? onClose() : router.push('/');
+      AsyncStorage.setItem('IS_ONBOARDED', 'true');
+      //onClose ? onClose() : router.push('/register')
+      router.push('/register');
     } else {
       setScreenIndex(screenIndex + 1);
     }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Vibration, Platform, Image, Button, Modal } from "react-native";
+import { Text, View, Vibration, Platform, Image } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useUser } from "@/hooks/useUser";
@@ -11,9 +11,6 @@ import HeaderHomeScreen from "@/components/HeaderHomeScreen";
 import CardsHome from "@/components/CardsHome";
 import ListHome from "@/components/ListHome";
 import LoadingScreen from "@/components/LoadingScreen";
-import { Link } from "expo-router";
-import { useOnboarding } from '@/hooks/useOnboarding';
-
 import {
   groupTasksByTime,
   categorizeTasks,
@@ -27,8 +24,6 @@ import { useTaskStore } from "@/stores/taskStore";
 import { useBillStore } from "@/stores/billStore";
 import useAchievementsStore from "@/stores/achievementsStore";
 import { analyseAchievement, analyseStreaksAchievement } from "@/utils/achievementUtils";
-import OnboardingScreen from "@/app/onboarding";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
   const today = new Date();
@@ -59,8 +54,7 @@ export default function HomeScreen() {
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
   const {unlockAchievement} = useAchievementsStore()
-  //const { showOnboarding, onFirstLaunchClosed } = useOnboarding();
-  const [showOnboarding, setShowOnboarding] = useState(false)
+
   const getMascotStyle = (mascot: string) => {
     switch (mascot) {
       case "Lady Mess":
@@ -76,24 +70,10 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (logged === false) {
-      router.push("/register");
+      router.push("/onboarding");
     }
   }, [logged]);
 
-useEffect(() => {
-  async function checkFirstLaunch(){
-    const firstLaunchVal = await AsyncStorage.getItem('IS_ONBOARDED');
-    if (!firstLaunchVal) {
-      setShowOnboarding(true)
-    }
-  }
-  checkFirstLaunch()
-}, []);
-
-async function onFirstLaunchClosed() {
-  await AsyncStorage.setItem('IS_ONBOARDED', 'true');
-  setShowOnboarding(false)
-}
   useEffect(() => {
     if (loading === false && logged === true && userInfo) {
       fetchTasks(today, userInfo.authToken);
@@ -316,12 +296,6 @@ async function onFirstLaunchClosed() {
               setFilterSelection={setFilterSelection}
             />
           )}
-        <Modal 
-          visible={showOnboarding}
-          onRequestClose={() => setShowOnboarding(false)}
-        >
-          <OnboardingScreen onClose={onFirstLaunchClosed} />
-        </Modal>
         </SafeAreaView>
       </SafeAreaProvider>
     )
