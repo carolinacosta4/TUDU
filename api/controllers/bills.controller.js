@@ -43,6 +43,7 @@ exports.findBillsForMonth = async (req, res) => {
       )
       .populate("IDcurrency", "-__v")
       .select("-__v")
+      .sort({ dueDate: 1 })
       .exec();
 
     if (!bills || bills.length === 0) {
