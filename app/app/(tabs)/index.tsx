@@ -70,7 +70,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (logged === false) {
-      router.push("/register");
+      router.push("/onboarding");
     }
   }, [logged]);
 
