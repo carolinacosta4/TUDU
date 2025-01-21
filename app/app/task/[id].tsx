@@ -30,6 +30,7 @@ const TaskDetail = () => {
   const { user } = useUser();
   const { fetchUser, unlockAchievement } = useUserStore();
   const [edit, setEdit] = useState<Boolean>(false);
+  const [alreadyStarted, setAlreadyStarted] = useState<Boolean>(false);
   
   useEffect(() => {
     if (typeof id === "string") {
@@ -42,6 +43,16 @@ const TaskDetail = () => {
       fetchUser(userInfo.userID);
     }
   }, [userInfo]);
+
+  useEffect(() => {
+    if(task){
+      const now = new Date();
+      const start = new Date(task.startDate);
+      if (start <= now ) {
+        setAlreadyStarted(true);
+      }
+    }
+  }, [task.startDate]);
   
   if (!task || !fontsLoaded || !userInfo || loadingTask) {
     return (
@@ -75,13 +86,13 @@ const TaskDetail = () => {
         return {};
     }
   };
-
+  
   const getCountdown = (startDate: Date): string => {
     const now = new Date();
     const start = new Date(startDate);
 
     if (start <= now) {
-      return "Today";
+      return "Already started";
     }
 
     const isToday = start.toDateString() === now.toDateString();
@@ -91,7 +102,6 @@ const TaskDetail = () => {
       const minutes = Math.floor(
         (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
       );
-
       return `${hours}h ${minutes}m`;
     }
 
@@ -175,7 +185,13 @@ const TaskDetail = () => {
         </View>
           {edit ? (
             <ScrollView style={styles.container}>
-              <Text>Edit view</Text>
+              <Text style={{
+                fontSize: 20,
+                color: "#562CAF",
+                fontFamily: "SF-Pro-Display-Medium",
+                lineHeight: 24,
+                paddingBottom: 24,
+              }}>Edit task</Text>
               <EditTask task={task} handleEdit={handleEdit} />
             </ScrollView>
           ) : (
@@ -237,7 +253,7 @@ const TaskDetail = () => {
               </Text>
 
               <View style={styles.startInfo}>
-                <Text style={styles.countdown}>Starts in</Text>
+                {!alreadyStarted && <Text style={styles.countdown}>Starts in</Text>}
                 <Text style={styles.timeRemaining}>
                   {getCountdown(task.startDate)}
                 </Text>

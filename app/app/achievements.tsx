@@ -29,7 +29,7 @@ export default function AchievementsScreen() {
   }, []);
 
   useEffect(() => {
-    if (achievements.length > 0) {
+    if (user && achievements.length > 0) {
       const lockedAchievements = achievements.filter(
         (achievement) =>
           !user.userAchievements.find(

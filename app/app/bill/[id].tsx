@@ -138,7 +138,13 @@ const BillDetail = () => {
         </View>
           {edit ? (
             <ScrollView style={styles.container}>
-              <Text>Edit view</Text>
+              <Text style={{
+                fontSize: 20,
+                color: "#562CAF",
+                fontFamily: "SF-Pro-Display-Medium",
+                lineHeight: 24,
+                paddingBottom: 24,
+              }}>Edit bill</Text>
               <EditBill bill={bill} handleEdit={handleEdit}/>
             </ScrollView>
           ) : (
