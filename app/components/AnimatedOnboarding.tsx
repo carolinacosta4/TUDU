@@ -21,21 +21,21 @@ const AnimatedOnboarding = ({url, type}: AnimatedOnboardingType) => {
             autoPlay
             loop={true}
             style={{
-            width: 1400,
+            width: 1200,
             height: 'auto',
             aspectRatio: 1,
             }}
             source={require('@/assets/lotties/data_lazyanimation.json')}
         />
     </Animated.View> : type == 15 ? 
-    <Animated.View style={{ alignContent: 'center', height: 300, width: 300, alignItems: 'center', justifyContent: 'center', paddingBottom: Dimensions.get("window").width *0.2}}>
+    <Animated.View style={{ alignContent: 'center', height: 300, width: 200, alignItems: 'center', justifyContent: 'center', paddingBottom: Dimensions.get("window").width *0.2, paddingLeft: Dimensions.get("window").width *0.1}}>
         <AnimatedLottie
             exiting={ZoomOut}
             ref={animation}
             autoPlay
             loop={true}
             style={{
-            width: 1400,
+            width: 1200,
             height: 'auto',
             aspectRatio: 1,
             }}
