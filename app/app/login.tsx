@@ -42,8 +42,8 @@ export default function LoginScreen() {
           router.push("/");
         }
       } catch (error: any) {
-        if (error.response) {
-          setError(error.response.data.msg);
+        if (error) {
+          setError(error);
           setShowError(true);
         } else {
           console.error("Error message:", error);

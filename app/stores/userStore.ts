@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import api from "@/api/api";
 import User from "../interfaces/User";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface UserState {
   user: User | undefined;
@@ -157,6 +158,7 @@ export const useUserStore = create<UserState>((set) => ({
           Authorization: `Bearer ${authToken}`,
         },
       });
+      await AsyncStorage.clear();
     } catch (error) {
       console.error(error);
     }
