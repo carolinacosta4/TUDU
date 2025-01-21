@@ -58,7 +58,6 @@ exports.updateStreak = async (req, res) => {
         const lastAccessed = new Date(streak.lastDateAccessed);
         const accessedYesterday = lastAccessed.toDateString() === yesterday.toDateString();
         const accessedToday = lastAccessed.toDateString() === today.toDateString();
-       
         if (!accessedYesterday && !accessedToday) {
             const tasksYesterday = await db.Task.find({
                 IDuser: userId,
@@ -66,8 +65,8 @@ exports.updateStreak = async (req, res) => {
                 endDate: { $gte: yesterday },
             });
 
-            if (tasksYesterday.length > 0) {
-                streak.streaks = 0;
+            if (tasksYesterday.length === 0) {
+                streak.streaks = 1;
             }
         }
 
