@@ -222,10 +222,12 @@ const TaskDetail = () => {
                 style={{
                   fontSize: 13.33,
                   fontFamily: "Rebond-Grotesque-Medium",
-                  padding: 7,
+                  paddingHorizontal: 30,
+                  paddingVertical: 5,
                   lineHeight: 15,
                   borderRadius: 100,
                   marginBottom: 20,
+                  alignSelf: "flex-start",
                   textAlign: "center",
                   color: task.IDcategory.color,
                   backgroundColor: task.IDcategory.backgroundColor,
