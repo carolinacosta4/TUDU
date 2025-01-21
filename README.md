@@ -46,12 +46,14 @@ Structuring and developing the Mobile Application:
 
 ![React Native](https://img.shields.io/badge/ReactNative-222222?style=for-the-badge&logo=React&logoColor=)
 ![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)
+![Typescript](https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square)
+![Zustand](https://img.shields.io/badge/Zustand-black.svg)
 
 Structuring and developing the Back-end:
 
 ![MongoDB](https://img.shields.io/badge/-MongoDB-13aa52?style=for-the-badge&logo=mongodb&logoColor=white)
-![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)
-![Zustand](https://img.shields.io/badge/Zustand-black.svg)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=Postman&logoColor=white)
+![JavaScript](https://shields.io/badge/JavaScript-F7DF1E?logo=JavaScript&logoColor=000&style=flat-square)
 
 Internal structure of the project:
 
