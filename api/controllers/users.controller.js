@@ -74,13 +74,15 @@ exports.findUser = async (req, res) => {
       .populate("IDAchievements", "-__v")
       .exec();
 
+    let userAchievementsSorted = userAchievements.sort((a, b) => new Date(b.unlockedAt) - new Date(a.unlockedAt))
+    
     return res.status(200).json({
       success: true,
       data: user,
       FavoriteTip: userFavoriteTips,
       userTasks: userTasks,
       userBills: userBills,
-      userAchievements: userAchievements,
+      userAchievements: userAchievementsSorted,
     });
   } catch (error) {
     handleErrorResponse(res, error);

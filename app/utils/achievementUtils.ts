@@ -107,27 +107,38 @@ export const analyseAchievement = (
     );
 
     if (!found) {
-      let today = new Date();
-      let previousTasks = user.userTasks.filter(
-        (task: Task) => task.endDate < today
-      );
-      let previousBills = user.userBills.filter(
-        (bill: Bill) => bill.dueDate < today
-      );
-
       if (
-        !previousTasks.find((task: Task) => !task.status) &&
-        !previousBills.find((bill: Bill) => !bill.status)
+        user.userTasks.length >= 10 &&
+        user.userBills.length >= 10 &&
+        !user.userTasks.find((t: Task) => t.status == false) &&
+        !user.userBills.find((b: Bill) => b.status == false)
       ) {
-        if (userInfo) {
-          unlockAchievement(
-            userInfo.userID,
-            "67659d2a4ff69edb3f0640e6",
-            userInfo.authToken
+        let today = new Date();
+        let previousTasks = user.userTasks.filter(
+          (task: Task) => task.endDate < today
+        );
+        let previousBills = user.userBills.filter(
+          (bill: Bill) => bill.dueDate < today
+        );
+
+        if (
+          !previousTasks.find((task: Task) => !task.status) &&
+          !previousBills.find((bill: Bill) => !bill.status)
+        ) {
+          let found = user.userAchievements.find(
+            (a: any) => a.IDAchievements.name == achievementName
           );
+          if (userInfo && !found) {
+            unlockAchievement(
+              userInfo.userID,
+              "67659d2a4ff69edb3f0640e6",
+              userInfo.authToken
+            );
+          }
+          unlockUltimateAchievement(userInfo, unlockAchievement, user);
+          return;
         }
-        unlockUltimateAchievement(userInfo, unlockAchievement, user);
-        return;
+        console.log("ta true");
       }
     }
   } else if (achievementName == "Clean Sweep") {
@@ -138,7 +149,8 @@ export const analyseAchievement = (
     if (!found) {
       if (
         !user.userTasks.find((task: Task) => !task.status) &&
-        !user.userBills.find((bill: Bill) => !bill.status)
+        !user.userBills.find((bill: Bill) => !bill.status) &&
+        user.userTasks.length >= 10
       ) {
         if (userInfo) {
           unlockAchievement(
@@ -162,7 +174,6 @@ export const analyseStreaksAchievement = (
   unlockAchievement: any,
   userStreak: any
 ) => {
-
   let foundStreakStarter = user.userAchievements.find(
     (a: any) => a.IDAchievements.name == "Streak starter"
   );
