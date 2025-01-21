@@ -16,7 +16,6 @@ import { formatDate } from "@/utils/taskUtils";
 import { useTaskStore } from "@/stores/taskStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useUser } from "@/hooks/useUser";
-import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -29,8 +28,7 @@ const TaskDetail = () => {
   const { updateTask, deleteTask, fetchTask, task, loadingTask } = useTaskStore();
   const { userInfo } = useUserInfo();
   const { user } = useUser();
-  const { fetchUser } = useUserStore();
-  const { unlockAchievement } = useAchievementsStore();
+  const { fetchUser, unlockAchievement } = useUserStore();
   const [edit, setEdit] = useState<Boolean>(false);
   
   useEffect(() => {

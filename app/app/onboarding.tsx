@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, Pressable } from "react-native";
+import { Text, View, StyleSheet, Image, Pressable, Dimensions } from "react-native";
 import { Stack } from "expo-router";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -236,9 +236,6 @@ export default function OnboardingScreen(/*{  onClose }: Props*/) {
       transition: 'background-color 100ms ease'
     };
   });
-  
-
-
 
   return (
     <GestureDetector gesture={swipes}>
@@ -323,7 +320,7 @@ const styles = StyleSheet.create({
     paddingTop: "10%",
     borderRadius: 9999,
     position: "absolute",
-    top: 456,
+    top: Dimensions.get('window').height * 0.5,
   },
   text: {
     width: 331,
