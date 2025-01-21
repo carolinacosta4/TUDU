@@ -1,8 +1,10 @@
+import Category from "./Category";
+
 export default interface Task {
   _id: string;
   name: string;
   priority: string;
-  IDcategory: string;
+  IDcategory: Category;
   startDate: Date;
   endDate: Date;
   periodicity: string;

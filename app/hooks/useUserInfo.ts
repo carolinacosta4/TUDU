@@ -23,8 +23,19 @@ export function useUserInfo() {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem("user", jsonValue);
+      setLogged(true);
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await AsyncStorage.clear();
+      setUserInfo(undefined);
+      setLogged(false);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -33,5 +44,5 @@ export function useUserInfo() {
     setLoading(false);
   }, []);
 
-  return { userInfo, setUserInfo, storeData, loading, logged };
+  return { userInfo, setUserInfo, storeData, loading, logged, logout };
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Dimensions, ScrollView, Text, View } from "react-native";
 import { Fragment } from "react";
 import BillItem from "@/components/BillItem";
 import TaskItem from "@/components/TaskItem";
@@ -21,9 +21,11 @@ const ListHome = ({
   changeStatus,
   user,
 }: CardsHomeProps) => {
+  const width = Dimensions.get("window").width;
+
   return (
     <ScrollView>
-      <View style={{ marginBottom: 450 }}>
+      <View style={{ marginBottom: width / 0.8 }}>
         {(filteredBills.length > 0 || allDayTasks.length > 0) && (
           <>
             <Text
@@ -33,6 +35,7 @@ const ListHome = ({
                 fontFamily: "Rebond-Grotesque-Medium",
                 marginTop: 24,
                 marginBottom: 4,
+                lineHeight: 20,
               }}
             >
               All-day
@@ -70,6 +73,7 @@ const ListHome = ({
                 fontFamily: "Rebond-Grotesque-Medium",
                 marginTop: 10,
                 marginBottom: 4,
+                lineHeight: 20,
               }}
             >
               {group.time}

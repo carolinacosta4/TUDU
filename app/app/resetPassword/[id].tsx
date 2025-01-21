@@ -1,4 +1,3 @@
-import api from "@/api/api";
 import { useState } from "react";
 import {
   Image,
@@ -11,6 +10,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import InputField from "@/components/InputField";
 import useFonts from "@/hooks/useFonts";
+import useUserStore from "@/stores/userStore";
 
 export default function RecoverPasswordScreen() {
   const [password, setPassword] = useState("");
@@ -21,23 +21,24 @@ export default function RecoverPasswordScreen() {
   const [showSuccess, setShowSuccess] = useState(false);
   const fontsLoaded = useFonts();
   const { id } = useLocalSearchParams();
+  const { resetPassword } = useUserStore();
 
   const handleSendEmail = async () => {
     if (password && confirmPassword) {
       setShowError(false);
       try {
-        const response = await api.post(`users/reset-password/${id}`, {
-          password: password,
-          confirmPassword: confirmPassword,
-        });
-
-        if (response.data.success) {
+        const response = await resetPassword(
+          String(id),
+          password,
+          confirmPassword
+        );
+        if (response.success) {
           setShowSuccess(true);
-          setSuccess('Password updated successfully');
+          setSuccess("Password updated successfully");
         }
       } catch (error: any) {
-        if (error.response) {
-          setError(error.response.data.msg);
+        if (error) {
+          setError(error);
           setShowError(true);
         } else {
           console.error("Error message:", error);
@@ -94,6 +95,7 @@ export default function RecoverPasswordScreen() {
                     fontSize: 23.04,
                     color: "#291752",
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                     textAlign: "center",
                   }}
                 >
@@ -104,6 +106,7 @@ export default function RecoverPasswordScreen() {
                     fontSize: 19.2,
                     color: "#562CAF",
                     fontFamily: "Rebond-Grotesque-Regular",
+                    lineHeight: 20,
                     paddingHorizontal: 70,
                     textAlign: "center",
                   }}
@@ -151,6 +154,7 @@ export default function RecoverPasswordScreen() {
                       color: "#EEEADF",
                       fontSize: 19.2,
                       fontFamily: "Rebond-Grotesque-Bold",
+                      lineHeight: 20,
                     }}
                   >
                     Continue
@@ -162,6 +166,7 @@ export default function RecoverPasswordScreen() {
                       color: "red",
                       marginTop: 12,
                       fontFamily: "Rebond-Grotesque-Regular",
+                      lineHeight: 20,
                     }}
                   >
                     {error}
@@ -173,6 +178,7 @@ export default function RecoverPasswordScreen() {
                       color: "green",
                       marginTop: 12,
                       fontFamily: "Rebond-Grotesque-Regular",
+                      lineHeight: 20,
                     }}
                   >
                     {success}

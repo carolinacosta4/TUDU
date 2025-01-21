@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
-import users from "@/api/api";
+import api from "@/api/api";
 import { useUserInfo } from "./useUserInfo";
+import Task from "@/interfaces/Task";
+import Category from "@/interfaces/Category";
 
 export function useTask() {
-  const { userInfo, loading } = useUserInfo();
+  const { loading } = useUserInfo();
   const [tasks, setTasks] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [task, setTask] = useState<Task>();
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  const handleGetTasks = async (date: Date, authToken: string) => {
+  const handleGetTask = async (id: string) => {
     try {
-      const response = await users.get(`tasks?date=${date.toISOString()}`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      setTasks(response.data.data);
+      const response = await api.get(`tasks/${id}`);
+      setTask(response.data.data);
     } catch (error) {
       console.warn(error);
     }
@@ -22,7 +21,7 @@ export function useTask() {
 
   const handleGetTasksCategories = async () => {
     try {
-      const response = await users.get(`tasks/categories`);
+      const response = await api.get(`tasks/categories`);
       setCategories(response.data.data);
     } catch (error) {
       console.warn(error);
@@ -33,23 +32,5 @@ export function useTask() {
     handleGetTasksCategories();
   }, []);
 
-  const getTasks = async (date: Date) => {
-    if (userInfo && userInfo.authToken && !loading) {
-      handleGetTasks(date, userInfo.authToken);
-    }
-  };
-
-  const editTask = async (id: string, data: any) => {
-    try {
-      await users.patch(`tasks/${id}`, data, {
-        headers: {
-          Authorization: `Bearer ${userInfo?.authToken}`,
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  return { tasks, setTasks, loading, getTasks, editTask, categories };
+  return { tasks, setTasks, loading, categories, handleGetTask, task };
 }

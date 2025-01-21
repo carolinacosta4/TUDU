@@ -6,11 +6,26 @@ import { useUserInfo } from "./useUserInfo";
 export function useUser() {
   const { userInfo, loading } = useUserInfo();
   const [user, setUser] = useState<User>();
-
   const handleGetUser = async (userID: string) => {
     try {
       const response = await api.get(`users/${userID}`);
-      setUser(response.data);
+      setUser(response.data);      
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUserStreak = async (userID: string) => {
+    try {
+      await api.patch(
+        `streaks/${userID}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo?.authToken}`,
+          },
+        }
+      );
     } catch (error) {
       console.error(error);
     }
@@ -22,5 +37,11 @@ export function useUser() {
     }
   }, [userInfo, loading]);
 
-  return { user, setUser, loading };
+  return {
+    user,
+    setUser,
+    loading,
+    handleGetUser,
+    handleUserStreak,
+  };
 }

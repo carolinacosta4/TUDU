@@ -16,9 +16,9 @@ exports.getStreaksByUserId = async (req, res) => {
         const streak = await Streaks.findOne({ IDuser: userId });
 
         if (!streak) {
-            return res.status(404).json({
+            return res.status(200).json({
                 success: false,
-                msg: "Streak data not found for this user",
+                data: {},
             });
         }
 
@@ -33,14 +33,13 @@ exports.getStreaksByUserId = async (req, res) => {
 
 exports.updateStreak = async (req, res) => {
     try {
-        const userId = req.loggedUserId;
+        const userId = req.params.idU;
         const today = new Date();
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
 
 
-        let streak = await Streaks.findOne({ _id: userId });
-
+        let streak = await Streaks.findOne({ IDuser: userId });
         if (!streak) {
             streak = new Streaks({
                 IDuser: userId,
@@ -58,16 +57,16 @@ exports.updateStreak = async (req, res) => {
 
         const lastAccessed = new Date(streak.lastDateAccessed);
         const accessedYesterday = lastAccessed.toDateString() === yesterday.toDateString();
-
-        if (!accessedYesterday) {
+        const accessedToday = lastAccessed.toDateString() === today.toDateString();
+        if (!accessedYesterday && !accessedToday) {
             const tasksYesterday = await db.Task.find({
                 IDuser: userId,
                 startDate: { $lte: yesterday },
                 endDate: { $gte: yesterday },
             });
 
-            if (tasksYesterday.length > 0) {
-                streak.streaks = 0;
+            if (tasksYesterday.length === 0) {
+                streak.streaks = 1;
             }
         }
 

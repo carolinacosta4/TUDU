@@ -1,6 +1,5 @@
-import api from "@/api/api";
 import { Link, router } from "expo-router";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   View,
@@ -12,6 +11,9 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import InputField from "@/components/InputField";
 import useFonts from "@/hooks/useFonts";
 import { useUserInfo } from "@/hooks/useUserInfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import OnboardingScreen from "@/app/onboarding";
+import useUserStore from "@/stores/userStore";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
@@ -22,6 +24,9 @@ export default function RegisterScreen() {
   const [showError, setShowError] = useState(false);
   const fontsLoaded = useFonts();
   const { setUserInfo, storeData } = useUserInfo();
+  const [passwordShown1, setPasswordShown1] = useState(false);
+  const [passwordShown2, setPasswordShown2] = useState(false);
+  const { addUser, loginUser } = useUserStore();
 
   const handleCreateAccount = async () => {
     if (!/\S+@\S+\.\S+/.test(email)) {
@@ -33,33 +38,24 @@ export default function RegisterScreen() {
     if (name && email && password && confirmPassword) {
       setShowError(false);
       try {
-        await api.post("users", {
-          name: name,
-          email: email,
-          password: password,
-          confirmPassword: confirmPassword,
-        });
+        addUser({ name, email, password, confirmPassword });
+        const response = await loginUser(email, password);
 
-        const response = await api.post("users/login", {
-          email: email,
-          password: password,
-        });
-
-        if (response.data.success) {
+        if (response.success) {
           setUserInfo({
-            userID: response.data.userID,
-            authToken: response.data.accessToken,
+            userID: response.userID,
+            authToken: response.accessToken,
           });
           storeData({
-            userID: response.data.userID,
-            authToken: response.data.accessToken,
+            userID: response.userID,
+            authToken: response.accessToken,
           });
 
           router.push("/");
         }
       } catch (error: any) {
-        if (error.response) {
-          setError(error.response.data.msg);
+        if (error) {
+          setError(error);
           setShowError(true);
         } else {
           console.error("Error message:", error);
@@ -115,6 +111,7 @@ export default function RegisterScreen() {
                   fontSize: 16,
                   color: "#562CAF",
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 Say goodbye to chaos!
@@ -146,16 +143,22 @@ export default function RegisterScreen() {
                 <InputField
                   value={password}
                   onChangeText={setPassword}
-                  secureTextEntry={true}
+                  secureTextEntry={passwordShown1}
                   placeholder="Password"
                   icon={"lock-outline"}
+                  passwordIcon={passwordShown1 ? "eye-off" : "eye-outline"}
+                  setPasswordShown={setPasswordShown1}
+                  passwordShown={passwordShown1}
                 />
                 <InputField
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   placeholder="Confirm password"
-                  secureTextEntry={true}
+                  secureTextEntry={passwordShown2}
                   icon={"lock-outline"}
+                  passwordIcon={passwordShown2 ? "eye-off" : "eye-outline"}
+                  setPasswordShown={setPasswordShown2}
+                  passwordShown={passwordShown2}
                 />
               </View>
               <TouchableHighlight
@@ -174,6 +177,7 @@ export default function RegisterScreen() {
                     color: "#EEEADF",
                     fontSize: 19.2,
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                   }}
                 >
                   Create account
@@ -190,6 +194,7 @@ export default function RegisterScreen() {
                   paddingRight: 90,
                   textAlign: "center",
                   fontFamily: "Rebond-Grotesque-Regular",
+                  lineHeight: 20,
                 }}
               >
                 When you register, you're agreeing to our terms and privacy
@@ -202,6 +207,7 @@ export default function RegisterScreen() {
                     color: "#291752",
                     textAlign: "center",
                     fontFamily: "Rebond-Grotesque-Bold",
+                    lineHeight: 20,
                   }}
                 >
                   Already have an account?
@@ -210,6 +216,7 @@ export default function RegisterScreen() {
             </View>
           </View>
         </ScrollView>
+        {/* {showOnboarding && <OnboardingScreen onClose={handleOnboardingClose} />} */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
