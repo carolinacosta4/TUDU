@@ -6,6 +6,8 @@ interface UserState {
   user: User | undefined;
   streak: { streak: 0; date: 0 | Date };
   fetchUser: (userID: string) => Promise<void>;
+  addUser: (user: any) => Promise<void>;
+  loginUser: (email: string, password: string) => Promise<any>;
   fetchStreak: (userID: string, authToken: string) => Promise<void>;
   updateUser: (
     id: string,
@@ -23,6 +25,12 @@ interface UserState {
     authToken: string
   ) => Promise<void>;
   deleteUser: (id: string, authToken: string) => Promise<void>;
+  sendEmail: (email: string) => Promise<void>;
+  resetPassword: (
+    id: string,
+    password: string,
+    confirmPassword: string
+  ) => Promise<any>;
   unlockAchievement: (
     id: string,
     achievementId: string,
@@ -39,6 +47,24 @@ export const useUserStore = create<UserState>((set) => ({
       set({ user: response.data });
     } catch (error) {
       console.error(error);
+    }
+  },
+  addUser: async (user) => {
+    try {
+      await api.post("users", user);
+    } catch (error: any) {
+      throw error.response?.data?.msg;
+    }
+  },
+  loginUser: async (email, password) => {
+    try {
+      const response = await api.post("users/login", {
+        email: email,
+        password: password,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data?.msg;
     }
   },
   fetchStreak: async (userID: string, authToken: string) => {
@@ -133,6 +159,27 @@ export const useUserStore = create<UserState>((set) => ({
       });
     } catch (error) {
       console.error(error);
+    }
+  },
+  sendEmail: async (email) => {
+    try {
+      await api.post("users/password-recovery", {
+        email: email,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  resetPassword: async (id, password, confirmPassword) => {
+    try {
+      const response = await api.post(`users/reset-password/${id}`, {
+        password: password,
+        confirmPassword: confirmPassword,
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data?.msg;
     }
   },
 unlockAchievement: async (id, achievementId, authToken) => {
