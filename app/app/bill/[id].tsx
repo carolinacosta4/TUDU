@@ -16,7 +16,6 @@ import { formatDate } from "@/utils/taskUtils";
 import { useBillStore } from "@/stores/billStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useUser } from "@/hooks/useUser";
-import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -29,8 +28,7 @@ const BillDetail = () => {
   const {updateBill, deleteBill, fetchBill, bill, loadingBill} = useBillStore();
   const {userInfo} = useUserInfo()
   const { user } = useUser();
-  const {fetchUser} = useUserStore()
-  const {unlockAchievement} = useAchievementsStore()
+  const {fetchUser, unlockAchievement} = useUserStore()
   const [edit, setEdit] = useState<Boolean>(false);
 
   useEffect(() => {
