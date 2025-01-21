@@ -176,11 +176,14 @@ exports.create = async (req, res) => {
     }
 
     const newBills = await Bill.insertMany(billInstances);
+    const bills = await Bill.populate(newBills, [
+      { path: "IDcurrency", select: "-__v" }
+    ]);
 
     return res.status(201).json({
       success: true,
       msg: "Bill created successfully.",
-      data: newBills,
+      data: bills,
     });
   } catch (error) {
     handleErrorResponse(res, error);
