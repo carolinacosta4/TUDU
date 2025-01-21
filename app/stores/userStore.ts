@@ -23,6 +23,11 @@ interface UserState {
     authToken: string
   ) => Promise<void>;
   deleteUser: (id: string, authToken: string) => Promise<void>;
+  unlockAchievement: (
+    id: string,
+    achievementId: string,
+    authToken: string
+  ) => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -128,6 +133,21 @@ export const useUserStore = create<UserState>((set) => ({
       });
     } catch (error) {
       console.error(error);
+    }
+  },
+unlockAchievement: async (id, achievementId, authToken) => {
+    try {
+      await api.post(
+        `users/${id}/achievements/${achievementId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+    } catch (error: any) {
+      throw error.response?.data?.msg;
     }
   },
 }));
