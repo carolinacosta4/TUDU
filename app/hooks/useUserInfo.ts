@@ -31,7 +31,7 @@ export function useUserInfo() {
 
   const logout = async () => {
     try {
-      await AsyncStorage.clear();
+      await AsyncStorage.removeItem("user");
       setUserInfo(undefined);
       setLogged(false);
     } catch (error) {

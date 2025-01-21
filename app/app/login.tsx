@@ -42,8 +42,8 @@ export default function LoginScreen() {
           router.push("/");
         }
       } catch (error: any) {
-        if (error.response) {
-          setError(error.response.data.msg);
+        if (error) {
+          setError(error);
           setShowError(true);
         } else {
           console.error("Error message:", error);
@@ -104,7 +104,15 @@ export default function LoginScreen() {
               >
                 Back to planning, back to progress.
               </Text>
-              <Text style={{ fontSize: 16, color: "#562CAF" }}>Let's go!</Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "#562CAF",
+                  fontFamily: "Rebond-Grotesque-Regular",
+                }}
+              >
+                Let's go!
+              </Text>
             </View>
             <View style={{ rowGap: 24, alignItems: "center" }}>
               <View style={{ rowGap: 16 }}>

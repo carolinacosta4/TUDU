@@ -116,7 +116,13 @@ export default function RegisterScreen() {
               >
                 Say goodbye to chaos!
               </Text>
-              <Text style={{ fontSize: 16, color: "#562CAF" }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "#562CAF",
+                  fontFamily: "Rebond-Grotesque-Regular",
+                }}
+              >
                 Stay on top of your tasks
               </Text>
             </View>
