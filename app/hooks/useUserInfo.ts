@@ -23,6 +23,7 @@ export function useUserInfo() {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem("user", jsonValue);
+      setLogged(true);
     } catch (e) {
       console.error(e);
     }

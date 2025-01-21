@@ -1,4 +1,9 @@
-import { TextInput, StyleSheet, Text, View } from "react-native";
+import {
+  TextInput,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 type InputFieldProps = {
@@ -7,6 +12,9 @@ type InputFieldProps = {
   placeholder: string;
   secureTextEntry?: boolean;
   icon: string;
+  passwordIcon?: string;
+  setPasswordShown?: (value: boolean) => void;
+  passwordShown?: boolean;
 };
 
 export default function InputField({
@@ -15,6 +23,9 @@ export default function InputField({
   placeholder,
   secureTextEntry,
   icon,
+  passwordIcon,
+  setPasswordShown,
+  passwordShown,
 }: InputFieldProps) {
   return (
     <View style={styles.container}>
@@ -27,6 +38,11 @@ export default function InputField({
         secureTextEntry={secureTextEntry}
         placeholderTextColor="#C4BFB5"
       />
+      {passwordIcon && setPasswordShown && (
+        <TouchableOpacity onPress={() => setPasswordShown(!passwordShown)}>
+          <Icon name={passwordIcon} size={24} color="#562CAF" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -43,7 +59,7 @@ const styles = StyleSheet.create({
     columnGap: 8,
   },
   input: {
-    width: 250,
+    width: 220,
     paddingTop: 12,
     paddingBottom: 12,
     borderRadius: 12,
