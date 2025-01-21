@@ -25,7 +25,6 @@ export default function RegisterScreen() {
   const fontsLoaded = useFonts();
   const { setUserInfo, storeData } = useUserInfo();
   const [showOnboarding, setShowOnboarding] = useState(false)
-    AsyncStorage.clear()
     /*
     useEffect(() => {
       async function checkFirstLaunch() {
