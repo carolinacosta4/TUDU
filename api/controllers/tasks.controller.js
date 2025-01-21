@@ -157,7 +157,7 @@ exports.findTask = async (req, res) => {
         "IDuser",
         "-password -__v -profilePicture -cloudinary_id -notifications -sound -vibration -darkMode -isDeactivated -onboardingSeen -IDmascot"
       )
-      .populate("IDcategory", "-_id -__v")
+      .populate("IDcategory", "-__v")
       .select("-__v")
       .exec();
 

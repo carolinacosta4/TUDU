@@ -1,5 +1,5 @@
 import { Link, router } from "expo-router";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   View,
@@ -11,6 +11,8 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import InputField from "@/components/InputField";
 import useFonts from "@/hooks/useFonts";
 import { useUserInfo } from "@/hooks/useUserInfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import OnboardingScreen from "@/app/onboarding";
 import useUserStore from "@/stores/userStore";
 
 export default function RegisterScreen() {
@@ -25,7 +27,36 @@ export default function RegisterScreen() {
   const [passwordShown1, setPasswordShown1] = useState(false);
   const [passwordShown2, setPasswordShown2] = useState(false);
   const { addUser, loginUser } = useUserStore();
+  const [showOnboarding, setShowOnboarding] = useState(false)
+    AsyncStorage.clear()
+    /*
+    useEffect(() => {
+      async function checkFirstLaunch() {
+        try {
+          const firstLaunchVal = await AsyncStorage.getItem('IS_ONBOARDED');
+          console.log("Retrieved IS_ONBOARDED:", firstLaunchVal);
+          if (!firstLaunchVal) {
+            console.log('IS_ONBOARDED does not exist, showing onboarding');
+            setShowOnboarding(true);
+            router.push('/onboarding')
+            console.log('show onbaoaring',showOnboarding)          }
+        } catch (error) {
+          console.warn("Error retrieving data from AsyncStorage:", error);
+        }
+      }
+      checkFirstLaunch();
+    }, []);
 
+    const handleOnboardingClose = async () => {
+      try {
+        await AsyncStorage.setItem('IS_ONBOARDED', 'true');
+        console.log("Stored IS_ONBOARDED: true");
+        setShowOnboarding(false); 
+      } catch (error) {
+        console.warn("Error saving data to AsyncStorage:", error);
+      }
+    };
+*/
   const handleCreateAccount = async () => {
     if (!/\S+@\S+\.\S+/.test(email)) {
       setError("Please enter a valid email address");
@@ -208,6 +239,7 @@ export default function RegisterScreen() {
             </View>
           </View>
         </ScrollView>
+        {/* {showOnboarding && <OnboardingScreen onClose={handleOnboardingClose} />} */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
