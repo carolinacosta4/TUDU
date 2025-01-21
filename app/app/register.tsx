@@ -28,7 +28,6 @@ export default function RegisterScreen() {
   const [passwordShown2, setPasswordShown2] = useState(false);
   const { addUser, loginUser } = useUserStore();
   const [showOnboarding, setShowOnboarding] = useState(false)
-    AsyncStorage.clear()
     /*
     useEffect(() => {
       async function checkFirstLaunch() {
