@@ -7,6 +7,7 @@ import {
   Dimensions,
   TextInput,
   Switch,
+  ScrollView
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -86,8 +87,8 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
 
   return (
     <>
-      <View style={{ rowGap: 24 }}>
-        <View style={{ rowGap: 8 }}>
+      <ScrollView>
+        <View style={{ rowGap: 8, marginVertical: 10 }}>
           <Text
             style={{
               fontSize: 16,
@@ -114,7 +115,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
           />
         </View>
 
-        <View style={{ rowGap: 8 }}>
+        <View style={{ rowGap: 8, marginVertical: 10 }}>
           <Text
             style={{
               fontSize: 16,
@@ -141,7 +142,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
           />
         </View>
 
-        <View style={{ rowGap: 8 }}>
+        <View style={{ rowGap: 8, marginVertical: 10 }}>
           <Text
             style={{
               fontSize: 16,
@@ -211,7 +212,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
           />
         </View>
 
-        <View style={{ rowGap: 8 }}>
+        <View style={{ rowGap: 8, marginVertical: 10 }}>
           <Text
             style={{
               fontSize: 16,
@@ -280,7 +281,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
           />
         </View>
 
-        <View style={{ rowGap: 16 }}>
+        <View style={{ rowGap: 16, marginVertical: 10 }}>
           <View
             style={{
               flexDirection: "row",
@@ -390,7 +391,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
           </View>
         </View>
 
-        <View style={{ rowGap: 16 }}>
+        <View style={{ rowGap: 16, marginVertical: 10 }}>
           <View
             style={{
               flexDirection: "row",
@@ -463,6 +464,8 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
             borderRadius: 16,
             height: 48,
             justifyContent: "center",
+            marginVertical: 30,
+            paddingBottom: 20
           }}
           onPress={handleEditBill}
         >
@@ -478,7 +481,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
             Done
           </Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </>
   );
 }
