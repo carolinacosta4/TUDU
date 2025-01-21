@@ -27,35 +27,7 @@ export default function RegisterScreen() {
   const [passwordShown1, setPasswordShown1] = useState(false);
   const [passwordShown2, setPasswordShown2] = useState(false);
   const { addUser, loginUser } = useUserStore();
-  const [showOnboarding, setShowOnboarding] = useState(false)
-    /*
-    useEffect(() => {
-      async function checkFirstLaunch() {
-        try {
-          const firstLaunchVal = await AsyncStorage.getItem('IS_ONBOARDED');
-          console.log("Retrieved IS_ONBOARDED:", firstLaunchVal);
-          if (!firstLaunchVal) {
-            console.log('IS_ONBOARDED does not exist, showing onboarding');
-            setShowOnboarding(true);
-            router.push('/onboarding')
-            console.log('show onbaoaring',showOnboarding)          }
-        } catch (error) {
-          console.warn("Error retrieving data from AsyncStorage:", error);
-        }
-      }
-      checkFirstLaunch();
-    }, []);
 
-    const handleOnboardingClose = async () => {
-      try {
-        await AsyncStorage.setItem('IS_ONBOARDED', 'true');
-        console.log("Stored IS_ONBOARDED: true");
-        setShowOnboarding(false); 
-      } catch (error) {
-        console.warn("Error saving data to AsyncStorage:", error);
-      }
-    };
-*/
   const handleCreateAccount = async () => {
     if (!/\S+@\S+\.\S+/.test(email)) {
       setError("Please enter a valid email address");

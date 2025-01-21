@@ -10,6 +10,7 @@ import logoBlue from "@/assets/images/logo_blue.png";
 import logoGreen from "@/assets/images/logo_green.png";
 import logoYellow from "@/assets/images/logo_yellow.png";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AnimatedOnboarding from '@/components/AnimatedOnboarding'
 const COLORS = {
   primary: '#562CAF',
   secondary: '#291752',
@@ -54,7 +55,7 @@ const onboardingSteps = [
     icon: null
   },
   {
-    image: "https://res.cloudinary.com/ditdnslga/image/upload/v1734716116/jlihlvzvfwruvoh5midg.png",
+    animation: "@/assets/lotties/data_lazyanimation.json",
     widthImage: 178,
     heightImage: 200,
     subtitle: "Create Tasks in Seconds",
@@ -100,7 +101,7 @@ const onboardingSteps = [
     }
   },
   {
-    image: "https://res.cloudinary.com/ditdnslga/image/upload/v1734716116/mvcli5lsp2uwp7uvhcwo.png",
+    animation: "@/assets/lotties/data_lasyanimation.json",
     widthImage: 234,
     heightImage: 172,
     subtitle: "Never miss a deadline",
@@ -146,7 +147,7 @@ const onboardingSteps = [
     }
   },
   {
-    image: "https://res.cloudinary.com/ditdnslga/image/upload/v1734716116/qjdu28or1nmu7auc9ldw.png",
+    animation: "@/assets/lotties/data_perfectanimation.json",
     widthImage: 200,
     heightImage: 180,
     subtitle: "Celebrate your progress",
@@ -181,11 +182,8 @@ const onboardingSteps = [
     icon: null
   },
 ];
-/*
-type Props = {
-  onClose: () => void
-}*/
-export default function OnboardingScreen(/*{  onClose }: Props*/) {
+
+export default function OnboardingScreen() {
   const [screenIndex, setScreenIndex] = useState(0);
   const data = onboardingSteps[screenIndex];
 
@@ -194,7 +192,6 @@ export default function OnboardingScreen(/*{  onClose }: Props*/) {
     if (isLastScreen) {
       setScreenIndex(0);
       AsyncStorage.setItem('IS_ONBOARDED', 'true');
-      //onClose ? onClose() : router.push('/register')
       router.push('/register');
     } else {
       setScreenIndex(screenIndex + 1);
@@ -243,14 +240,9 @@ export default function OnboardingScreen(/*{  onClose }: Props*/) {
       <Stack.Screen options={{ headerShown: false }} />
         <View style={styles.containerOnboarding}>
           <Animated.View entering={FadeIn} exiting={FadeOut} key={screenIndex} style={styles.innerContainer}>
-            <View style={styles.imageContainer}>
-              <Image
-                source={{
-                  uri: data.image,
-                }}
-                style={{ width: data.widthImage, height: data.heightImage }}
-              />
-            </View>
+            <Animated.View style={styles.imageContainer}>
+              {data.animation ? <AnimatedOnboarding url={data.animation} type = {data.logo}/> : <Image source={{ uri: data.image }} style = {{width: data.widthImage, height: data.heightImage}}/>}
+            </Animated.View>
             <Animated.View  style={[styles.contentOnboarding, changeBackgroundColor]}   entering={screenIndex === 0 ? BounceInDown.delay(50) : undefined}>
               <View style={styles.logo}>
                 <Image
@@ -310,7 +302,12 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: "absolute",
-    top: 164,
+    width:  Dimensions.get("window").width *0.8,
+    height: 300,
+    top: 100,
+    justifyContent: 'flex-end',
+    flex: 1,
+    alignItems: 'center'
   },
   contentOnboarding: {
     width: "140%",

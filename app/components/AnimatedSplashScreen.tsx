@@ -5,7 +5,7 @@ import { Stack } from "expo-router";
 import Animated, {FadeIn, FadeOut, ZoomIn, ZoomOut} from "react-native-reanimated";
 
 const AnimatedLottie  = Animated.createAnimatedComponent(LottieView)
-// hacer una funcion de if user already logged entonces aparece la otra animacion y aparece el onboarding y si no, entonces aparece la de logged
+
  const AnimatedSplashScreen = ({
     onAnimationFinish = (isCancelled) => {},
 }: {
