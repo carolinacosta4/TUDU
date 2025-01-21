@@ -1,7 +1,6 @@
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import * as SplashScreen from 'expo-splash-screen'
 import { useEffect, useState } from "react";
 import useFonts from "@/hooks/useFonts";
 import AnimatedSplashScreen from '@/components/AnimatedSplashScreen'
@@ -39,14 +38,14 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{flex: 1}}>
           <Animated.View style={{flex: 1}} entering={FadeIn}>
             <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
               <Stack.Screen name="register" options={{ headerShown: false }} />
               <Stack.Screen name="login" options={{ headerShown: false }} />
               <Stack.Screen name="recoverPassword" options={{ headerShown: false }} />
               <Stack.Screen name="tips/[tipId]" options={{ headerShown: false }} />
               <Stack.Screen name="tips" options={{ headerShown: false }} />
               <Stack.Screen name="favorites" options={{ headerShown: false }} />
-              <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+              <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
               <Stack.Screen
                 name="resetPassword/[id]"
                 options={{ headerShown: false }}

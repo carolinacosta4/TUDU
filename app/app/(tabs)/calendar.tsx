@@ -22,15 +22,17 @@ import { useBillStore } from "@/stores/billStore";
 import { useTaskStore } from "@/stores/taskStore";
 import LoadingScreen from "@/components/LoadingScreen";
 import HeaderItem from "@/components/Header";
+import useUserStore from "@/stores/userStore";
 
 const CalendarScreen = () => {
-  const { user, userStreak } = useUser();
+  const { user } = useUser();
   const fontsLoaded = useFonts();
   const { userInfo } = useUserInfo();
   const [showStat, setShowStat] = useState(true);
   const [day, setDay] = useState();
   const { fetchCalendarTasks, calendarTasks, updateTask } = useTaskStore();
   const { fetchCalendarBills, updateBill, calendarBills } = useBillStore();
+  const { streak } = useUserStore();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const categorizedTasks = categorizeTasks(calendarTasks);
   const { allDayTasks, timedTasks } = categorizedTasks;
@@ -149,7 +151,7 @@ const CalendarScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingHorizontal: 20 }}>
           <Text style={{color: '#291752', fontSize: 23.04, fontFamily: 'SF-Pro-Display-Medium'}}>Calendar</Text>
-          <HeaderItem page="Calendar" userStreak={userStreak} />
+          <HeaderItem page="Calendar" userStreak={streak} />
         </View>
       <Calendar
         style={styles.calendar}
