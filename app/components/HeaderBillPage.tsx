@@ -68,7 +68,7 @@ const HeaderBillPage = ({
       </View>
       <View style={styles.totalCard}>
         <View style={styles.backgroundCard} />
-        <Text style={styles.monthTitle}>Month’s total ({monthsTotal.currencyName})</Text>
+        {monthsTotal.total > 0 ? <Text style={styles.monthTitle}>Month’s total ({monthsTotal.currencyName})</Text> : <Text style={styles.monthTitle}>Month’s total</Text>}
         <Text style={styles.totalAmount}>{monthsTotal.total}{monthsTotal.currencySymbol}</Text>
       </View>
     </View>

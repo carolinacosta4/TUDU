@@ -136,70 +136,6 @@ export default function HomeScreen() {
     await analyseStreaksAchievement(user, userInfo, unlockAchievement, streak)
   };
 
-  useEffect(() => {
-    if ((tasks.length > 0 || bills.length > 0) && loaded == true) {
-      checkAndUpdateMascots(tasks, bills);
-      checkAndUpdateStreak(tasks, bills);
-      scheduleTaskNotifications(tasks);
-    }
-  }, [tasks, bills, loaded]);
-
-  useEffect(() => {
-    if (user && userInfo && loaded) {
-      analyseAchievement("On time, every time", user, userInfo, unlockAchievement);
-    }
-  }, [user, userInfo, loaded]);
-  
-  if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo || !user)
-    return <LoadingScreen/>
-
-  const ONE_SECOND_IN_MS = 1000;
-  const PATTERN = [1 * ONE_SECOND_IN_MS];
-
-  Notifications.setNotificationHandler({
-    handleNotification: async (notification) => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
-
-  const checkAndUpdateStreak = async (tasks: Task[], bills: Bill[]) => {
-    const totalItems = tasks.length + bills.length;
-    const completedItems =
-      tasks.filter((task) => task.status).length +
-      bills.filter((bill) => bill.status).length;
-    const seventyDone = Math.ceil(totalItems * 0.7);
-
-    if (user && completedItems == seventyDone) {
-      await handleUserStreak(user.data._id);
-      handleGetStreak(user.data._id);
-    }
-    await analyseStreaksAchievement(user, userInfo, unlockAchievement, userStreak)
-  };
-
-  const checkAndUpdateMascots = async (tasks: Task[], bills: Bill[]) => {
-    const totalItems = tasks.length + bills.length;
-    const completedItems =
-      tasks.filter((task) => task.status).length +
-      bills.filter((bill) => bill.status).length;
-    const halfItems = Math.ceil(totalItems / 2);
-
-    if (user) {
-      if (completedItems === totalItems) {
-        await editUserMascot(user.data._id, "676969ada5e78f1378a63a70");
-        handleGetUser(user.data._id);
-      } else if (completedItems >= halfItems) {
-        await editUserMascot(user.data._id, "67696917a5e78f1378a63a6e");
-        handleGetUser(user.data._id);
-      } else {
-        await editUserMascot(user.data._id, "676969dfa5e78f1378a63a71");
-        handleGetUser(user.data._id);
-      }
-      await analyseAchievement("Happy pet, happy you", user, userInfo, unlockAchievement)
-    }
-  };
-
   const scheduleTaskNotifications = async (tasks: Task[]) => {
     const now = new Date();
 
@@ -229,6 +165,34 @@ export default function HomeScreen() {
       }
     }
   };
+
+  useEffect(() => {
+    if ((tasks.length > 0 || bills.length > 0) && loaded == true) {
+      checkAndUpdateMascots(tasks, bills);
+      checkAndUpdateStreak(tasks, bills);
+      scheduleTaskNotifications(tasks);
+    }
+  }, [tasks, bills, loaded]);
+
+  useEffect(() => {
+    if (user && userInfo && loaded) {
+      analyseAchievement("On time, every time", user, userInfo, unlockAchievement);
+    }
+  }, [user, userInfo, loaded]);
+  
+  if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo || !user)
+    return <LoadingScreen/>
+
+  const ONE_SECOND_IN_MS = 1000;
+  const PATTERN = [1 * ONE_SECOND_IN_MS];
+
+  Notifications.setNotificationHandler({
+    handleNotification: async (notification) => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
 
   if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo || !user)
     return <LoadingScreen/>
