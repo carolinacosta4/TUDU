@@ -15,7 +15,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#61549F"
-      }
+      },
+    "permissions": [
+      "VIBRATE",
+      "RECEIVE_BOOT_COMPLETED",
+      "FOREGROUND_SERVICE",
+      "NOTIFICATIONS"
+    ]
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +44,16 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "@/assets/images/default_mascot.png",
+          "color": "#F7F6F0",
+          "defaultChannel": "default",
+          "enableBackgroundRemoteNotifications": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
