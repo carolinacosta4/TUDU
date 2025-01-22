@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
 import { useUser } from '@/hooks/useUser';
 import TipItemList from '@/components/TipItemList';
 import useFonts from "@/hooks/useFonts";
@@ -8,11 +8,15 @@ import Tip from '@/interfaces/Tip';
 import LoadingScreen from '@/components/LoadingScreen';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import HeaderItem from '@/components/Header';
+import LottieView from "lottie-react-native";
+import Animated from "react-native-reanimated";
 
 const Favorites = () => {
   const [filteredTips, setFilteredTips] = useState<Tip[]>([]);
   const {user} = useUser();
   const fontsLoaded = useFonts();
+  const AnimatedLottie = Animated.createAnimatedComponent(LottieView);
+  const animation = useRef<LottieView>(null);
 
   useEffect(() => {
     if(user) setFilteredTips(user.FavoriteTip.map(tip => tip.IDtip))
@@ -67,10 +71,25 @@ const Favorites = () => {
         <View style={styles.containerImage}>
           <View style={styles.textContainer}>
           <View style={styles.textWrapper}> 
-                <Image 
-                  source={{ uri: 'https://res.cloudinary.com/ditdnslga/image/upload/v1734716115/r0wwfbnf1g4qme1vcexn.png' }}
-                  style={styles.mascotImage}
-                />
+            <Animated.View
+              style={{
+                height: 260,
+                alignItems: "center",
+                justifyContent: "center",
+                paddingRight: Dimensions.get("window").width * 0.35,
+              }}
+            >
+              <AnimatedLottie
+                ref={animation}
+                autoPlay
+                loop={true}
+                style={{
+                  width: 500,
+                  aspectRatio: 1,
+                }}
+                source={require("@/assets/lotties/data_default_sad_animation.json")}
+              />
+              </Animated.View>
               <Text style={styles.title}>Nothing here yet!</Text>
               <Text style={styles.subtitle}>Start exploring and save tips that inspire you!</Text>
             </View>
@@ -121,6 +140,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SF Pro Display',
     fontWeight: '500',
     lineHeight: 34.56,
+    marginTop: Dimensions.get("window").width * -0.2,
   },
   subtitle: {
     width: 274,

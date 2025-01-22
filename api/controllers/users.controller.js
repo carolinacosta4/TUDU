@@ -167,6 +167,13 @@ exports.login = async (req, res) => {
         msg: "The user you tried loggin in doesn't exist.",
       });
 
+    if (user.isDeactivated)
+      return res.status(400).json({
+        success: false,
+        error: "User deactivated",
+        msg: "The user you tried loggin in is deactivated. Contact our support team for help.",
+      });
+
     const check = bcrypt.compareSync(req.body.password, user.password);
     if (!check)
       return res.status(400).json({

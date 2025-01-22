@@ -30,8 +30,8 @@ const CalendarScreen = () => {
   const { userInfo } = useUserInfo();
   const [showStat, setShowStat] = useState(true);
   const [day, setDay] = useState();
-  const { fetchCalendarTasks, calendarTasks, updateTask } = useTaskStore();
-  const { fetchCalendarBills, updateBill, calendarBills } = useBillStore();
+  const { fetchCalendarTasks, calendarTasks, updateTask, loadingTasksCalendar } = useTaskStore();
+  const { fetchCalendarBills, updateBill, calendarBills, loadingBillsCalendar } = useBillStore();
   const { streak } = useUserStore();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const categorizedTasks = categorizeTasks(calendarTasks);
@@ -182,7 +182,8 @@ const CalendarScreen = () => {
         />
       ) : (
         <View style={styles.statsList}>
-          {calendarTasks.length > 0 ? (
+          {loadingTasksCalendar || loadingBillsCalendar ? <LoadingScreen type='calendar'/> :
+          calendarTasks.length > 0 ? (
             <ListHome
               allDayTasks={allDayTasks}
               groupedTasks={groupedStuff}
@@ -192,7 +193,8 @@ const CalendarScreen = () => {
             />
           ) : (
             <NoTasksView />
-          )}
+          )
+        }
         </View>
       )}
     </SafeAreaView>

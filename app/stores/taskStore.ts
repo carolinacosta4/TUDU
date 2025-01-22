@@ -6,6 +6,7 @@ interface TaskState {
   tasks: Task[];
   task: Task;
   loadingTask: boolean;
+  loadingTasksCalendar: boolean;
   calendarTasks: Task[];
   fetchTasks: (date: Date, authToken: string) => Promise<void>;
   fetchCalendarTasks: (date: Date, authToken: string) => Promise<void>;
@@ -23,6 +24,7 @@ export const useTaskStore = create<TaskState>((set) => ({
   tasks: [],
   task: {} as Task,
   loadingTask: true,
+  loadingTasksCalendar: true,
   calendarTasks: [],
   fetchTasks: async (date, authToken) => {
     try {
@@ -38,12 +40,14 @@ export const useTaskStore = create<TaskState>((set) => ({
   },
   fetchCalendarTasks: async (date, authToken) => {
     try {
+      set({ loadingTasksCalendar: true });
       const response = await api.get(`tasks?date=${date.toISOString()}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       set({ calendarTasks: response.data.data });
+      set({ loadingTasksCalendar: false });
     } catch (error) {
       console.error(error);
     }
