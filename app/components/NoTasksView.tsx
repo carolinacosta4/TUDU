@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Dimensions,
   Image,
@@ -8,10 +8,14 @@ import {
   View,
 } from "react-native";
 import ModalCreateStuff from "./ModalCreateStuff";
+import LottieView from "lottie-react-native";
+import Animated from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 const NoTasksView = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const AnimatedLottie = Animated.createAnimatedComponent(LottieView);
+  const animation = useRef<LottieView>(null);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -20,17 +24,31 @@ const NoTasksView = () => {
   return (
     <>
       <ScrollView>
-        <View style={{ alignItems: "center", marginTop: 20 }}>
-          <Image
-            source={{
-              uri: "https://res.cloudinary.com/ditdnslga/image/upload/v1734716115/r0wwfbnf1g4qme1vcexn.png",
+        <View style={{ alignItems: "center", marginTop: 20, marginBottom: width / 0.8 }}>
+          <Animated.View
+            style={{
+              height: 260,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingRight: Dimensions.get("window").width * 0.35,
             }}
-            style={{ width: 122.71, height: 133, marginBottom: 24 }}
-          />
+          >
+            <AnimatedLottie
+              ref={animation}
+              autoPlay
+              loop={true}
+              style={{
+                width: 500,
+                aspectRatio: 1,
+              }}
+              source={require("@/assets/lotties/data_default_sad_animation.json")}
+            />
+          </Animated.View>
           <Text
             style={{
               fontSize: 23.04,
               marginBottom: 4,
+              marginTop: Dimensions.get("window").width * -0.2,
               fontFamily: "SF-Pro-Display-Medium",
             }}
           >

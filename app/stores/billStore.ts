@@ -6,6 +6,7 @@ interface BillState {
   bills: Bill[];
   bill: Bill;
   loadingBill: Boolean,
+  loadingBillsCalendar: Boolean,
   monthlyBills: Bill[];
   calendarBills: Bill[];
   fetchBills: (date: Date, authToken: string) => Promise<void>;
@@ -29,6 +30,7 @@ export const useBillStore = create<BillState>((set) => ({
   bills: [],
   bill: {} as Bill,
   loadingBill: true,
+  loadingBillsCalendar: true,
   monthlyBills: [],
   calendarBills: [],
   fetchBills: async (date, authToken) => {
@@ -57,12 +59,14 @@ export const useBillStore = create<BillState>((set) => ({
   },
   fetchCalendarBills: async (date, authToken) => {
     try {
+      set({ loadingBillsCalendar: true });
       const response = await api.get(`bills?date=${date.toISOString()}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       set({ calendarBills: response.data.data });
+      set({ loadingBillsCalendar: false });
     } catch (error) {
       console.error(error);
     }
@@ -103,7 +107,7 @@ export const useBillStore = create<BillState>((set) => ({
       });
 
       set((state) => ({
-        monthlyBills: [...state.monthlyBills, ...billsForMonth],
+        monthlyBills: [...state.monthlyBills, ...billsForMonth].sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()),
       }));
     } catch (error) {
       console.error(error);
