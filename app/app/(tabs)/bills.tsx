@@ -225,8 +225,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   container: {
-    width: '100%',
-    height: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -234,30 +232,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F6F0',
   },
   footer: {
-    width: '100%',
-    height: '100%',
     padding: 24,
     flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: '#EEEADF',
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
+    marginBottom: Dimensions.get("window").width * 0.8
   },
   footerContent: {
     flexDirection: 'column',
-    alignItems: 'flex-start',
-    width: '100%',
-    gap: 32,
   },
   header: {
-    width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
     gap: 8,
   },
   thisMonth: {
-    width: '98%',
     flexDirection: 'column',
     gap: 12,
   },
@@ -273,7 +265,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E1E1E1',
   },
   upcomingMonths: {
-    width: '100%',
     flexDirection: 'column',
     gap: 12,
   },
