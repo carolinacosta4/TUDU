@@ -16,7 +16,6 @@ import { formatDate } from "@/utils/taskUtils";
 import { useTaskStore } from "@/stores/taskStore";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useUser } from "@/hooks/useUser";
-import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -29,9 +28,9 @@ const TaskDetail = () => {
   const { updateTask, deleteTask, fetchTask, task, loadingTask } = useTaskStore();
   const { userInfo } = useUserInfo();
   const { user } = useUser();
-  const { fetchUser } = useUserStore();
-  const { unlockAchievement } = useAchievementsStore();
+  const { fetchUser, unlockAchievement } = useUserStore();
   const [edit, setEdit] = useState<Boolean>(false);
+  const [alreadyStarted, setAlreadyStarted] = useState<Boolean>(false);
   
   useEffect(() => {
     if (typeof id === "string") {
@@ -44,6 +43,16 @@ const TaskDetail = () => {
       fetchUser(userInfo.userID);
     }
   }, [userInfo]);
+
+  useEffect(() => {
+    if(task){
+      const now = new Date();
+      const start = new Date(task.startDate);
+      if (start <= now ) {
+        setAlreadyStarted(true);
+      }
+    }
+  }, [task.startDate]);
   
   if (!task || !fontsLoaded || !userInfo || loadingTask) {
     return (
@@ -77,13 +86,13 @@ const TaskDetail = () => {
         return {};
     }
   };
-
+  
   const getCountdown = (startDate: Date): string => {
     const now = new Date();
     const start = new Date(startDate);
 
     if (start <= now) {
-      return "Today";
+      return "Already started";
     }
 
     const isToday = start.toDateString() === now.toDateString();
@@ -93,7 +102,6 @@ const TaskDetail = () => {
       const minutes = Math.floor(
         (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
       );
-
       return `${hours}h ${minutes}m`;
     }
 
@@ -177,7 +185,13 @@ const TaskDetail = () => {
         </View>
           {edit ? (
             <ScrollView style={styles.container}>
-              <Text>Edit view</Text>
+              <Text style={{
+                fontSize: 20,
+                color: "#562CAF",
+                fontFamily: "SF-Pro-Display-Medium",
+                lineHeight: 24,
+                paddingBottom: 24,
+              }}>Edit task</Text>
               <EditTask task={task} handleEdit={handleEdit} />
             </ScrollView>
           ) : (
@@ -224,10 +238,12 @@ const TaskDetail = () => {
                 style={{
                   fontSize: 13.33,
                   fontFamily: "Rebond-Grotesque-Medium",
-                  padding: 7,
+                  paddingHorizontal: 30,
+                  paddingVertical: 5,
                   lineHeight: 15,
                   borderRadius: 100,
                   marginBottom: 20,
+                  alignSelf: "flex-start",
                   textAlign: "center",
                   color: task.IDcategory.color,
                   backgroundColor: task.IDcategory.backgroundColor,
@@ -237,7 +253,7 @@ const TaskDetail = () => {
               </Text>
 
               <View style={styles.startInfo}>
-                <Text style={styles.countdown}>Starts in</Text>
+                {!alreadyStarted && <Text style={styles.countdown}>Starts in</Text>}
                 <Text style={styles.timeRemaining}>
                   {getCountdown(task.startDate)}
                 </Text>

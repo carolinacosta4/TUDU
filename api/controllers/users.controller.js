@@ -74,13 +74,15 @@ exports.findUser = async (req, res) => {
       .populate("IDAchievements", "-__v")
       .exec();
 
+    let userAchievementsSorted = userAchievements.sort((a, b) => new Date(b.unlockedAt) - new Date(a.unlockedAt))
+    
     return res.status(200).json({
       success: true,
       data: user,
       FavoriteTip: userFavoriteTips,
       userTasks: userTasks,
       userBills: userBills,
-      userAchievements: userAchievements,
+      userAchievements: userAchievementsSorted,
     });
   } catch (error) {
     handleErrorResponse(res, error);
@@ -163,6 +165,13 @@ exports.login = async (req, res) => {
         success: false,
         error: "User not found",
         msg: "The user you tried loggin in doesn't exist.",
+      });
+
+    if (user.isDeactivated)
+      return res.status(400).json({
+        success: false,
+        error: "User deactivated",
+        msg: "The user you tried loggin in is deactivated. Contact our support team for help.",
       });
 
     const check = bcrypt.compareSync(req.body.password, user.password);

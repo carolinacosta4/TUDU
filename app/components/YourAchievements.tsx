@@ -64,7 +64,7 @@ const YourAchievements = ({ achievements }: YourAchievementsProps) => {
           </Fragment>
         ))
       ) : (
-        <Text>Work harder to have achievements!!</Text>
+        <Text style={{paddingVertical: 20, fontSize: 16, lineHeight: 20, fontFamily: "Rebond-Grotesque-Regular", color: "#291752"}}>No achievements unlocked yet... time to shine!</Text>
       )}
       </View>
     </View>

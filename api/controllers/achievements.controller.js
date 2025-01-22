@@ -1,5 +1,3 @@
-// const jwt = require("jsonwebtoken");
-// const bcrypt = require("bcryptjs");
 const db = require("../models/index.js");
 const config = require("../config/db.config.js");
 const mongoose = require("mongoose");
@@ -43,7 +41,6 @@ exports.create = async (req, res) => {
             });
         }
 
-        // Verificar se o Achievement já existe
         const existingAchievement = await Achievements.findOne({ name });
         if (existingAchievement) {
             return res.status(400).json({
@@ -52,7 +49,6 @@ exports.create = async (req, res) => {
             });
         }
 
-        // Validar as imagens no Cloudinary e obter os secure_url
         let image, lockedImage;
         try {
             image = await cloudinary.api.resource(cloudinary_id_image);
@@ -65,18 +61,17 @@ exports.create = async (req, res) => {
             });
         }
 
-        // Criar a instância do Achievement com os secure_urls
         const createdAt = new Date();
         const newAchievement = new Achievements({
             name,
-            image: image.secure_url, // secure_url da imagem principal
-            cloudinary_id_image: cloudinary_id_image, // ID da imagem
-            lockedImage: lockedImage.secure_url, // secure_url da imagem bloqueada
-            cloudinary_id_lockedImage: cloudinary_id_lockedImage, // ID da imagem bloqueada
+            image: image.secure_url,
+            cloudinary_id_image: cloudinary_id_image,
+            lockedImage: lockedImage.secure_url,
+            cloudinary_id_lockedImage: cloudinary_id_lockedImage,
             created_at: createdAt
         });
 
-        // Salvar no banco
+
         const savedAchievement = await newAchievement.save();
 
         return res.status(201).json({

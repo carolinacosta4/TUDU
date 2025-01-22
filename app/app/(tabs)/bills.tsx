@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Dimensions, Platform, Vibration } from "react-native"; 
+import { View, Text, StyleSheet, ScrollView, Dimensions, Platform, Vibration, Button } from "react-native"; 
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useEffect, useState } from "react";
@@ -8,7 +8,6 @@ import Bill from "@/interfaces/Bill";
 import HeaderBillPage from "@/components/HeaderBillPage";
 import { useBillStore } from "@/stores/billStore";
 import NoTasksView from "@/components/NoTasksView";
-import useAchievementsStore from "@/stores/achievementsStore";
 import useUserStore from "@/stores/userStore";
 import { analyseAchievement } from "@/utils/achievementUtils";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -19,11 +18,10 @@ export default function BillsScreen() {
   const thismonth = new Date();
   const { userInfo, logged } = useUserInfo();
   const { monthlyBills, updateBill, fetchMonthBills } = useBillStore()
-  const { loading, handleGetUser, user, userStreak } = useUser();
+  const { loading, user } = useUser();
   const [loadingBills, setloadingBills] = useState(true);
   const [upcomingBills, setUpcomingBills] = useState<Bill[]>([]);
-  const {unlockAchievement} = useAchievementsStore()
-  const {fetchUser} = useUserStore()
+  const {fetchUser, streak, unlockAchievement} = useUserStore()
 
   useEffect(() => {
     if(userInfo) {
@@ -161,7 +159,7 @@ export default function BillsScreen() {
       <SafeAreaView style={styles.containerScrollView}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, paddingHorizontal: 20 }}>
           <Text style={{color: '#291752', fontSize: 23.04, fontFamily: 'SF-Pro-Display-Medium'}}>Bills</Text>
-          <HeaderItem page="Bills" userStreak={userStreak} />
+          <HeaderItem page="Bills" userStreak={streak} />
         </View>
         <View style={styles.container}>
         <HeaderBillPage progress={calculateProgress()} activeBillsCount={activeBillsCount()} pendingBill={pendingBill()} nextPayment={nextPayment()} monthsTotal={monthsTotal()}/>

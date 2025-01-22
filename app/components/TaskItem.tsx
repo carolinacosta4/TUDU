@@ -130,7 +130,6 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
       )}
     </View>
   ) : (
-    <Link href={{ pathname: "/task/[id]", params: { id: task._id } }}>
       <View
         style={{
           flexDirection: "row",
@@ -156,7 +155,8 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
             <Icon name="circle-outline" size={25} color="#562CAF" />
           </TouchableWithoutFeedback>
         )}
-
+      <Link href={{ pathname: "/task/[id]", params: { id: task._id } }}>
+      <View style={{ width: '94%', flexDirection: "row", justifyContent: "space-between" }}>
         <Text
           style={{
             fontSize: 16,
@@ -168,9 +168,6 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
         >
           {task.name}
         </Text>
-        <View
-          style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
-        >
           <View
             style={{
               alignSelf: "flex-start",
@@ -192,9 +189,9 @@ const TaskCardItem = ({ task, allDay, changeStatus, type }: TaskItemProps) => {
               {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
             </Text>
           </View>
-        </View>
+          </View>
+        </Link>
       </View>
-    </Link>
   );
 };
 

@@ -1,4 +1,3 @@
-import api from "@/api/api";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -12,6 +11,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import InputField from "@/components/InputField";
 import useFonts from "@/hooks/useFonts";
+import useUserStore from "@/stores/userStore";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -20,31 +20,30 @@ export default function LoginScreen() {
   const [showError, setShowError] = useState(false);
   const fontsLoaded = useFonts();
   const { setUserInfo, storeData } = useUserInfo();
+  const [passwordShown, setPasswordShown] = useState(false);
+  const { loginUser } = useUserStore();
 
   const handleLoginAccount = async () => {
     if (email && password) {
       setShowError(false);
       try {
-        const response = await api.post("users/login", {
-          email: email,
-          password: password,
-        });
+        const response = await loginUser(email, password);
 
-        if (response.data.success) {
+        if (response.success) {
           setUserInfo({
-            userID: response.data.userID,
-            authToken: response.data.accessToken,
+            userID: response.userID,
+            authToken: response.accessToken,
           });
           storeData({
-            userID: response.data.userID,
-            authToken: response.data.accessToken,
+            userID: response.userID,
+            authToken: response.accessToken,
           });
 
           router.push("/");
         }
       } catch (error: any) {
-        if (error.response) {
-          setError(error.response.data.msg);
+        if (error) {
+          setError(error);
           setShowError(true);
         } else {
           console.error("Error message:", error);
@@ -105,7 +104,15 @@ export default function LoginScreen() {
               >
                 Back to planning, back to progress.
               </Text>
-              <Text style={{ fontSize: 16, color: "#562CAF" }}>Let's go!</Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "#562CAF",
+                  fontFamily: "Rebond-Grotesque-Regular",
+                }}
+              >
+                Let's go!
+              </Text>
             </View>
             <View style={{ rowGap: 24, alignItems: "center" }}>
               <View style={{ rowGap: 16 }}>
@@ -118,9 +125,12 @@ export default function LoginScreen() {
                 <InputField
                   value={password}
                   onChangeText={setPassword}
-                  secureTextEntry={true}
+                  secureTextEntry={!passwordShown}
                   placeholder="Password"
                   icon={"lock-outline"}
+                  passwordIcon={passwordShown ? "eye-off" : "eye-outline"}
+                  setPasswordShown={setPasswordShown}
+                  passwordShown={passwordShown}
                 />
               </View>
               <TouchableHighlight

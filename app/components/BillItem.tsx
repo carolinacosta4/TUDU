@@ -68,7 +68,6 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
       )}
     </View>
   ) : (
-    <Link href={{ pathname: "/bill/[id]", params: { id: bill._id } }}>
       <View
         style={{
           flexDirection: "row",
@@ -94,7 +93,8 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
             <Icon name="circle-outline" size={25} color="#562CAF" />
           </TouchableWithoutFeedback>
         )}
-
+      <Link href={{ pathname: "/bill/[id]", params: { id: bill._id } }}>
+        <View style={{ width: '94%', flexDirection: "row", justifyContent: "space-between" }}>
         <Text
           style={{
             fontSize: 16,
@@ -105,9 +105,6 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
         >
           {bill.name}
         </Text>
-        <View
-          style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
-        >
           <Text
             style={{
               fontSize: 19.2,
@@ -117,11 +114,11 @@ const BillItem = ({ bill, changeStatus, type }: BillItemProps) => {
               textAlign: "right",
             }}
           >
-            {bill.amount}€
+            {bill.amount}{bill.IDcurrency.symbol}
           </Text>
         </View>
+        </Link>
       </View>
-    </Link>
   );
 };
 

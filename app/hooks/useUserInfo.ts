@@ -23,6 +23,7 @@ export function useUserInfo() {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem("user", jsonValue);
+      setLogged(true);
     } catch (e) {
       console.error(e);
     }
@@ -30,7 +31,7 @@ export function useUserInfo() {
 
   const logout = async () => {
     try {
-      await AsyncStorage.clear();
+      await AsyncStorage.removeItem("user");
       setUserInfo(undefined);
       setLogged(false);
     } catch (error) {

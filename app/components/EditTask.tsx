@@ -7,6 +7,7 @@ import {
   Dimensions,
   TextInput,
   Switch,
+  ScrollView
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -98,8 +99,8 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
 
   return (
     <>
-      <View style={{ rowGap: 24 }}>
-        <View style={{ rowGap: 8 }}>
+      <ScrollView>
+        <View style={{ rowGap: 8, marginVertical: 10 }}>
           <Text
             style={{
               fontSize: 16,
@@ -126,7 +127,7 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
           />
         </View>
 
-        <View style={{ rowGap: 8 }}>
+        <View style={{ rowGap: 8, marginVertical: 10 }}>
           <Text
             style={{
               fontSize: 16,
@@ -195,7 +196,7 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
           />
         </View>
 
-        <View style={{ rowGap: 16 }}>
+        <View style={{ rowGap: 16, marginVertical: 10 }}>
           <View style={{ rowGap: 8 }}>
             <Text
               style={{
@@ -407,7 +408,7 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
           </View>
         </View>
 
-        <View style={{ rowGap: 16 }}>
+        <View style={{ rowGap: 16, marginVertical: 10 }}>
           <View
             style={{
               flexDirection: "row",
@@ -487,6 +488,8 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
             borderRadius: 16,
             height: 48,
             justifyContent: "center",
+            marginVertical: 30,
+            paddingBottom: 20
           }}
           onPress={() => handleEditTask(editTaskItem)}
         >
@@ -502,7 +505,7 @@ export default function EditTask({ task, handleEdit }: EditTaskProps) {
             Done
           </Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </>
   );
 }

@@ -14,19 +14,24 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#61549F"
       },
-  "permissions": [
-    "VIBRATE",
-    "RECEIVE_BOOT_COMPLETED",
-    "FOREGROUND_SERVICE",
-    "NOTIFICATIONS"
-  ]
+    "permissions": [
+      "VIBRATE",
+      "RECEIVE_BOOT_COMPLETED",
+      "FOREGROUND_SERVICE",
+      "NOTIFICATIONS"
+    ]
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
+    },
+    "splash": {
+      "image": "./assets/images/adaptive-icon.png", 
+      "resizeMode": "contain",       
+      "backgroundColor": "#61549F"   
     },
     "plugins": [
       "expo-router",
