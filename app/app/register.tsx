@@ -38,7 +38,7 @@ export default function RegisterScreen() {
     if (name && email && password && confirmPassword) {
       setShowError(false);
       try {
-        addUser({ name, email, password, confirmPassword });
+        await addUser({ name, email, password, confirmPassword });
         const response = await loginUser(email, password);
 
         if (response.success) {
@@ -146,7 +146,7 @@ export default function RegisterScreen() {
                   secureTextEntry={passwordShown1}
                   placeholder="Password"
                   icon={"lock-outline"}
-                  passwordIcon={passwordShown1 ? "eye-off" : "eye-outline"}
+                  passwordIcon={passwordShown1 ? "eye-outline" : "eye-off"}
                   setPasswordShown={setPasswordShown1}
                   passwordShown={passwordShown1}
                 />
@@ -156,7 +156,7 @@ export default function RegisterScreen() {
                   placeholder="Confirm password"
                   secureTextEntry={passwordShown2}
                   icon={"lock-outline"}
-                  passwordIcon={passwordShown2 ? "eye-off" : "eye-outline"}
+                  passwordIcon={passwordShown2 ? "eye-outline" : "eye-off"}
                   setPasswordShown={setPasswordShown2}
                   passwordShown={passwordShown2}
                 />

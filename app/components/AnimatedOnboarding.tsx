@@ -1,14 +1,13 @@
 import LottieView from "lottie-react-native";
-import { View, Text, Dimensions } from "react-native";
+import { Dimensions } from "react-native";
 const { width, height } = Dimensions.get("window");
-import Animated, {FadeIn, FadeOut, ZoomIn, ZoomOut} from "react-native-reanimated";
+import Animated, { ZoomOut} from "react-native-reanimated";
 import React, { useRef } from "react";
 
 type AnimatedOnboardingType = {
-    url: string,
     type: number
 }
-const AnimatedOnboarding = ({url, type}: AnimatedOnboardingType) => {
+const AnimatedOnboarding = ({type}: AnimatedOnboardingType) => {
     const AnimatedLottie  = Animated.createAnimatedComponent(LottieView)
     const animation = useRef<LottieView>(null)
 
