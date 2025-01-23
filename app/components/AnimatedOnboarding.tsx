@@ -1,6 +1,5 @@
 import LottieView from "lottie-react-native";
 import { Dimensions } from "react-native";
-const { width, height } = Dimensions.get("window");
 import Animated, { ZoomOut} from "react-native-reanimated";
 import React, { useRef } from "react";
 
@@ -13,7 +12,7 @@ const AnimatedOnboarding = ({type}: AnimatedOnboardingType) => {
 
     return (
     type == 14 ? 
-    <Animated.View style={{ alignContent: 'center', height: 300, width: 300, alignItems: 'center', justifyContent: 'center', paddingTop: Dimensions.get("window").width *0.3}}>
+    <Animated.View style={{ alignContent: 'center', height: 300, width: 300, alignItems: 'center', justifyContent: 'center', paddingTop: Dimensions.get("window").width *0.2}}>
         <AnimatedLottie
             exiting={ZoomOut}
             ref={animation}
@@ -42,7 +41,7 @@ const AnimatedOnboarding = ({type}: AnimatedOnboardingType) => {
         />
     </Animated.View>
     : type == 16 && 
-    <Animated.View style={{ alignContent: 'center', height: 300, width: 300, alignItems: 'center', justifyContent: 'center', paddingTop: Dimensions.get("window").width *0.4, paddingRight: Dimensions.get("window").width *0.1}}>
+    <Animated.View style={{ alignContent: 'center', height: 300, width: 300, alignItems: 'center', justifyContent: 'center', paddingTop: Dimensions.get("window").width *0.3, paddingRight: Dimensions.get("window").width *0.1}}>
         <AnimatedLottie
             exiting={ZoomOut}
             ref={animation}

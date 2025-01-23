@@ -39,7 +39,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
   const [periodicity, setPeriodicity] = useState(bill.periodicity || "never");
   const [IDcurrency, setIDcurrency] = useState(bill.IDcurrency);
   const [notification, setNotification] = useState(bill.notification || false);
-  const [notes, setNotes] = useState(bill.notes || "Type here...");
+  const [notes, setNotes] = useState(bill.notes || "");
   
   const editBillItem = {
     name: name,
@@ -314,8 +314,6 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
                 }}
               >
                 {dueDate.toLocaleString("en-GB", {
-                  hour: "2-digit",
-                  minute: "2-digit",
                   year: "numeric",
                   month: "2-digit",
                   day: "2-digit",
@@ -445,6 +443,7 @@ export default function EditBill({ bill, handleEdit }: EditBillProps) {
                 color: "#474038",
               }}
               value={notes}
+              placeholder="Type here..."
               placeholderTextColor={"#C4BFB5"}
               onChangeText={setNotes}
             />

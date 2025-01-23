@@ -1,5 +1,5 @@
 import { Link, router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Image,
   View,
@@ -11,8 +11,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import InputField from "@/components/InputField";
 import useFonts from "@/hooks/useFonts";
 import { useUserInfo } from "@/hooks/useUserInfo";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import OnboardingScreen from "@/app/onboarding";
 import useUserStore from "@/stores/userStore";
 
 export default function RegisterScreen() {
@@ -143,10 +141,10 @@ export default function RegisterScreen() {
                 <InputField
                   value={password}
                   onChangeText={setPassword}
-                  secureTextEntry={passwordShown1}
+                  secureTextEntry={!passwordShown1}
                   placeholder="Password"
                   icon={"lock-outline"}
-                  passwordIcon={passwordShown1 ? "eye-outline" : "eye-off"}
+                  passwordIcon={passwordShown1 ? "eye-off" : "eye-outline"}
                   setPasswordShown={setPasswordShown1}
                   passwordShown={passwordShown1}
                 />
@@ -154,9 +152,9 @@ export default function RegisterScreen() {
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   placeholder="Confirm password"
-                  secureTextEntry={passwordShown2}
+                  secureTextEntry={!passwordShown2}
                   icon={"lock-outline"}
-                  passwordIcon={passwordShown2 ? "eye-outline" : "eye-off"}
+                  passwordIcon={passwordShown2 ? "eye-off" : "eye-outline"}
                   setPasswordShown={setPasswordShown2}
                   passwordShown={passwordShown2}
                 />
@@ -216,7 +214,6 @@ export default function RegisterScreen() {
             </View>
           </View>
         </ScrollView>
-        {/* {showOnboarding && <OnboardingScreen onClose={handleOnboardingClose} />} */}
       </SafeAreaView>
     </SafeAreaProvider>
   );

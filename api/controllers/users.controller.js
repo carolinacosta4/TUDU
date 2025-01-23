@@ -527,11 +527,6 @@ exports.unlockAchievement = async (req, res) => {
       });
     }
 
-    let unlocked = new UserAchievements({
-      IDuser: req.loggedUserId,
-      IDAchievements: idA
-    });
-
     const existingAchievement = await UserAchievements.findOne({
       IDuser: req.loggedUserId,
       IDAchievements: idA
@@ -543,6 +538,11 @@ exports.unlockAchievement = async (req, res) => {
         msg: "Achievement is already unlocked",
       });
     }
+
+    let unlocked = new UserAchievements({
+      IDuser: req.loggedUserId,
+      IDAchievements: idA
+    });
 
     const newUnlocked = await unlocked.save();
 
