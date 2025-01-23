@@ -161,6 +161,7 @@ const ModalAccount = ({
                 placeholderTextColor={"#C4BFB5"}
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
+                secureTextEntry={true}
               />
 
               <TextInput
@@ -177,6 +178,7 @@ const ModalAccount = ({
                 placeholderTextColor={"#C4BFB5"}
                 value={newPassword}
                 onChangeText={setNewPassword}
+                secureTextEntry={true}
               />
 
               <TextInput
@@ -193,6 +195,7 @@ const ModalAccount = ({
                 placeholderTextColor={"#C4BFB5"}
                 value={confirmNewPassword}
                 onChangeText={setConfirmNewPassword}
+                secureTextEntry={true}
               />
             </View>
           ) : (
