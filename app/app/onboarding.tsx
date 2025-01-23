@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, Pressable, Dimensions } from "react-native";
+import { Text, View, StyleSheet, Image, Pressable, Dimensions, TouchableOpacity } from "react-native";
 import { Stack } from "expo-router";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -200,6 +200,11 @@ export default function OnboardingScreen() {
     }
   };
 
+  const onSkip = async () => {
+    await AsyncStorage.setItem('IS_ONBOARDED', 'true');
+    router.push('/register');
+  };
+
   const onBack = () => {
     const isFirstScreen = screenIndex === 0
     if (isFirstScreen) {
@@ -240,6 +245,9 @@ export default function OnboardingScreen() {
     <GestureDetector gesture={swipes}>
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
+      {screenIndex != onboardingSteps.length - 1 && <TouchableOpacity onPress={onSkip} style={{position: 'absolute', top: Dimensions.get('window').height * 0.1, right: Dimensions.get('window').width * 0.1, zIndex: 1}}>
+        <Text style={{fontFamily: 'Rebond-Grotesque-Regular', fontSize: 16, color: '#291752', lineHeight: 20, textDecorationLine: 'underline'}}>Skip</Text>
+      </TouchableOpacity>}
         <View style={styles.containerOnboarding}>
           <Animated.View entering={FadeIn} exiting={FadeOut} key={screenIndex} style={styles.innerContainer}>
             <Animated.View style={styles.imageContainer}>
