@@ -11,6 +11,7 @@ import logoGreen from "@/assets/images/logo_green.png";
 import logoYellow from "@/assets/images/logo_yellow.png";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AnimatedOnboarding from '@/components/AnimatedOnboarding'
+import { useOnboarding } from "@/hooks/useOnboarding";
 const COLORS = {
   primary: '#562CAF',
   secondary: '#291752',
@@ -185,6 +186,7 @@ const onboardingSteps = [
 
 export default function OnboardingScreen() {
   const [screenIndex, setScreenIndex] = useState(0);
+  const {onFirstLaunchClosed} = useOnboarding();
   const data = onboardingSteps[screenIndex];
 
   const onContinue = () => {
@@ -241,7 +243,7 @@ export default function OnboardingScreen() {
         <View style={styles.containerOnboarding}>
           <Animated.View entering={FadeIn} exiting={FadeOut} key={screenIndex} style={styles.innerContainer}>
             <Animated.View style={styles.imageContainer}>
-              {data.animation ? <AnimatedOnboarding url={data.animation} type = {data.logo}/> : <Image source={{ uri: data.image }} style = {{width: data.widthImage, height: data.heightImage}}/>}
+              {data.animation ? <AnimatedOnboarding type = {data.logo}/> : <Image source={{ uri: data.image }} style = {{width: data.widthImage, height: data.heightImage}}/>}
             </Animated.View>
             <Animated.View  style={[styles.contentOnboarding, changeBackgroundColor]}   entering={screenIndex === 0 ? BounceInDown.delay(50) : undefined}>
               <View style={styles.logo}>
@@ -258,7 +260,7 @@ export default function OnboardingScreen() {
               </Animated.Text>
 
               <Pressable style={[styles.buttonContainer, data.buttonContainer]} onPress={onContinue}>
-                <Text style={[styles.buttonText, data.buttonText]}>{data.button}</Text>
+                {data.button == 'Create Account' ? <Text style={[styles.buttonText, data.buttonText]} onPress={onFirstLaunchClosed}>{data.button}</Text> : <Text style={[styles.buttonText, data.buttonText]}>{data.button}</Text>}
                 {data.icon && (
                   <Icon 
                     name={data.icon.name || 'chevron-right'}

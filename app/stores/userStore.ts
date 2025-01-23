@@ -2,6 +2,7 @@ import { create } from "zustand";
 import api from "@/api/api";
 import User from "../interfaces/User";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from 'expo-notifications';
 
 interface UserState {
   user: User | undefined;
@@ -10,6 +11,7 @@ interface UserState {
   addUser: (user: any) => Promise<void>;
   loginUser: (email: string, password: string) => Promise<any>;
   fetchStreak: (userID: string, authToken: string) => Promise<void>;
+  logout: () => void;
   updateUser: (
     id: string,
     updatedUser: any,
@@ -46,6 +48,7 @@ export const useUserStore = create<UserState>((set) => ({
     try {
       const response = await api.get(`users/${userID}`);
       set({ user: response.data });
+      return response.data
     } catch (error) {
       console.error(error);
     }
@@ -59,6 +62,7 @@ export const useUserStore = create<UserState>((set) => ({
   },
   loginUser: async (email, password) => {
     try {
+      set({ user: undefined, streak: { streak: 0, date: 0 } });
       const response = await api.post("users/login", {
         email: email,
         password: password,
@@ -159,6 +163,11 @@ export const useUserStore = create<UserState>((set) => ({
         },
       });
       await AsyncStorage.clear();
+      await Notifications.cancelAllScheduledNotificationsAsync();
+      set({
+        user: undefined,
+        streak: { streak: 0, date: 0 },
+      });
     } catch (error) {
       console.error(error);
     }
@@ -199,6 +208,10 @@ unlockAchievement: async (id, achievementId, authToken) => {
       throw error.response?.data?.msg;
     }
   },
+  logout: async () => {
+    set({ user: undefined });
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  }
 }));
 
 export default useUserStore;

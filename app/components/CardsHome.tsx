@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, ScrollView, Text, View, Platform } from "react-native";
+import { Dimensions, ScrollView, Text, View } from "react-native";
 import { Fragment } from "react";
 import BillItem from "@/components/BillItem";
 import TaskItem from "@/components/TaskItem";

@@ -34,6 +34,8 @@ export function useUser() {
   useEffect(() => {
     if (userInfo && !loading) {
       handleGetUser(userInfo.userID);
+    } else {
+      setUser(undefined);
     }
   }, [userInfo, loading]);
 

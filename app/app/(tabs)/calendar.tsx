@@ -183,7 +183,7 @@ const CalendarScreen = () => {
       ) : (
         <View style={styles.statsList}>
           {loadingTasksCalendar || loadingBillsCalendar ? <LoadingScreen type='calendar'/> :
-          calendarTasks.length > 0 ? (
+          calendarTasks.length > 0 || calendarBills.length > 0 ? (
             <ListHome
               allDayTasks={allDayTasks}
               groupedTasks={groupedStuff}
