@@ -29,8 +29,6 @@ export const analyseAchievement = (
   userInfo: any,
   unlockAchievement: any
 ) => {
-  const today = new Date();
-
   if (achievementName == "Debt-free hero") {
     let found = user.userAchievements.find(
       (a: any) => a.IDAchievements.name == achievementName
@@ -138,7 +136,6 @@ export const analyseAchievement = (
           unlockUltimateAchievement(userInfo, unlockAchievement, user);
           return;
         }
-        console.log("ta true");
       }
     }
   } else if (achievementName == "Clean Sweep") {
@@ -163,8 +160,6 @@ export const analyseAchievement = (
         return;
       }
     }
-  } else {
-    console.log("other achievement");
   }
 };
 

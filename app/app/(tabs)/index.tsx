@@ -26,6 +26,7 @@ import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
 import { analyseAchievement, analyseStreaksAchievement } from "@/utils/achievementUtils";
 import useUserStore from "@/stores/userStore";
+import { useOnboarding } from "@/hooks/useOnboarding";
 
 export default function HomeScreen() {
   const today = new Date();
@@ -47,6 +48,7 @@ export default function HomeScreen() {
   const [loaded, setLoaded] = useState(false);
   const [showList, setShowList] = useState(false);
   const {fetchStreak, streak, updateUserMascot, unlockAchievement, fetchUser, user} = useUserStore()
+  	const { showOnboarding } = useOnboarding();
 
   const getMascotStyle = (mascot: string) => {
     switch (mascot) {
@@ -73,12 +75,14 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    if (logged === false) {      
+    if (logged === false && showOnboarding === 'true') {      
       router.push("/onboarding");
+    }else if (logged === false && showOnboarding === 'false') {      
+      router.push("/register");
     }else if (logged === true && userInfo) {
       fetchUser(userInfo.userID)
     }
-  }, [logged]);
+  }, [logged, showOnboarding]);
 
   useEffect(() => {
     if (loading === false && logged === true && userInfo) {
@@ -138,7 +142,7 @@ export default function HomeScreen() {
 
   const scheduleTaskNotifications = async (tasks: Task[]) => {
     const now = new Date();
-
+    await Notifications.cancelAllScheduledNotificationsAsync();
     for (const task of tasks) {
       if (task.status == false && task.notification == true) {
         const dueDate = new Date(task.startDate);
@@ -170,9 +174,14 @@ export default function HomeScreen() {
     if ((tasks.length > 0 || bills.length > 0) && loaded == true) {
       checkAndUpdateMascots(tasks, bills);
       checkAndUpdateStreak(tasks, bills);
-      scheduleTaskNotifications(tasks);
     }
   }, [tasks, bills, loaded]);
+
+  useEffect(() => {
+    if (tasks.length > 0 && loaded == true) {
+      scheduleTaskNotifications(tasks);
+    }
+  }, [tasks, loaded]);
 
   useEffect(() => {
     if (user && userInfo && loaded) {
@@ -180,7 +189,7 @@ export default function HomeScreen() {
     }
   }, [user, userInfo, loaded]);
   
-  if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo || !user)
+  if (loading || !fontsLoaded || loadingTasks || !loaded || !userInfo || !user || user.data == null)
     return <LoadingScreen/>
 
   const ONE_SECOND_IN_MS = 1000;

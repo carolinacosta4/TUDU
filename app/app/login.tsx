@@ -12,6 +12,8 @@ import { useUserInfo } from "@/hooks/useUserInfo";
 import InputField from "@/components/InputField";
 import useFonts from "@/hooks/useFonts";
 import useUserStore from "@/stores/userStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useOnboarding } from "@/hooks/useOnboarding";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -22,11 +24,14 @@ export default function LoginScreen() {
   const { setUserInfo, storeData } = useUserInfo();
   const [passwordShown, setPasswordShown] = useState(false);
   const { loginUser } = useUserStore();
+  const { onFirstLaunchClosed } = useOnboarding();
 
   const handleLoginAccount = async () => {
     if (email && password) {
       setShowError(false);
       try {
+        setUserInfo(undefined);
+        await AsyncStorage.removeItem("user");
         const response = await loginUser(email, password);
 
         if (response.success) {
@@ -40,6 +45,7 @@ export default function LoginScreen() {
           });
 
           router.push("/");
+          onFirstLaunchClosed();
         }
       } catch (error: any) {
         if (error) {
