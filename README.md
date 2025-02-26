@@ -1,7 +1,7 @@
 ![Generic badge](https://img.shields.io/badge/status-completed-562CAF)
 
 <div align="center">
-<img src="https://res.cloudinary.com/ditdnslga/image/upload/v1737420406/fgb2jufn1gaggfasnk3s.png" width="20%">
+<img src="https://github.com/carolinacosta4/TUDU/blob/main/app/assets/images/logo_purple.png" width="20%">
 </div>
 
 <hr>
