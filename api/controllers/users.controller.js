@@ -182,7 +182,7 @@ exports.login = async (req, res) => {
       });
 
     const token = jwt.sign({ id: user._id }, config.SECRET, {
-      expiresIn: "48hr",
+      expiresIn: "20d",
     });
 
     return res.status(200).json({
